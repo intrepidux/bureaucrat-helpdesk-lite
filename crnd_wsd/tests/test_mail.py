@@ -1,7 +1,6 @@
 import logging
 from odoo.tools.misc import mute_logger
 from odoo.addons.generic_request.tests.common import disable_mail_auto_delete
-from odoo.addons.generic_mixin.tests.common import TEST_URL
 from .phantom_common import TestPhantomTour
 
 _logger = logging.getLogger(__name__)
@@ -17,7 +16,6 @@ class TestRequestPortalMail(TestPhantomTour):
         self.wsd_user = self.env.ref('crnd_wsd.user_demo_service_desk_website')
         self.request_demo_user = self.env.ref(
             'generic_request.user_demo_request')
-        self.base_url = TEST_URL
 
     @mute_logger('odoo.addons.mail.models.mail_mail',
                  'requests.packages.urllib3.connectionpool',
@@ -48,7 +46,8 @@ class TestRequestPortalMail(TestPhantomTour):
         self.authenticate(self.wsd_user.login, 'demo-sd-website')
         res = self.url_open('/mail/view/request/%s' % request.id)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.url, '%s%s' % (self.base_url, request.access_url))
+        self.assertEqual(
+            res.url, '%s%s' % (self.base_url(), request.access_url))
 
     @mute_logger('odoo.addons.mail.models.mail_mail',
                  'requests.packages.urllib3.connectionpool',
@@ -82,7 +81,8 @@ class TestRequestPortalMail(TestPhantomTour):
         self.authenticate('portal', 'portal')
         res = self.url_open('/mail/view/request/%s' % request.id)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.url, '%s%s' % (self.base_url, request.access_url))
+        self.assertEqual(
+            res.url, '%s%s' % (self.base_url(), request.access_url))
 
     @mute_logger('odoo.addons.mail.models.mail_mail')
     def test_assign_portal_no_logged_in(self):

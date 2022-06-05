@@ -1,3 +1,4 @@
+# flake8: noqa: E501
 {
     'name': "Generic Request",
 
@@ -10,7 +11,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'category': 'Generic Request',
-    'version': '14.0.1.161.0',
+    'version': '15.0.1.161.0',
     'external_dependencies': {
         'python': [
             'html2text',
@@ -46,7 +47,6 @@
         'data/request_timesheet_activity.xml',
         'data/request_channel.xml',
 
-        'views/templates.xml',
         'views/request_views.xml',
         'views/res_config_settings_view.xml',
         'views/request_category_view.xml',
@@ -72,8 +72,6 @@
         'wizard/request_wizard_stop_work.xml',
         'wizard/request_wizard_set_parent.xml',
 
-        'templates/templates.xml',
-
         'reports/request_timesheet_report.xml',
         'reports/request_graph_reports.xml',
     ],
@@ -92,6 +90,22 @@
         'demo/request_creation_template.xml',
         'demo/demo_request_timesheet_activity.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'generic_request/static/src/scss/request_kanban_tags.scss',
+            'generic_request/static/src/scss/request_timesheet.scss',
+            'generic_request/static/src/scss/request_form.scss',
+            'generic_request/static/src/scss/request_kanban.scss',
+            'generic_request/static/src/scss/request_dashboard_kanban.scss',
+
+            'generic_request/static/src/js/field_request_html.js',
+            'generic_request/static/src/js/request_tag_widget.js',
+
+            'generic_request/static/src/js/stage_route_out/form_controller.js',
+            'generic_request/static/src/js/stage_route_out/form_renderer.js',
+            'generic_request/static/src/js/stage_route_out/stage_route_out_widget.js',
+        ],
+    },
 
     'images': ['static/description/banner.gif'],
     'installable': True,

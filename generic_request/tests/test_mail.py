@@ -2,8 +2,8 @@ import logging
 from odoo.tests import HttpCase
 from odoo.tools.misc import mute_logger
 from odoo.addons.generic_mixin.tests.common import (
-    TEST_URL,
     AccessRulesFixMixinMT,
+    deactivate_records_for_model,
 )
 from .common import disable_mail_auto_delete
 
@@ -17,13 +17,15 @@ class TestRequestMailNotificationLinks(AccessRulesFixMixinMT, HttpCase):
 
         self.request_demo_user = self.env.ref(
             'generic_request.user_demo_request')
-        self.base_url = TEST_URL
         self.user_root = self.env.ref('base.user_root')
 
         # Subscribe demo user to printer request
         self.env.ref(
             'generic_request.request_type_sequence'
         ).message_subscribe(self.request_demo_user.partner_id.ids)
+
+        # Disable assets from uninstalled modules
+        deactivate_records_for_model(self.env, 'ir.asset')
 
     def flush_tracking(self):
         """ Force the creation of tracking values. """
@@ -63,9 +65,9 @@ class TestRequestMailNotificationLinks(AccessRulesFixMixinMT, HttpCase):
             # Hide errors about missing menus
             res = self.url_open('/mail/view/request/%s' % request.id)
         self.assertEqual(res.status_code, 200)
-        self.assertNotRegex(res.url, r'^%s/web/login.*$' % self.base_url)
+        self.assertNotRegex(res.url, r'^%s/web/login.*$' % self.base_url())
         self.assertRegex(
-            res.url, r'^%s/web#.*id=%s.*$' % (self.base_url, request.id))
+            res.url, r'^%s/web#.*id=%s.*$' % (self.base_url(), request.id))
 
     @mute_logger('odoo.addons.mail.models.mail_mail',
                  'requests.packages.urllib3.connectionpool',
@@ -115,6 +117,6 @@ class TestRequestMailNotificationLinks(AccessRulesFixMixinMT, HttpCase):
             # Hide errors about missing menus
             res = self.url_open('/mail/view/request/%s' % request.id)
         self.assertEqual(res.status_code, 200)
-        self.assertNotRegex(res.url, r'^%s/web/login.*$' % self.base_url)
+        self.assertNotRegex(res.url, r'^%s/web/login.*$' % self.base_url())
         self.assertRegex(
-            res.url, r'^%s/web#.*id=%s.*$' % (self.base_url, request.id))
+            res.url, r'^%s/web#.*id=%s.*$' % (self.base_url(), request.id))

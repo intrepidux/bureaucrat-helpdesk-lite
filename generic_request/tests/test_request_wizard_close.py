@@ -1,8 +1,8 @@
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 from odoo.addons.generic_mixin.tests.common import ReduceLoggingMixin
 
 
-class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
+class TestRequestReopenAs(ReduceLoggingMixin, TransactionCase):
 
     @classmethod
     def setUpClass(cls):

@@ -527,18 +527,11 @@
                       bgcolor="gray:closed"
                       bg_color_field="res_bg_color"
                       fg_color_field="res_label_color">
-                    <field name="name"/>
-                    <field name="closed"/>
-                    <field name="res_bg_color"/>
-                    <field name="res_label_color"/>
                 </node>
                 <arrow object="request.stage.route"
                        source="stage_from_id"
                        destination="stage_to_id"
                        label="['name']">
-                    <field name="stage_from_id"/>
-                    <field name="stage_to_id"/>
-                    <field name="name"/>
                 </arrow>
             </diagram_plus>
         </field>
