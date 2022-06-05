@@ -42,7 +42,8 @@
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_default_text.js"></script>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_public_user.js"></script>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_public_user_redirect.js"></script>
-            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_public_user_create_req.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_public_user_create_req_to_congrat_page.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_public_user_create_req_to_req_page.js"></script>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_filter_kind.js"></script>
 
         </xpath>

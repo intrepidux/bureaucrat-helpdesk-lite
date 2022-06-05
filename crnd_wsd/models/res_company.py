@@ -11,6 +11,13 @@ class ResCompany(models.Model):
             ('create-request', 'Allow to create request'),
         ],
         default='redirect')
+    request_wsd_public_use_author_phone = fields.Selection(
+        selection=[
+            ('no-phone', 'No Phone'),
+            ('optional-phone', 'Optional Phone'),
+            ('required-phone', 'Required Phone'),
+        ],
+        default='no-phone')
     request_limit_max_text_size = fields.Integer(default=0)
 
     request_allowed_upload_file_types = fields.Char()
@@ -41,4 +48,8 @@ class ResCompany(models.Model):
             })
 
     def _get_allowed_upload_file_types(self):
-        return self.request_allowed_upload_file_types.split(',')
+        if not self.request_allowed_upload_file_types:
+            return []
+        return [
+            p.strip()
+            for p in self.request_allowed_upload_file_types.split(',')]

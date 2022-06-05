@@ -1,5 +1,75 @@
 # Changelog
 
+## Version 1.156.0
+
+Added ability to search requests by following fields:
+- author_id.phone
+- author_id.mobile
+- author_id.name
+- partner_id.phone
+- partner_id.mobile
+- partner_id.name
+
+
+## Version 1.153.0
+
+Merge the generic_request_parent as module into the generic_request module
+
+
+## Version 1.152.0
+
+Merge the generic_request_reopen_as module into the generic_request module
+
+
+## Version 1.151.0
+
+Added ability to specify access groups for request category and request type.
+Previously this functionality was available only in crnd_wsd module, but now
+it will be available in the core module.
+
+
+## Version 1.148.0
+
+Changed status view in requests.
+Now there is only the current status of request.
+
+
+## Version 1.146.0
+
+Added option in configuration to show/hide searchpanel on requests view
+
+
+## Version 1.145.0
+
+Changed 'Automatically create contacts for requests' option in the requests settings:
+- now it allows to autocreate contact (if not exist) only for author of incoming message
+ 
+Added options in the requests settings:
+- availability to autocreate new contact (if not exist), mentioned in the CC header of incoming mail
+- automatically subscribing the contacts, mentioned in the CC header on incoming mail
+
+
+## Version 1.142.0
+
+Refactored the UI for changing stages of request and closing request.
+Now, instead of changing request stage via statusbar widget in right-top corner of the form,
+there will be buttons present in view (left-top corner of ther form) that will be used to move request via route.
+Also, the names of that buttons (and their styles) could be configured on route level.
+And when the route is closing route, then automatically will be show closing wizard with pre-selected route.
+This way, it have to be more user-friendly.
+
+
+## Version 1.138.0
+
+Added configuration option, that allows to select preferred view for requests: list or kanban.
+Currently this works only for standard menu *Requests*
+
+
+## Version 1.137.0
+
+Added *searchpanel* to requests, thus now it is possible to easily filter requests by category, type, service, tags and stage type.
+
+
 ## Version 1.131.0
 
 - Do not allow to create requests from emails that come from email addresses that are aliases (managed by odoo).

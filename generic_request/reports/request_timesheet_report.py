@@ -42,22 +42,24 @@ class RequestTimesheetReport(models.Model):
     def init(self):
         # pylint: disable=sql-injection
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute("""
-            CREATE or REPLACE VIEW %(view_name)s as (
-            SELECT
-                rtr.id,
-                rtr.date,
-                rtr.date_start,
-                rtr.date_end,
-                rtr.user_id,
-                rtr.activity_id,
-                rtr.amount,
-                %(request_fields)s
-            FROM request_timesheet_line AS rtr
-            LEFT JOIN request_request AS rr ON rr.id = rtr.request_id
-        )""" % {  # nosec
-            'view_name': self._table,
-            'request_fields': ", ".join((
-                "rr.%s AS %s" % r for r in self._get_request_fields()
-            )),
-        })
+        # nosec
+        self.env.cr.execute(  # nosec
+            """
+                CREATE or REPLACE VIEW %(view_name)s as (
+                SELECT
+                    rtr.id,
+                    rtr.date,
+                    rtr.date_start,
+                    rtr.date_end,
+                    rtr.user_id,
+                    rtr.activity_id,
+                    rtr.amount,
+                    %(request_fields)s
+                FROM request_timesheet_line AS rtr
+                LEFT JOIN request_request AS rr ON rr.id = rtr.request_id
+            )""" % {
+                'view_name': self._table,
+                'request_fields': ", ".join((
+                    "rr.%s AS %s" % r for r in self._get_request_fields()
+                )),
+            })

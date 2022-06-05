@@ -50,6 +50,40 @@ class TestRequestPortalMail(TestPhantomTour):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.url, '%s%s' % (self.base_url, request.access_url))
 
+    @mute_logger('odoo.addons.mail.models.mail_mail',
+                 'requests.packages.urllib3.connectionpool',
+                 'odoo.models.unlink')
+    def test_chatter_msg_has_link_for_portal_users(self):
+        request = self.env['request.request'].with_context(
+            mail_create_nolog=True,
+            mail_notrack=True,
+        ).create({
+            'type_id': self.env.ref('generic_request.request_type_simple').id,
+            'request_text': 'Test',
+        })
+        request.message_subscribe(
+            partner_ids=[self.env.ref('base.partner_demo_portal').id])
+
+        with disable_mail_auto_delete(self.env):
+            request.message_post(
+                body="Test Message",
+                subject="Test Subject",
+                message_type='comment',
+                subtype_id=self.env.ref('mail.mt_comment').id,
+            )
+
+        test_messages = self.env['mail.mail'].search([
+            ('model', '=', 'request.request'),
+            ('res_id', '=', request.id),
+            ('subject', '=', 'Test Subject'),
+        ])
+        self.assertEqual(len(test_messages), 1)
+
+        self.authenticate('portal', 'portal')
+        res = self.url_open('/mail/view/request/%s' % request.id)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.url, '%s%s' % (self.base_url, request.access_url))
+
     @mute_logger('odoo.addons.mail.models.mail_mail')
     def test_assign_portal_no_logged_in(self):
         request = self.env['request.request'].with_context(

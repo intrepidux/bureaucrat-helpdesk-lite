@@ -1,16 +1,21 @@
+# WARNING: This file is generated automatically! Do not edit it manually!
+#          This file will be regenerated on next update
+
 addons-list:
-    - generic_request
-    - crnd_service_desk
-    - crnd_wsd
-    - bureaucrat_helpdesk_lite
+    - name: bureaucrat_helpdesk_lite
+    - name: crnd_service_desk
+    - name: crnd_wsd
+    - name: generic_request
+
 git-sources:
     - crnd: crnd/bureaucrat-generics
-    - crnd: crnd/bureaucrat-service
-    - crnd: crnd/bureaucrat-bundles
+      name: bureaucrat_generics_98
+
+
 known-addons:
-    - generic_mixin
-    - crnd_web_diagram_plus
     - crnd_web_list_popover_widget
-    - generic_tag
     - crnd_web_tree_colored_field
+    - crnd_web_diagram_plus
+    - generic_mixin
+    - generic_tag
     - crnd_web_m2o_info_widget

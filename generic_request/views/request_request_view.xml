@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="action_request_wizard_close" model="ir.actions.act_window">
-        <field name="name">Close</field>
-        <field name="res_model">request.wizard.close</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{'default_request_id': active_id, 'name_only': True}</field>
-    </record>
     <record model="ir.ui.view" id="view_request_request_form">
         <field name="model">request.request</field>
         <field name="arch" type="xml">
@@ -22,21 +15,23 @@
                 <field name="can_change_author" invisible="1"/>
                 <field name="can_change_category" invisible="1"/>
                 <field name="can_change_deadline" invisible="1"/>
-                <field name="next_stage_ids" invisible="1"/>
                 <header>
-                    <button name="%(action_request_wizard_close)d"
-                            type="action" string="Close"
-                            attrs="{'invisible': ['|',( 'can_be_closed', '=', False), ('id', '=', False)]}"
-                            class="oe_highlight"/>
+                    <div class="stage_route_out_widget">
+                        <field name="stage_route_out_json" widget="stage_route_out_widget"/>
+                    </div>
                     <field name="stage_id" widget="statusbar"
-                           options="{'clickable': true}"
-                           clickable="True"
                            required="0"
-                           attrs="{'invisible' : [('id', '=', False)]}"
-                           domain="[('id', 'in', next_stage_ids)]"/>
+                           attrs="{'readonly': True}"
+                           domain="[('id', '=', stage_id)]"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_button_show_subrequests"
+                                type="object"
+                                class="oe_stat_button" icon="fa-sitemap">
+                            <field string="Subrequests" name="child_count"
+                                   widget="statinfo"/>
+                        </button>
                     </div>
                     <div name="title" class="oe_title request_title">
                         <div style=" display: flex; align-items: center;">
@@ -68,6 +63,11 @@
                             </div>
                         </div>
                         <h2 name="header_name">
+                            <span attrs="{'invisible': [('parent_id', '=', False)]}">
+                                <field name="parent_id"
+                                       placeholder="Parent..."/>
+                                <span class="ml4 mr4">/</span>
+                            </span>
                             <field name="name"/>
                             <field name="kanban_state"
                                    widget="state_selection"
@@ -137,13 +137,13 @@
                                             type="object"
                                             icon="fa-play"
                                             title="Start"
-                                            class="btn-xs btn-success ml4"
+                                            class="btn-sm btn-success ml4"
                                             attrs="{'invisible': [('timesheet_start_status', '=', 'started')]}"/>
                                     <button name="action_stop_work"
                                             type="object"
                                             icon="fa-stop"
                                             title="Stop"
-                                            class="btn-xs btn-warning ml4"
+                                            class="btn-sm btn-warning ml4"
                                             attrs="{'invisible': [('timesheet_start_status', '=', 'not-started')]}"/>
                                 </span>
                             </div>
@@ -197,7 +197,7 @@
                                                placeholder="Author..."
                                                attrs="{'readonly': [('can_change_author', '=', False)]}"
                                                widget="m2o_info"
-                                               options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/>
+                                               options="{'info_method': 'request_helper_m2o_info'}"/>
                                         <span name="span_request_author_stat">
                                             <button name="action_show_related_author_requests_opened"
                                                     type="object"
@@ -224,6 +224,8 @@
                                     </div>
                                     <field name="author_name"
                                            attrs="{'invisible': ['|', ('author_id', '!=', False), ('author_name', '=', False)]}"/>
+                                    <field name="author_phone"
+                                           attrs="{'invisible': ['|', ('author_id', '!=', False), ('author_phone', '=', False)]}"/>
                                 </group>
                                 <group name="group_partner" class="mb0 mt0">
                                     <label for="partner_id"/>
@@ -231,7 +233,7 @@
                                         <field name="partner_id"
                                                placeholder="Related partner..."
                                                widget="m2o_info"
-                                               options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/>
+                                               options="{'info_method': 'request_helper_m2o_info'}"/>
                                         <span name="span_request_partner_stat">
                                             <button name="action_show_related_partner_requests_opened"
                                                     type="object"
@@ -368,7 +370,8 @@
                              name="request_footer__creator">
                             <div><label for="date_created" string="Created"/></div>
                             <div>
-                                <i class="fa fa-calendar mr4"/>
+                                <i title="Date Created"
+                                   class="fa fa-calendar mr4"/>
                                 <field name="date_created"/>
                             </div>
                             <div>
@@ -376,7 +379,8 @@
                                    title="Created by user"/>
                                 <field name="created_by_id"
                                        widget="m2o_info"
-                                       options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/>
+                                       class="d-inline-block"
+                                       options="{'info_method': 'request_helper_m2o_info'}"/>
                             </div>
                         </div>
                         <div class="col-md-3"
@@ -384,7 +388,8 @@
                              attrs="{'invisible': [('date_moved', '=', False)]}">
                             <div><label for="date_moved" string="Moved"/></div>
                             <div>
-                                <i class="fa fa-calendar mr4"/>
+                                <i title="Date Created"
+                                   class="fa fa-calendar mr4"/>
                                 <field name="date_moved"/>
                             </div>
                             <div>
@@ -392,7 +397,8 @@
                                    title="Moved by user"/>
                                 <field name="moved_by_id"
                                        widget="m2o_info"
-                                       options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/></div>
+                                       class="d-inline-block"
+                                       options="{'info_method': 'request_helper_m2o_info'}"/></div>
                         </div>
                         <div class="col-md-3"
                              name="request_footer__assigned">
@@ -437,7 +443,8 @@
                                         style="padding: 0px 0px;"/>
                             </div>
                             <div>
-                                <i class="fa fa-calendar mr4" attrs="{'invisible': [('date_assigned', '=', False)]}"/>
+                                <i title="Date Assigned"
+                                   class="fa fa-calendar mr4" attrs="{'invisible': [('date_assigned', '=', False)]}"/>
                                 <field name="date_assigned"/>
                             </div>
                             <div attrs="{'invisible': [('user_id', '=', False)]}">
@@ -446,7 +453,8 @@
                                  <field name="user_id"
                                         readonly="1"
                                         widget="m2o_info"
-                                        options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/>
+                                        class="d-inline-block"
+                                        options="{'info_method': 'request_helper_m2o_info'}"/>
                             </div>
                         </div>
                         <div class="col-md-3"
@@ -454,7 +462,8 @@
                              attrs="{'invisible': [('date_closed', '=', False)]}">
                             <div><label for="date_closed" string="Closed"/></div>
                             <div>
-                                <i class="fa fa-calendar mr4"/>
+                                <i title="Date Closed"
+                                   class="fa fa-calendar mr4"/>
                                 <field name="date_closed"/>
                             </div>
                             <div>
@@ -462,7 +471,8 @@
                                    title="Closed by user"/>
                                 <field name="closed_by_id"
                                        widget="m2o_info"
-                                       options="{'info_fields': ['name', 'commercial_company_name', 'website', 'email', 'phone', 'mobile']}"/>
+                                       class="d-inline-block"
+                                       options="{'info_method': 'request_helper_m2o_info'}"/>
                             </div>
                         </div>
                     </div>
@@ -487,6 +497,7 @@
                 <field name="name"/>
                 <field name="type_id"/>
                 <field name="category_id"/>
+                <field name="parent_id"/>
                 <field name="author_id"/>
                 <field name="user_id"/>
                 <field name="request_text_sample" string="Description"
@@ -553,6 +564,8 @@
                 <field name="deadline_date"/>
                 <field name="deadline_state"/>
                 <field name="kanban_state"/>
+                <field name="parent_id"></field>
+                <field name="child_count"></field>
 
                 <field name="message_follower_ids"/>
                 <field name="message_discussion_ids"/>
@@ -567,6 +580,15 @@
                                  name="header"
                                  class="o_request_kanban_header">
                                 <div name="title_box" class="o_header_title_box">
+                                    <div t-if="record.parent_id.value"
+                                         class="o_header_box_item">
+                                        <a type="object"
+                                           name="action_open_parent">
+                                            <span><field
+                                                    name="parent_id"/><span>
+                                                / </span></span>
+                                        </a>
+                                    </div>
                                     <div name="title" class="o_header_title o_header_box_item">
                                         <span><field name="name"/></span>
                                     </div>
@@ -605,6 +627,12 @@
                                     <span t-if="record.message_follower_ids.raw_value" class="icon">
                                         <span title='Followers' class='fa fa-users mr4'></span>
                                         <t t-esc="record.message_follower_ids.raw_value.length"/>
+                                    </span>
+                                    <span t-if="record.child_count.raw_value"
+                                          class="icon">
+                                        <span title='Subrequests'
+                                              class='fa fa-sitemap mr4'></span>
+                                        <t t-esc="record.child_count.raw_value"/>
                                     </span>
                                 </div>
                                 <div name="right_info" class="o_header_right_info">
@@ -756,9 +784,18 @@
         <field name="arch" type="xml">
             <search>
                 <field name="display_name" string=""
-                       filter_domain="['|', ('name', 'ilike', self), ('request_text', 'ilike', self)]"/>
+                       filter_domain="['|', '|', '|', '|', '|', '|', '|',
+                       ('name', 'ilike', self),
+                       ('request_text', 'ilike', self),
+                       ('author_id.phone', 'ilike', self),
+                       ('author_id.mobile', 'ilike', self),
+                       ('author_id.name', 'ilike', self),
+                       ('partner_id.phone', 'ilike', self),
+                       ('partner_id.mobile', 'ilike', self),
+                       ('partner_id.name', 'ilike', self)]"/>
                 <field name="name"/>
                 <field name="type_id"/>
+                <field name="parent_id"/>
                 <field name="kind_id"/>
                 <field name="category_id"/>
                 <field name="stage_type_id"/>
@@ -770,6 +807,8 @@
                 <field name="tag_ids"/>
                 <field name="search_tag_id"/>
                 <field name="search_no_tag_id"/>
+                <field name="message_ids"
+                       filter_domain="['|', ('message_ids.body', 'ilike', self), ('message_ids.subject', 'ilike', self)]"/>
 
                 <filter name="filter_archived"
                         string="Archived"
@@ -818,6 +857,16 @@
                 <filter string="Unread Messages"
                         name="message_needaction"
                         domain="[('message_needaction','=',True)]"/>
+                <separator/>
+                <filter string="Is Subrequest"
+                        name="is_subrequest"
+                        domain="[('parent_id', '!=', False)]"/>
+                <filter string="Not Subrequest"
+                        name="not_subrequest"
+                        domain="[('parent_id', '=', False)]"/>
+                <filter string="Has Subrequests"
+                        name="has_subrequest"
+                        domain="[('child_ids', '!=', False)]"/>
 
                 <group name="group_group_by" expand="0" string="Group by...">
                     <filter name="filter_group_by_creation_date"
@@ -884,6 +933,24 @@
         <field name="name">Request Count</field>
         <field name="res_model">request.request</field>
         <field name="view_mode">kanban,tree,graph,pivot,form,activity</field>
+    </record>
+
+    <record model="ir.ui.view" id="view_request_request_searchpanel">
+        <field name="model">request.request</field>
+        <field name="inherit_id" ref="view_request_request_search"/>
+        <field name="groups_id"
+               eval="[(4, ref('group_request_show_searchpanel_view'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="/search/group" position="before">
+                <searchpanel>
+                    <field name="category_id" string="Category"/>
+                    <field name="type_id" string="Type"/>
+                    <field name="stage_type_id" string="Stage Type"/>
+                    <field name="tag_ids" string="Tags" select="multi"
+                           domain="[('model_id.model', '=', 'request.request')]"/>
+                </searchpanel>
+            </xpath>
+        </field>
     </record>
 
     <menuitem id="menu_request_type_view"
