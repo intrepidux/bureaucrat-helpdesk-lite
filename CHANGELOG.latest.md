@@ -1,10 +1,6 @@
 # Changelog
 
-## Release (2022-Jun-05 16:08:40)
-
-### Added addons:
-
-- web_view_searchpanel (12.0.1.0.2)
+## Release (2022-Jun-05 16:10:13)
 
 ### Updated addons:
 

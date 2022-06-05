@@ -6,4 +6,3 @@
 | crnd_service_desk | Service Desk | LGPL-3 | 12.0.1.4.0 |          Process addon for the Website Service Desk application.      |  |
 | crnd_wsd | Website Service Desk | LGPL-3 | 12.0.1.89.0 | Website UI for Service Desk |  |
 | generic_request | Generic Request | LGPL-3 | 12.0.1.161.0 |          Incident management and helpdesk system - logging, recording,         tracking, addressing, handling and archiving         issues that occur in daily routine.      |  |
-| web_view_searchpanel | Search Panel | LGPL-3 | 12.0.1.0.2 | Kanban Search Panel |  |
