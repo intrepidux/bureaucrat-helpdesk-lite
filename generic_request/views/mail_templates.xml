@@ -9,6 +9,14 @@
                     <th style="border-bottom: 1px solid #ccc; text-align: left;">Name</th>
                     <td style="border-bottom: 1px solid #ccc;"><a t-att-href="object.get_mail_url()" target="_blank" t-esc="object.name"/></td>
                 </tr>
+                <tr style="vertical-align: top" t-if="object.parent_id">
+                    <th style="border-bottom: 1px solid #ccc; text-align: left;">
+                        Parent Request</th>
+                    <td style="border-bottom: 1px solid #ccc;"><a
+                            t-att-href="object.parent_id.get_mail_url()"
+                            target="_blank"
+                            t-esc="object.parent_id.name"/></td>
+                </tr>
                 <tr name="tr_request_stage" style="vertical-align: top">
                     <th style="border-bottom: 1px solid #ccc; text-align: left;">Stage</th>
                     <td style="border-bottom: 1px solid #ccc;"><span t-esc="object.stage_id.display_name"/></td>

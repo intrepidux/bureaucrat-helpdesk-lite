@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="wsd_request_body" name="Request body">
+        <div t-if="show_congrats_msg" class="row">
+            <div class="col-12">
+                <div class="alert alert-success alert-dismissible show" align="center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span>X</span>
+                    </button>
+                    <t t-if="req.type_id.website_custom_congratulation_note and req.type_id.website_custom_congratulation_note != '&lt;p&gt;&lt;br&gt;&lt;/p&gt;'">
+                        <div t-field="req.type_id.website_custom_congratulation_note">
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <h3 class="alert-heading">Your request has been submitted.</h3>
+                        <p>It will be reviewed soon.</p>
+                    </t>
+                </div>
+            </div>
+        </div>
         <div class="row mb24">
             <div class="col-md-12">
                 <div class="card">
@@ -23,6 +40,13 @@
 
                             </span>
                             <span class="col-md-6">
+                                <span id="request-top-head-view-internal"
+                                      groups="generic_request.group_request_user"
+                                      class="pull-right">
+                                <a t-att-href="'/web#model=%s&amp;id=%s&amp;action=%s&amp;view_type=form' % ('request.request', req.id, 'generic_request.action_request_window')"
+                                   title="View in internal"
+                                   class="ml-3 fa fa-external-link"/>
+                                </span>
                                 <span class="badge pull-right"
                                       title="Current stage"
                                       id="request-top-head-stage"
@@ -82,7 +106,7 @@
                                 <t t-foreach="action_routes" t-as="req_act">
                                     <div class="text-right">
                                         <a href="#"
-                                           t-attf-class="request-action btn btn-sm btn-{{ req_act.website_button_style }}"
+                                           t-attf-class="request-action btn btn-sm btn-{{ req_act.button_style }}"
                                            t-att-title="req_act.name or req_act.display_name"
                                            t-att-data-action-id="req_act.id"
                                            t-att-data-require-response="req_act.close and req_act.require_response"

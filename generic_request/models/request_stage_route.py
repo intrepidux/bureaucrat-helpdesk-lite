@@ -1,6 +1,4 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import (ValidationError,
-                             AccessError)
+from odoo import models, fields, api, exceptions, _
 
 
 class RequestStageRoute(models.Model):
@@ -38,6 +36,23 @@ class RequestStageRoute(models.Model):
         help="If set, then user will be asked for comment on this route")
     default_response_text = fields.Html(translate=True)
 
+    button_style = fields.Selection([
+        ('default', 'Default'),
+        ('primary', 'Primary'),
+        ('secondary', 'Secondary'),
+        ('success', 'Success'),
+        ('danger', 'Danger'),
+        ('warning', 'Warning'),
+        ('info', 'Info'),
+        ('light', 'Light'),
+        ('dark', 'Dark'),
+        ('link', 'Link'),
+    ], default='default', help='Buttons style')
+
+    reopen_as_type_ids = fields.Many2many(
+        'request.type', 'request_type_request_stage_route_rel',
+        string='Reopen request type')
+
     _sql_constraints = [
         ('stage_stage_from_to_type_uniq',
          'UNIQUE (request_type_id, stage_from_id, stage_to_id)',
@@ -73,7 +88,7 @@ class RequestStageRoute(models.Model):
             self.allowed_group_ids and
             not self.allowed_group_ids & self.env.user.groups_id)
         if not_allowed_by_user or not_allowed_by_group:
-            raise AccessError(
+            raise exceptions.AccessError(
                 _(
                     "This stage change '%(route)s' restricted by "
                     "access rights.\n"
@@ -102,7 +117,7 @@ class RequestStageRoute(models.Model):
         if not route:
             RequestStage = self.env['request.stage']
             stage = RequestStage.browse(to_stage_id) if to_stage_id else None
-            raise ValidationError(_(
+            raise exceptions.ValidationError(_(
                 "Cannot move request to this stage: no route.\n"
                 "\tRequest: %(request)s\n"
                 "\tTo stage id: %(to_stage_id)s\n"

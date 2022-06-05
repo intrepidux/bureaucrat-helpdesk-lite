@@ -155,6 +155,38 @@
                                     <field name="request_active" colspan="4"/>
                                 </group>
                         </group>
+                        <group name="group_event_data_subrequest"
+                               attrs="{'invisible': [('event_code', 'not in', ('subrequest-stage-changed', 'subrequest-closed'))]}"
+                               colspan="4">
+                            <group>
+                                <field name="subrequest_id"/>
+                            </group>
+                            <group>
+                                <field name="subrequest_old_stage_id"/>
+                                <field name="subrequest_new_stage_id"/>
+                            </group>
+                        </group>
+                        <group name="group_event_data_parent_request"
+                               attrs="{'invisible': [('event_code', 'not in', ('parent-request-stage-changed', 'parent-request-closed'))]}"
+                               colspan="4">
+                            <group>
+                                <field name="parent_old_stage_id"/>
+                                <field name="parent_new_stage_id"/>
+                            </group>
+                            <group>
+                                <field name="parent_route_id"/>
+                            </group>
+                        </group>
+                        <group name="group_event_data_parent_request_changed"
+                               attrs="{'invisible': [('event_code', 'not in', ('parent-request-changed'))]}"
+                               colspan="4">
+                            <group>
+                                <field name="parent_old_id"/>
+                                <field name="parent_new_id"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
                     </group>
                 </sheet>
             </form>

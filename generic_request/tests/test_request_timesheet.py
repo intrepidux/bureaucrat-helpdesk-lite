@@ -54,7 +54,7 @@ class TestWizardLogTime(RequestCase):
         with freeze_time("2020-01-14 05:00:00"):
             action = request.action_stop_work()
             wizard = self.env[action['res_model']].with_context(
-                action['context']
+                **action['context']
             ).create({
                 'activity_id': self.activity_id_2.id,
             })
@@ -118,7 +118,7 @@ class TestWizardLogTime(RequestCase):
             action = request2.action_start_work()
             self.assertEqual(action['res_model'], 'request.wizard.stop.work')
             wizard = self.env[action['res_model']].with_context(
-                action['context']
+                **action['context']
             ).create({
                 'activity_id': self.activity_id_2.id,
             })

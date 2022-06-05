@@ -1,9 +1,11 @@
 # pylint:disable=too-many-lines
+import json
 import logging
 from datetime import datetime
 from odoo import models, fields, api, tools, _, http, exceptions, SUPERUSER_ID
-from odoo.addons.generic_mixin import pre_write, post_write
+from odoo.addons.generic_mixin import pre_write, post_write, pre_create
 from odoo.osv import expression
+from odoo.exceptions import ValidationError
 from ..tools.utils import html2text
 from ..constants import (
     TRACK_FIELD_CHANGES,
@@ -16,6 +18,7 @@ from ..constants import (
     PRIORITY_MAP,
 )
 _logger = logging.getLogger(__name__)
+TRACK_FIELD_CHANGES.update(['parent_id'])
 
 
 class RequestRequest(models.Model):
@@ -30,6 +33,8 @@ class RequestRequest(models.Model):
     _description = 'Request'
     _order = 'date_created DESC'
     _needaction = True
+    _parent_store = True
+    _parent_order = 'name'
 
     name = fields.Char(
         required=True, index=True, readonly=True, default="New", copy=False)
@@ -149,8 +154,6 @@ class RequestRequest(models.Model):
     can_change_deadline = fields.Boolean(
         compute='_compute_can_change_deadline', readonly=True,
         compute_sudo=False)
-    next_stage_ids = fields.Many2many(
-        'request.stage', compute="_compute_next_stage_ids", readonly=True)
 
     # Request data fields
     request_text = fields.Html(required=True)
@@ -206,10 +209,14 @@ class RequestRequest(models.Model):
     author_name = fields.Char(
         readonly=True,
         help="Name of author based on incoming email")
+    author_phone = fields.Char(
+        readonly=True,
+        help="Phone of author")
 
     message_discussion_ids = fields.One2many(
-        'mail.message', 'res_id', string='Discussion Messages', store=False,
-        compute="_compute_message_discussion_ids", compute_sudo=False)
+        'mail.message', 'res_id', string='Discussion Messages', store=True,
+        domain=lambda r: [
+            ('subtype_id', '=', r.env.ref('mail.mt_comment').id)])
     original_message_id = fields.Char(
         help='Technical field. '
              'ID of original message that started this request.')
@@ -266,6 +273,20 @@ class RequestRequest(models.Model):
     partner_related_request_closed_count = fields.Integer(
         compute='_compute_related_a_p_request_ids')
 
+    stage_route_out_json = fields.Char(
+        compute='_compute_stage_route_out_json', readonly=True)
+
+    parent_id = fields.Many2one(
+        'request.request', 'Parent', index=True,
+        ondelete='restrict', readonly=True,
+        tracking=True,
+        help="Parent request")
+    parent_path = fields.Char(index=True)
+    child_ids = fields.One2many(
+        'request.request', 'parent_id', 'Subrequests', readonly=True)
+    child_count = fields.Integer(
+        'Subrequest Count', compute='_compute_child_count')
+
     _sql_constraints = [
         ('name_uniq',
          'UNIQUE (name)',
@@ -286,6 +307,9 @@ class RequestRequest(models.Model):
         elif path and path.startswith('/jsonrpc') or path == '/jsonrpc':
             res.update({'channel_id': self.env.ref(
                 'generic_request.request_channel_api').id})
+        if 'parent_id' in fields_list:
+            parent = self._context.get('generic_request_parent_id')
+            res.update({'parent_id': parent})
 
         return res
 
@@ -313,12 +337,6 @@ class RequestRequest(models.Model):
                     rec.deadline_state = 'overdue'
                 elif date_deadline == now:
                     rec.deadline_state = 'today'
-
-    @api.depends('message_ids')
-    def _compute_message_discussion_ids(self):
-        for request in self:
-            request.message_discussion_ids = request.message_ids.filtered(
-                lambda r: r.subtype_id == self.env.ref('mail.mt_comment'))
 
     @api.depends('stage_id', 'stage_id.type_id')
     def _compute_stage_colors(self):
@@ -395,22 +413,6 @@ class RequestRequest(models.Model):
     def _compute_can_change_deadline(self):
         for record in self:
             record.can_change_deadline = record._hook_can_change_deadline()
-
-    def _get_next_stage_route_domain(self):
-        self.ensure_one()
-        return [
-            ('request_type_id', '=', self.type_id.id),
-            ('stage_from_id', '=', self.stage_id.id),
-            ('close', '=', False)
-        ]
-
-    @api.depends('type_id', 'stage_id')
-    def _compute_next_stage_ids(self):
-        for record in self:
-            routes = self.env['request.stage.route'].search(
-                record._get_next_stage_route_domain())
-            record.next_stage_ids = (
-                record.stage_id + routes.mapped('stage_to_id'))
 
     @api.depends('request_text')
     def _compute_request_text_sample(self):
@@ -548,7 +550,46 @@ class RequestRequest(models.Model):
             else:
                 record.timesheet_start_status = 'not-started'
 
+    @api.depends('stage_id')
+    def _compute_stage_route_out_json(self):
+        for rec in self:
+            routes = []
+            for route in rec.stage_id.route_out_ids:
+                try:
+                    route._ensure_can_move(rec)
+                except exceptions.AccessError:  # pylint: disable=except-pass
+                    # We have to ignore routes that cannot be used
+                    # to move request
+                    pass
+                else:
+                    # Add route to those allowed to move
+                    if route.name:
+                        route_name = route.name
+                    else:
+                        route_name = route.stage_to_id.name
+                    routes += [{
+                        'id': route.id,
+                        'name': route_name,
+                        'stage_to_id': route.stage_to_id.id,
+                        'close': route.close,
+                        'btn_style': route.button_style,
+                    }]
+
+            rec.stage_route_out_json = json.dumps({'routes': routes})
+
+    @api.depends('child_ids')
+    def _compute_child_count(self):
+        for rec in self:
+            rec.child_count = len(rec.child_ids)
+
+    @api.constrains('parent_id')
+    def _recursion_constraint(self):
+        if not self._check_recursion():
+            raise ValidationError(_(
+                'Error! You cannot create recursive requests.'))
+
     def _create_update_from_type(self, r_type, vals):
+        vals = dict(vals)
         # Name update
         if vals.get('name') == "###new###":
             # To set correct name for request generated from mail aliases
@@ -606,9 +647,6 @@ class RequestRequest(models.Model):
 
     @api.model
     def create(self, vals):
-        # Update date_assigned
-        if vals.get('user_id'):
-            vals['date_assigned'] = fields.Datetime.now()
         if vals.get('type_id', False):
             r_type = self.env['request.type'].browse(vals['type_id'])
             vals = self._create_update_from_type(r_type, vals)
@@ -616,6 +654,11 @@ class RequestRequest(models.Model):
         self_ctx = self.with_context(mail_create_nolog=False)
         request = super(RequestRequest, self_ctx).create(vals)
         request.trigger_event('created')
+        self_ctx = self.sudo()
+        if self_ctx.env.context.get('generic_request_parent_id'):
+            new_ctx = dict(self_ctx.env.context)
+            new_ctx.pop('generic_request_parent_id')
+            return request.with_env(request.env(context=new_ctx))
         return request
 
     def _get_generic_tracking_fields(self):
@@ -641,10 +684,10 @@ class RequestRequest(models.Model):
         raise exceptions.ValidationError(_(
             'It is not allowed to change request type'))
 
+    @pre_create('user_id')
     @pre_write('user_id')
     def _before_user_id_changed(self, changes):
-        new_user = changes['user_id'][1]  # (old_user, new_user)
-        if new_user:
+        if changes['user_id'].new_val:
             return {'date_assigned': fields.Datetime.now()}
         return {'date_assigned': False}
 
@@ -781,6 +824,49 @@ class RequestRequest(models.Model):
         """ Determine mail subtype for request creation message/notification
         """
         return self.env.ref('generic_request.mt_request_created')
+
+    @post_write('parent_id')
+    def _after_parent_changed_trigger_request_event(self, changes):
+        old, new = changes['parent_id']
+        event_data = {
+            'parent_old_id': old.id,
+            'parent_new_id': new.id,
+        }
+        self.trigger_event('parent-request-changed', event_data)
+
+    @post_write('stage_id')
+    def _after_stage_id_changed_trigger_request_event(self, changes):
+        old, new = changes['stage_id']
+        parent_event_data = {
+            'parent_route_id': self.last_route_id.id,
+            'parent_old_stage_id': old.id,
+            'parent_new_stage_id': new.id,
+        }
+        for child in self.child_ids:
+            child.trigger_event(
+                'parent-request-stage-changed', parent_event_data)
+            if (not old.closed and new.closed):
+                child.trigger_event(
+                    'parent-request-closed', parent_event_data)
+
+        if self.parent_id:
+            subrequest_event_data = {
+                'subrequest_id': self.id,
+                'subrequest_old_stage_id': old.id,
+                'subrequest_new_stage_id': new.id,
+            }
+            self.parent_id.trigger_event(
+                'subrequest-stage-changed', subrequest_event_data)
+            if (not old.closed and new.closed):
+                self.parent_id.trigger_event(
+                    'subrequest-closed', subrequest_event_data)
+
+                # Here parent has at least one subrequest (self), so we do not
+                # need to check if parent has subrequests.
+                child_reqs = self.parent_id.sudo().child_ids
+                if all(sr.stage_id.closed for sr in child_reqs):
+                    self.parent_id.trigger_event(
+                        'subrequest-all-subrequests-closed', {})
 
     def _track_subtype(self, init_values):
         """ Give the subtypes triggered by the changes on the record according
@@ -954,7 +1040,7 @@ class RequestRequest(models.Model):
 
             # remove default author from context
             # This is required to fix bug in generic_request_crm:
-            # when use create new request from lead, and there is default
+            # when user create new request from lead, and there is default
             # author specified in context, then all notification messages use
             # that author as author of message. This way customer notification
             # has customer as author. Next block of code have to fix
@@ -962,7 +1048,7 @@ class RequestRequest(models.Model):
             if self_ctx.env.context.get('default_author_id'):
                 new_ctx = dict(self_ctx.env.context)
                 new_ctx.pop('default_author_id')
-                self_ctx = self_ctx.with_context(new_ctx)
+                self_ctx = self_ctx.with_env(self_ctx.env(context=new_ctx))
 
             if partner.lang:
                 self_ctx = self_ctx.with_context(lang=partner.sudo().lang)
@@ -1215,7 +1301,8 @@ class RequestRequest(models.Model):
         author_id = msg_dict.get('author_id')
 
         # Create author from email if needed
-        if not author_id and company.request_mail_create_partner_from_email:
+        create_author = company.request_mail_create_author_contact_from_email
+        if not author_id and create_author:
             author_id = self._get_or_create_partner_from_email(
                 msg_dict['from'], force_create=True)
             if author_id:
@@ -1241,28 +1328,31 @@ class RequestRequest(models.Model):
         request = super(RequestRequest, self).message_new(
             msg_dict, custom_values=defaults)
 
-        # Find partners from emails (cc) and subscribe them
+        # Find partners from emails (cc) and subscribe them if needed
         partner_ids = request._mail_find_partner_from_emails(
             self._find_emails_from_msg(msg_dict),
-            force_create=company.request_mail_create_partner_from_email)
+            force_create=company.request_mail_create_cc_contact_from_email)
         partner_ids = [p.id for p in partner_ids if p]
 
         if author:
-            partner_ids += [author.id]
+            request.message_subscribe([author.id])
 
-        request.message_subscribe(partner_ids)
+        # Subscribe partners if needed
+        if partner_ids and company.request_mail_auto_subscribe_cc_contacts:
+            request.message_subscribe(partner_ids)
         return request
 
     def message_update(self, msg, update_vals=None):
         # Subscribe partners found in received email
         email_list = self._find_emails_from_msg(msg)
+        company = self.env.user.company_id
 
-        # TODO: Add option in settings that could allow to force create
         # contacts mentioned in cc
         partner_ids = self._mail_find_partner_from_emails(
-            email_list, force_create=False)
+            email_list,
+            force_create=company.request_mail_create_cc_contact_from_email)
         partner_ids = [p.id for p in partner_ids if p]
-        if partner_ids:
+        if partner_ids and company.request_mail_auto_subscribe_cc_contacts:
             self.message_subscribe(partner_ids)
 
         return super(RequestRequest, self).message_update(
@@ -1324,6 +1414,36 @@ class RequestRequest(models.Model):
             message, msg_vals, *args, **kwargs
         )
 
+    def api_move_request(self, route_id):
+        """ This method could be used to move request via specified route.
+            In case of specified route is closing route, then it will return
+            dictionary that describes action to open request's closing wizard.
+
+            :param int route_id: ID for request's route to move request.
+        """
+        self.ensure_one()
+        route = self.env['request.stage.route'].browse(route_id)
+        if route in self.stage_id.route_out_ids:
+            if route.close:
+                return self.env[
+                    'generic.mixin.get.action'
+                ].get_action_by_xmlid(
+                    'generic_request.action_request_wizard_close',
+                    context={
+                        'default_request_id': self.id,
+                        'default_close_route_id': route_id,
+                        'name_only': True,
+                    })
+            self.stage_id = route.stage_to_id.id
+            return None
+
+        raise exceptions.UserError(_(
+            "Cannot move request (%(request)s) by this route (%(route)s)"
+        ) % {
+            'request': self.name,
+            'route': route.name,
+        })
+
     def action_show_request_events(self):
         self.ensure_one()
         return self.env['generic.mixin.get.action'].get_action_by_xmlid(
@@ -1331,9 +1451,21 @@ class RequestRequest(models.Model):
             domain=[('request_id', '=', self.id)])
 
     def _request_timesheet_get_defaults(self):
+        """ This method suppoesed to be overridden in other modules,
+            to provide some additional default values for timesheet lines.
+        """
         return {
             'request_id': self.id,
         }
+
+    def action_close_request(self):
+        self.ensure_one()
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
+            'generic_request.action_request_wizard_close',
+            context={
+                'default_request_id': self.id,
+                'name_only': True,
+            })
 
     def action_start_work(self):
         self.ensure_one()
@@ -1412,3 +1544,27 @@ class RequestRequest(models.Model):
             context={
                 'search_default_filter_open': 1,
             })
+
+    def action_open_parent(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "request.request",
+            "name": "Parent Request",
+            "view_mode": "form",
+            "target": "new",
+            "res_id": self.parent_id.id
+        }
+
+    def action_button_show_subrequests(self):
+        action = self.get_action_by_xmlid(
+            'generic_request.action_request_window',
+            context={'generic_request_parent_id': self.id,
+                     'search_default_filter_open': True},
+            domain=[('parent_id', '=', self.id)],
+        )
+        action.update({
+            'name': _('Subrequests'),
+            'display_name': _('Subrequests'),
+        })
+        return action

@@ -258,15 +258,18 @@
                     </div>
                     <notebook>
                         <page string="Info" name="page_info">
-                            <group>
-                                <group>
+                            <group name="group_info_root">
+                                <group name="group_info_left">
                                     <field name="request_type_ids" widget="many2many_tags"
                                            placeholder="Request types"/>
                                 </group>
-                                <group>
+                                <group name="group_info_right">
                                     <field name="code"
                                            placeholder="Code..."/>
                                     <field name="sequence"/>
+                                    <field name="access_group_ids"
+                                           widget="many2many_tags"
+                                           options="{'no_create': true, 'no_quick_create': true}"/>
                                 </group>
                             </group>
                         </page>

@@ -5,6 +5,14 @@
         <field name="name">Request Events</field>
         <field name="code">request_events</field>
     </record>
+    <record id="event_category_subrequest_events" model="request.event.category">
+        <field name="name">Subrequest Events</field>
+        <field name="code">subrequest_events</field>
+    </record>
+    <record id="event_category_parent_request_events" model="request.event.category">
+        <field name="name">Parent request Events</field>
+        <field name="code">parent_request_events</field>
+    </record>
 
     <!--request event type-->
     <record id="request_event_type_created" model="request.event.type">
@@ -106,5 +114,37 @@
         <field name="name">Request Unarchived</field>
         <field name="code">request-unarchived</field>
         <field name="category_id" ref="event_category_request_events"/>
+    </record>
+     <record id="request_event_type_subrequest_stage_changed" model="request.event.type">
+        <field name="name">Subrequest stage changed</field>
+        <field name="code">subrequest-stage-changed</field>
+        <field name="category_id" ref="event_category_subrequest_events"/>
+    </record>
+    <record id="request_event_type_subrequest_closed" model="request.event.type">
+        <field name="name">Subrequest closed</field>
+        <field name="code">subrequest-closed</field>
+        <field name="category_id" ref="event_category_subrequest_events"/>
+    </record>
+    <record id="request_event_type_task_all_tasks_closed" model="request.event.type">
+        <field name="name">All subrequests closed</field>
+        <field name="code">subrequest-all-subrequests-closed</field>
+        <field name="category_id" ref="event_category_subrequest_events"/>
+    </record>
+
+    <record id="request_event_type_parent_request_stage_changed" model="request.event.type">
+        <field name="name">Parent request stage changed</field>
+        <field name="code">parent-request-stage-changed</field>
+        <field name="category_id" ref="event_category_parent_request_events"/>
+    </record>
+    <record id="request_event_type_parent_request_closed" model="request.event.type">
+        <field name="name">Parent request closed</field>
+        <field name="code">parent-request-closed</field>
+        <field name="category_id" ref="event_category_parent_request_events"/>
+    </record>
+
+    <record id="request_event_type_parent_request_changed" model="request.event.type">
+        <field name="name">Parent request changed</field>
+        <field name="code">parent-request-changed</field>
+        <field name="category_id" ref="generic_request.event_category_request_events"/>
     </record>
 </odoo>
