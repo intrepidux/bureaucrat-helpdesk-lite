@@ -13,14 +13,6 @@
             <xpath expr="//notebook/page[@name='page_info']/group/group/field[@name='request_type_ids']" position="before">
                 <field name="website_ids" widget="many2many_tags"/>
             </xpath>
-            <xpath expr="//notebook/page[@name='page_info']/group" position="inside">
-                <group name="group_access"
-                    string="Access">
-                    <field name="access_group_ids"
-                        widget="many2many_tags"
-                        options="{'no_create': true, 'no_quick_create': true}"/>
-                </group>
-            </xpath>
         </field>
     </record>
 

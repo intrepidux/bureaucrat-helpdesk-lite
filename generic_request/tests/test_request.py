@@ -249,8 +249,11 @@ class TestRequestBase(RequestCase):
 
         request.response_text = 'test response 1'
 
-        request_closing = self.env['request.wizard.close'].create({
-            'request_id': request.id,
+        act = request.action_close_request()
+
+        request_closing = self.env[act['res_model']].with_context(
+            **act['context'],
+        ).create({
             'close_route_id': close_route.id,
         })
         request_closing.onchange_request_id()
@@ -258,7 +261,6 @@ class TestRequestBase(RequestCase):
         self.assertEqual(request_closing.response_text,
                          '<p>test response 1</p>')
 
-        request_closing.close_route_id = close_route
         request_closing.response_text = 'test response 42'
         request_closing.action_close_request()
 
@@ -843,3 +845,43 @@ class TestRequestBase(RequestCase):
             group_allow_archive.id, user_admin.groups_id.ids)
         self.request_1.sudo(user_admin).write({
             'active': True})
+
+    def test_request_action_preferred_list(self):
+        self.env.user.company_id.request_preferred_list_view_mode = 'list'
+        request_act = self.env.ref(
+            'generic_request.action_request_window',
+            raise_if_not_found=False)
+        # Views is [(view_id, view_mode),(view_id, view_mode)]
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][0][1], 'tree')
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][1][1], 'kanban')
+
+    def test_request_action_preferred_kanban(self):
+        self.env.user.company_id.request_preferred_list_view_mode = 'kanban'
+        request_act = self.env.ref(
+            'generic_request.action_request_window',
+            raise_if_not_found=False)
+        # Views is [(view_id, view_mode),(view_id, view_mode)]
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][0][1], 'kanban')
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][1][1], 'tree')
+
+    def test_request_action_preferred_default(self):
+        # Test configuration, when preferred view mode is set to 'default'
+        self.env.user.company_id.request_preferred_list_view_mode = 'default'
+        request_act = self.env.ref(
+            'generic_request.action_request_window',
+            raise_if_not_found=False)
+
+        # Change view mode, and expect that 'views' will still be based on
+        # 'view_mode'
+        request_act.write({
+            'view_mode': 'pivot,kanban,tree,graph,form,activity',
+        })
+        # Views is [(view_id, view_mode),(view_id, view_mode)]
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][0][1], 'pivot')
+        self.assertEqual(
+            request_act.read(['views'])[0]['views'][1][1], 'kanban')

@@ -8,6 +8,10 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.request_wsd_public_ui_visibility',
         readonly=False,
         string='Website Service Desk (Public Visibility)')
+    request_wsd_public_use_author_phone = fields.Selection(
+        related='company_id.request_wsd_public_use_author_phone',
+        readonly=False,
+        string='Website Service Desk (Use Author Phone)')
 
     request_limit_max_text_size = fields.Integer(
         related='company_id.request_limit_max_text_size', readonly=False)
@@ -26,3 +30,9 @@ class ResConfigSettings(models.TransientModel):
         related='website_id.request_create_step_layout',
         readonly=False,
         required=True)
+
+    request_on_request_creating_redirect_to = fields.Selection(
+        related='website_id.request_redirect_after_created_on_website',
+        readonly=False,
+        string='Redirect after request created on Website'
+    )

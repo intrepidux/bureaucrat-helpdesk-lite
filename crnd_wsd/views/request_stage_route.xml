@@ -15,8 +15,6 @@
             </div>
             <group name="group_access" position="after">
                 <group name="group_website" string="Website">
-                    <field name="website_button_style"
-                           string="Button Style"/>
                     <field name="website_extra_action"
                            string="Extra Action"/>
                 </group>

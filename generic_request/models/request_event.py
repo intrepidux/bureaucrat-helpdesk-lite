@@ -92,6 +92,18 @@ class RequestEvent(models.Model):
 
     assign_comment = fields.Text()
 
+    # Request parent
+    subrequest_id = fields.Many2one('request.request')
+    subrequest_old_stage_id = fields.Many2one('request.stage', readonly=True)
+    subrequest_new_stage_id = fields.Many2one('request.stage', readonly=True)
+
+    parent_route_id = fields.Many2one('request.stage.route', readonly=True)
+    parent_old_stage_id = fields.Many2one('request.stage', readonly=True)
+    parent_new_stage_id = fields.Many2one('request.stage', readonly=True)
+
+    parent_old_id = fields.Many2one('request.request', readonly=True)
+    parent_new_id = fields.Many2one('request.request', readonly=True)
+
     def _get_selection_kanban_state(self):
         return self.env['request.request']._fields['kanban_state'].selection
 

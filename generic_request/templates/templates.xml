@@ -5,6 +5,9 @@
             <script type="text/javascript" src="/generic_request/static/src/js/dashboard.js"></script>
             <script type="text/javascript" src="/generic_request/static/src/js/field_request_html.js"></script>
             <script type="text/javascript" src='/generic_request/static/src/js/request_tag_widget.js'/>
+            <script type="text/javascript" src='/generic_request/static/src/js/stage_route_out/form_renderer.js'/>
+            <script type="text/javascript" src='/generic_request/static/src/js/stage_route_out/form_controller.js'/>
+            <script type="text/javascript" src='/generic_request/static/src/js/stage_route_out/stage_route_out_widget.js'/>
             <link rel='stylesheet' type="text/scss" href='/generic_request/static/src/scss/request_settings.scss'/>
             <link rel="stylesheet"
                   type="text/scss"

@@ -111,6 +111,7 @@
         <field name="category_id" ref="request_category_demo_resource"/>
         <field name="date_created" eval="time.strftime('%Y-%m-07 %H:%M:%S')"/>
         <field name="author_id" ref="base.res_partner_address_3"/>
+        <field name="parent_id" ref="generic_request.request_request_type_simple_demo_1"/>
     </record>
 
     <!-- Demo Printer Request -->

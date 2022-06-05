@@ -121,3 +121,35 @@ class TestRequestAccessRights(AccessRightsCase):
             with self.assertRaises(exceptions.AccessError):
                 with self.env.cr.savepoint():
                     request.sudo(self.demo_user).unlink()
+
+    # Test Access Rights Parent
+    def test_200_read_parent_request(self):
+        request = self.menv['request.request'].create({
+            'type_id': self.msimple_type.id,
+            'category_id': self.mcategory_demo_general.id,
+            'request_text': 'Demo'
+        })
+        subrequest = self.menv['request.request'].create({
+            'type_id': self.msimple_type.id,
+            'parent_id': request.id,
+            'request_text': 'Demo subrequest'
+        })
+
+        with self.assertRaises(exceptions.AccessError):
+            with self.env.cr.savepoint():
+                # demo user cannot read fields of request he is not related to
+                self._read_request_fields(self.demo_user, request)
+
+        with self.assertRaises(exceptions.AccessError):
+            with self.env.cr.savepoint():
+                # demo user cannot read fields of request he is not related to
+                self._read_request_fields(self.demo_user, subrequest)
+
+        # Assign subrequest to demo_user
+        subrequest.user_id = self.demo_user
+
+        # ensure demo user can read all fields of subrequest
+        self._read_request_fields(self.demo_user, subrequest)
+
+        # ensure demo user can read all fields of parent request
+        self._read_request_fields(self.demo_user, request)

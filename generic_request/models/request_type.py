@@ -84,6 +84,13 @@ class RequestType(models.Model):
         'ir.sequence', 'Sequence', ondelete='restrict',
         help="Use this sequence to generate names for requests for this type")
 
+    # Access rignts
+    access_group_ids = fields.Many2many(
+        'res.groups', string='Access groups',
+        help="If user belongs to one of groups specified in this field,"
+             " then he will be able to select this type during request"
+             " creation, even if this category is not published."
+    )
     # Requests
     request_ids = fields.One2many(
         'request.request', 'type_id', 'Requests', readonly=True, copy=False)
