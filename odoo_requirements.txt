@@ -1,2 +1,0 @@
---github crnd-inc/generic-addons
---github crnd-inc/crnd-web
