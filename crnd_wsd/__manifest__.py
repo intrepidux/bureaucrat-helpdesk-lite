@@ -1,3 +1,4 @@
+# flake8: noqa: E501
 {
     'name': 'Website Service Desk',
     'category': 'Service Desk',
@@ -5,7 +6,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'license': 'LGPL-3',
-    'version': '14.0.1.87.0',
+    'version': '15.0.1.87.0',
 
     'depends': [
         'mail',
@@ -36,9 +37,49 @@
         'demo/demo_request_type_seq.xml',
         'demo/demo_bug_report_type.xml',
     ],
-    'qweb': [
-        'static/src/xml/templates.xml',
-    ],
+
+    'assets': {
+        'web.assets_frontend': [
+            'crnd_wsd/static/lib/trumbowyg/dist/trumbowyg.min.js',
+            'crnd_wsd/static/lib/trumbowyg/dist/langs/ua.min.js',
+            'crnd_wsd/static/lib/trumbowyg/dist/langs/ru.min.js',
+            'crnd_wsd/static/lib/trumbowyg/dist/plugins/table/trumbowyg.table.min.js',
+            'crnd_wsd/static/lib/trumbowyg/dist/plugins/colors/trumbowyg.colors.min.js',
+            'crnd_wsd/static/lib/trumbowyg/dist/ui/trumbowyg.min.css',
+            'crnd_wsd/static/lib/trumbowyg/dist/plugins/table/ui/trumbowyg.table.min.css',
+            'crnd_wsd/static/lib/trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.min.css',
+
+            'crnd_wsd/static/src/js/trumbowyg.upload-file.js',
+            'crnd_wsd/static/src/js/trumbowyg.js',
+            'crnd_wsd/static/src/js/blockui.js',
+            'crnd_wsd/static/src/js/request_discussion.js',
+            'crnd_wsd/static/src/js/request_new.js',
+            'crnd_wsd/static/src/js/request_new_step.js',
+            'crnd_wsd/static/src/js/request_actions.js',
+            'crnd_wsd/static/src/js/enable_popovers.js',
+            'crnd_wsd/static/src/js/widgets.js',
+            'crnd_wsd/static/src/scss/request.scss',
+            'crnd_wsd/static/src/scss/blockui_spin.css',
+        ],
+        'web.assets_tests': [
+            'crnd_wsd/static/src/js/tours/request_mail_login_portal.js',
+            'crnd_wsd/static/src/js/tours/request_action_no_actions.js',
+            'crnd_wsd/static/src/js/tours/request_action_actions.js',
+            'crnd_wsd/static/src/js/tours/request_action_actions_redirect.js',
+            'crnd_wsd/static/src/js/tours/request_base.js',
+            'crnd_wsd/static/src/js/tours/request_new.js',
+            'crnd_wsd/static/src/js/tours/request_new_default_text.js',
+            'crnd_wsd/static/src/js/tours/request_public_user.js',
+            'crnd_wsd/static/src/js/tours/request_public_user_redirect.js',
+            'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_congrat_page.js',
+            'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_req_page.js',
+            'crnd_wsd/static/src/js/tours/request_filter_kind.js',
+        ],
+        'web.assets_qweb': [
+            'crnd_wsd/static/src/xml/templates.xml',
+        ],
+    },
+
     'images': ['static/description/banner.gif'],
     'installable': True,
     'auto_install': False,

@@ -353,6 +353,11 @@ msgstr "<span class = \"field-icon fa fa-tags oe_inline\" title = \"Теги\" /
 
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+msgid "<span class=\"ml4 mr4\">/</span>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
 msgid "<span class=\"request-separator-text\">Info</span>"
 msgstr "<span class=\"request-separator-text\">Информация</span>"
 
@@ -379,6 +384,13 @@ msgstr "<span title=\"Сообщения\" class=\"fa fa-comments mr4\"/>"
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
 msgid "<span title=\"Subrequests\" class=\"fa fa-sitemap mr4\"/>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
+msgid ""
+"<span>\n"
+"                                                / </span>"
 msgstr ""
 
 #. module: generic_request
@@ -1556,8 +1568,6 @@ msgid "Discussion Messages"
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_generic_tag_category__display_name
-#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_category__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_channel__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template__display_name
@@ -1577,10 +1587,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__display_name
-#: model:ir.model.fields,field_description:generic_request.field_res_company__display_name
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__display_name
-#: model:ir.model.fields,field_description:generic_request.field_res_partner__display_name
-#: model:ir.model.fields,field_description:generic_request.field_res_users__display_name
 msgid "Display Name"
 msgstr "Отображаемое Имя"
 
@@ -1702,15 +1708,6 @@ msgid "Followers"
 msgstr "Подписчики"
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_request_category__message_channel_ids
-#: model:ir.model.fields,field_description:generic_request.field_request_kind__message_channel_ids
-#: model:ir.model.fields,field_description:generic_request.field_request_request__message_channel_ids
-#: model:ir.model.fields,field_description:generic_request.field_request_stage_route__message_channel_ids
-#: model:ir.model.fields,field_description:generic_request.field_request_type__message_channel_ids
-msgid "Followers (Channels)"
-msgstr "Подписчики (Каналы)"
-
-#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_category__message_partner_ids
 #: model:ir.model.fields,field_description:generic_request.field_request_kind__message_partner_ids
 #: model:ir.model.fields,field_description:generic_request.field_request_request__message_partner_ids
@@ -1804,6 +1801,15 @@ msgid "HR Assignments"
 msgstr "Кадровые назначения"
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_category__has_message
+#: model:ir.model.fields,field_description:generic_request.field_request_kind__has_message
+#: model:ir.model.fields,field_description:generic_request.field_request_request__has_message
+#: model:ir.model.fields,field_description:generic_request.field_request_stage_route__has_message
+#: model:ir.model.fields,field_description:generic_request.field_request_type__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
 msgid "Has Subrequests"
 msgstr ""
@@ -1883,8 +1889,6 @@ msgstr ""
 "\" attrs=\"{'invisible': [('timesheet_planned_amount', '!=', 0)]}\"/>"
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_generic_tag_category__id
-#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window__id
 #: model:ir.model.fields,field_description:generic_request.field_request_category__id
 #: model:ir.model.fields,field_description:generic_request.field_request_channel__id
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template__id
@@ -1904,10 +1908,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__id
-#: model:ir.model.fields,field_description:generic_request.field_res_company__id
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__id
-#: model:ir.model.fields,field_description:generic_request.field_res_partner__id
-#: model:ir.model.fields,field_description:generic_request.field_res_users__id
 msgid "ID"
 msgstr "ID"
 
@@ -2211,8 +2211,6 @@ msgid "Last 24 hours"
 msgstr "Последние 24 часа"
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_generic_tag_category____last_update
-#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_category____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_channel____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template____last_update
@@ -2232,10 +2230,6 @@ msgstr "Последние 24 часа"
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work____last_update
-#: model:ir.model.fields,field_description:generic_request.field_res_company____last_update
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings____last_update
-#: model:ir.model.fields,field_description:generic_request.field_res_partner____last_update
-#: model:ir.model.fields,field_description:generic_request.field_res_users____last_update
 msgid "Last Modified on"
 msgstr "Последнее изменение"
 
@@ -2816,6 +2810,11 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__new_request_type_id
 msgid "New type"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_request__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
 msgstr ""
 
 #. module: generic_request
@@ -5071,6 +5070,9 @@ msgstr "из"
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "to see which modules are included in each bundle."
 msgstr "чтобы увидеть, какие модули включены в каждый пакет"
+
+#~ msgid "Followers (Channels)"
+#~ msgstr "Подписчики (Каналы)"
 
 #~ msgid "Add parent / child relationship"
 #~ msgstr "Добавить родительские связи между запросами"

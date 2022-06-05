@@ -1,6 +1,6 @@
 import logging
 from contextlib import contextmanager
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 from odoo.addons.generic_mixin.tests.common import (
     ReduceLoggingMixin,
     AccessRulesFixMixinST,
@@ -30,7 +30,7 @@ def disable_mail_auto_delete(env):
 
 class RequestCase(AccessRulesFixMixinST,
                   ReduceLoggingMixin,
-                  SavepointCase):
+                  TransactionCase):
     """ BAse tests case for tests related to generic request
     """
 
@@ -118,7 +118,7 @@ class RequestCase(AccessRulesFixMixinST,
 
 class AccessRightsCase(AccessRulesFixMixinST,
                        ReduceLoggingMixin,
-                       SavepointCase):
+                       TransactionCase):
 
     @classmethod
     def setUpClass(cls):
@@ -131,8 +131,9 @@ class AccessRightsCase(AccessRulesFixMixinST,
             'generic_request.user_demo_request_manager')
 
         # Envs
-        cls.uenv = cls.env(user=cls.demo_user)
-        cls.menv = cls.env(user=cls.demo_manager)
+        cls.uenv = cls.env(user=cls.demo_user)   # pylint: disable=not-callable
+        cls.menv = cls.env(   # pylint: disable=not-callable
+            user=cls.demo_manager)
 
         # Request Type
         cls.usimple_type = cls.uenv.ref('generic_request.request_type_simple')

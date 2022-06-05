@@ -1,7 +1,15 @@
 from odoo.tests import HttpCase
 
+from odoo.addons.generic_mixin.tests.common import deactivate_records_for_model
+
 
 class TestPhantomTour(HttpCase):
+
+    def setUp(self):
+        super(TestPhantomTour, self).setUp()
+
+        # Disable assets from uninstalled modules
+        deactivate_records_for_model(self.env, 'ir.asset')
 
     def _test_phantom_tour(self, start_url, tour_name, **kw):
         """ Wrapper to run web tours
