@@ -6,7 +6,10 @@
     .o_request_kanban_header {
         display: flex;
         flex-flow: row nowrap;
-        margin: -$o-kanban-record-margin -$o-kanban-record-margin 0 -$o-kanban-record-margin;
+        margin-top: -$o-kanban-record-margin;
+        margin-right: -$o-kanban-record-margin;
+        margin-bottom: 0;
+        margin-left: -$o-kanban-record-margin;
         padding-left: $o-kanban-record-margin;
         min-height: 3em;
 

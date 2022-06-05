@@ -8,6 +8,7 @@ from werkzeug.urls import url_quote
 
 from odoo import http, tools, _
 from odoo.tools import ustr
+from odoo.tools.mimetypes import guess_mimetype
 from odoo.http import request
 
 from .controller_mixin import WSDControllerMixin
@@ -35,6 +36,40 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
         """ Get configuration for max upload size
         """
         return request.env.user.company_id._get_request_max_upload_file_size()
+
+    def _get_allowed_upload_file_types(self):
+        """ Get configuration for allowed upload file types
+        """
+        return request.env.user.company_id._get_allowed_upload_file_types()
+
+    def _check_file_has_allowed_type(self, data):
+        allowed_upload_file_types = self._get_allowed_upload_file_types()
+
+        if not allowed_upload_file_types:
+            return True
+        mimetype = guess_mimetype(data or b'')
+        match = False
+        f_type, f_subtype = mimetype.split('/')
+        for allowed_type in allowed_upload_file_types:
+            _type, subtype = allowed_type.split('/')
+            if subtype == '*':
+                if _type == f_type:
+                    match = True
+                    break
+            else:
+                if _type == f_type and subtype == f_subtype:
+                    match = True
+                    break
+        if match:
+            return True
+
+        _logger.warning(
+            'Unsupported file format %s,'
+            ' attachment only supports %s',
+            mimetype,
+            ', '.join(allowed_upload_file_types),
+        )
+        raise ValueError(_('Unsupported file format!'))
 
     @http.route('/crnd_wsd/file_upload', type='http',
                 auth='user', methods=['POST'], website=True)
@@ -76,6 +111,7 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
 
         try:
             data = upload.read()
+            self._check_file_has_allowed_type(data)
 
             if is_image:
                 data = self._optimize_image(data, disable_optimization=False)

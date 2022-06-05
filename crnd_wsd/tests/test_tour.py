@@ -1,6 +1,10 @@
+import logging
+
 from odoo import exceptions, tools
 from odoo.tests.common import tagged
 from .phantom_common import TestPhantomTour
+
+_logger = logging.getLogger(__name__)
 
 
 @tagged('post_install', '-at_install')
@@ -70,6 +74,7 @@ class TestWebsiteServiceDesk(TestPhantomTour):
             if vals.get('request_text', '') == '<p>create_error</p>':
                 raise Exception('Test exception')
             return monkey_create.origin(self, vals)
+
         self.env['request.request']._patch_method('create', monkey_create)
 
         new_requests = self._test_phantom_tour_requests(
@@ -107,24 +112,62 @@ class TestWebsiteServiceDesk(TestPhantomTour):
         self._test_phantom_tour(
             '/', 'crnd_wsd_tour_request_public_user_redirect')
 
-    def test_tour_public_user_create_request(self):
+    def test_tour_public_user_create_request_to_congrat_page(self):
         self.env.user.company_id.request_wsd_public_ui_visibility = (
             'create-request')
+        default_website = self.env.ref('website.default_website')
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'congrats_page'
+        )
+
         request = self._test_phantom_tour_requests(
-            '/', 'crnd_wsd_tour_request_public_user_create_request')
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_congrat')
 
         self.assertEqual(len(request), 1)
         self.assertFalse(request.author_id)
         self.assertFalse(request.partner_id)
         self.assertEqual(request.author_name, 'John Doe')
         self.assertEqual(request.email_from, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))
+
+    def test_tour_public_user_create_request_to_request_page(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        default_website = self.env.ref('website.default_website')
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'congrats_page'
+        )
+        # Change settings for redirect
+        default_website.write({
+            'request_redirect_after_created_on_website': 'req_page'
+        })
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'req_page'
+        )
+
+        request = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_request')
+
+        self.assertEqual(len(request), 1)
+        self.assertFalse(request.author_id)
+        self.assertFalse(request.partner_id)
+        self.assertEqual(request.author_name, 'John Doe')
+        self.assertEqual(request.email_from, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))
 
     def test_tour_public_user_create_request_create_contact(self):
         self.env.user.company_id.request_wsd_public_ui_visibility = (
             'create-request')
-        self.env.user.company_id.request_mail_create_partner_from_email = True
+        company = self.env.user.company_id
+        company.request_mail_create_author_contact_from_email = True
         request = self._test_phantom_tour_requests(
-            '/', 'crnd_wsd_tour_request_public_user_create_request')
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_congrat')
 
         self.assertEqual(len(request), 1)
         self.assertTrue(request.author_id)
@@ -133,3 +176,52 @@ class TestWebsiteServiceDesk(TestPhantomTour):
         self.assertFalse(request.email_from)
         self.assertEqual(request.author_id.name, 'John Doe')
         self.assertEqual(request.author_id.email, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))
+
+    def test_tour_create_request_default_option_no_phone(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        self.env.user.company_id.request_wsd_public_use_author_phone = (
+            'no-phone')
+        request = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_author_no_phone')
+        self.assertFalse(request.author_phone)
+        self.assertEqual(request.email_from, 'Test_author@email.com')
+
+    def test_tour_create_request_phone_required(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        self.env.user.company_id.request_wsd_public_use_author_phone = (
+            'required-phone')
+        request = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_author_phone_required')
+        self.assertTrue(request)
+        self.assertEqual(request.email_from, 'Test_author@email.com')
+        self.assertEqual(request.author_phone, '123456789')
+
+    def test_tour_create_request_phone_optional_no_phone(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        self.env.user.company_id.request_wsd_public_use_author_phone = (
+            'optional-phone')
+        request_without_phone = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_author_no_phone')
+        self.assertTrue(request_without_phone)
+        self.assertFalse(request_without_phone.author_phone)
+        self.assertEqual(request_without_phone.email_from,
+                         'Test_author@email.com')
+
+    def test_tour_create_request_phone_optional_with_phone(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        self.env.user.company_id.request_wsd_public_use_author_phone = (
+            'optional-phone')
+        request_with_phone = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_author_phone_required')
+        self.assertEqual(request_with_phone.email_from,
+                         'Test_author@email.com')
+        self.assertEqual(request_with_phone.author_phone, '123456789')

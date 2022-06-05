@@ -98,11 +98,15 @@ class RequestCase(AccessRulesFixMixinST,
 
         close_route = self.env['request.stage.route'].sudo(user).search([
             ('request_type_id', '=', request.type_id.id),
+            ('stage_from_id', '=', request.stage_id.id),
             ('stage_to_id', '=', stage.id),
         ])
         close_route.ensure_one()
-        wiz = self.env['request.wizard.close'].sudo(user).create({
-            'request_id': request.id,
+
+        act = request.action_close_request()
+        wiz = self.env[act['res_model']].sudo(user).with_context(
+            **act['context'],
+        ).create({
             'close_route_id': close_route.id,
             'response_text': response_text,
         })

@@ -6,9 +6,10 @@ import werkzeug
 from odoo import _
 from odoo import http
 from odoo.http import request
-from odoo.tools import ustr
 from odoo.osv import expression
-from odoo.exceptions import UserError, AccessError, ValidationError
+from odoo.exceptions import (
+    UserError, AccessError, ValidationError
+)
 
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.portal.controllers.portal import CustomerPortal
@@ -64,7 +65,7 @@ def get_redirect():
     Note, that 'redirect' param has quoted value that allows to keep
     query parametrs.
     """
-    full_url = request.httprequest.url
+    full_url = http.request.httprequest.url
     s = urlsplit(full_url)
     url = urlunsplit(['', '', s.path, s.query, s.fragment])
     return werkzeug.urls.url_encode({'redirect': url})
@@ -90,12 +91,12 @@ def guard_access(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if not request.website.is_public_user():
+        if not http.request.website.is_public_user():
             return func(*args, **kwargs)
         if (request.env.user.company_id.request_wsd_public_ui_visibility ==
                 'redirect'):
             url = "/web/login?%s" % get_redirect()
-            return request.redirect(url)
+            return http.request.redirect(url)
         return func(*args, **kwargs)
     return wrapper
 
@@ -105,7 +106,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         domain = [
             '|',
             ('website_id', '=', False),
-            ('website_id', '=', request.website.id),
+            ('website_id', '=', http.request.website.id),
         ]
         if search:
             domain += [
@@ -133,9 +134,9 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'my': domain + [
                 ('closed', '=', False),
                 '|', '|',
-                ('user_id', '=', request.env.user.id),
-                ('created_by_id', '=', request.env.user.id),
-                ('author_id', '=', request.env.user.partner_id.id),
+                ('user_id', '=', http.request.env.user.id),
+                ('created_by_id', '=', http.request.env.user.id),
+                ('author_id', '=', http.request.env.user.partner_id.id),
             ],
         }
 
@@ -162,9 +163,9 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
     @guard_access
     def requests(self, req_status='my', page=0, search="", **post):
         if req_status not in ('my', 'open', 'closed', 'all'):
-            return request.not_found()
+            return http.request.not_found()
 
-        Request = request.env['request.request']
+        Request = http.request.env['request.request']
 
         url = '/requests/' + req_status
         keep = QueryURL(
@@ -179,7 +180,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         }
 
         # make pager
-        pager = request.website.pager(
+        pager = http.request.website.pager(
             url=url,
             total=req_count[req_status],
             page=page,
@@ -189,7 +190,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         )
 
         # search the count to display, according to the pager data
-        reqs = request.env['request.request'].search(
+        reqs = http.request.env['request.request'].search(
             domains[req_status], limit=ITEMS_PER_PAGE, offset=pager['offset'])
         values = {
             'search': search,
@@ -205,12 +206,15 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         values.update(self._requests_list_get_extra_context(
             req_status=req_status, search=search, **post
         ))
-        return request.render(
+        return http.request.render(
             'crnd_wsd.wsd_requests', values)
 
     def _request_get_available_routes(self, req, **post):
         Route = http.request.env['request.stage.route']
         result = Route.browse()
+
+        if http.request.website.is_public_user():
+            return result
 
         user = http.request.env.user
         group_ids = user.sudo().groups_id.ids
@@ -240,38 +244,33 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         return result
 
     @http.route(["/requests/request/<int:req_id>"],
-                type='http', auth="user", website=True)
-    def request(self, req_id, **kw):
-        values = {}
-        reqs = request.env['request.request'].search(
-            [
-                '&', ('id', '=', req_id),
-                '|', ('website_id', '=', False),
-                ('website_id', '=', request.website.id)])
+                type='http', auth="public", website=True)
+    def request(self, req_id, access_token=None, **kw):
+        req = self._id_to_record(
+            'request.request', req_id,
+            access_token=access_token)
+        if req.website_id and req.website_id != http.request.website:
+            raise http.request.not_found()
 
-        if not reqs:
-            raise request.not_found()
-
-        reqs.check_access_rights('read')
-        reqs.check_access_rule('read')
-
-        action_routes = self._request_get_available_routes(reqs, **kw)
+        action_routes = self._request_get_available_routes(req, **kw)
 
         disable_new_comments = (
-            reqs.closed and reqs.sudo().type_id.website_comments_closed
+            req.closed and req.sudo().type_id.website_comments_closed
         )
 
-        values.update({
-            'req': reqs.sudo(),
+        values = {
+            'req': req.sudo(),
             'action_routes': action_routes.sudo(),
-            'can_change_request_text': reqs.can_change_request_text,
+            'can_change_request_text': (
+                False if http.request.website.is_public_user()
+                else req.can_change_request_text),
             'disable_composer': disable_new_comments,
             'can_read_request': can_read_request,
-        })
-
+            'show_congrats_msg': kw.get('show_congrats_msg', False),
+        }
         values.update(self._request_page_get_extra_context(req_id, **kw))
 
-        return request.render(
+        return http.request.render(
             "crnd_wsd.wsd_request", values)
 
     @http.route(["/requests/new"], type='http', auth="public",
@@ -279,21 +278,21 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
     @guard_access
     def request_new(self, **kwargs):
         # May be overridden to change start step
-        return request.redirect(QueryURL(
+        return http.request.redirect(QueryURL(
             '/requests/new/step/category', [])(**kwargs))
 
     def _request_new_get_public_categs_domain(self, category_id=None, **post):
-        if request.env.user.has_group(GROUP_USER_ADVANCED):
+        if http.request.env.user.has_group(GROUP_USER_ADVANCED):
             return []
         return [
             '&', ('website_published', '=', True),
             '|', ('website_ids', '=', False),
-            ('website_ids', 'in', request.website.id)]
+            ('website_ids', 'in', http.request.website.id)]
 
     def _request_new_get_public_categs(self, category_id=None, **post):
         domain = self._request_new_get_public_categs_domain(
             category_id=category_id, **post)
-        categs = request.env['request.category'].search(domain)
+        categs = http.request.env['request.category'].search(domain)
         result = categs.filtered(
             lambda r: self._request_new_get_public_types(
                 category_id=r.id, **post))
@@ -305,8 +304,8 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
     def request_new_select_category(self, category_id=None, **kwargs):
         keep = QueryURL('', [], category_id=category_id, **kwargs)
         req_category = self._id_to_record('request.category', category_id)
-        if request.httprequest.method == 'POST' and req_category:
-            return request.redirect(keep(
+        if http.request.httprequest.method == 'POST' and req_category:
+            return http.request.redirect(keep(
                 '/requests/new/step/type',
                 category_id=req_category.id, **kwargs))
 
@@ -316,7 +315,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                     category_id=r.id, **kwargs))
 
         if len(public_categories) <= 1 and not http.request.debug:
-            return request.redirect(keep(
+            return http.request.redirect(keep(
                 '/requests/new/step/type',
                 category_id=public_categories.id, **kwargs))
 
@@ -327,13 +326,13 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'get_redirect': get_redirect,
         }
 
-        return request.render(
+        return http.request.render(
             "crnd_wsd.wsd_requests_new_select_category", values)
 
     def _request_new_get_public_types_domain(self, type_id=None,
                                              category_id=None, **kwargs):
         domain = []
-        if not request.env.user.has_group(GROUP_USER_ADVANCED):
+        if not http.request.env.user.has_group(GROUP_USER_ADVANCED):
             domain += [('website_published', '=', True)]
 
         if category_id:
@@ -343,7 +342,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
 
         domain += [
             '|', ('website_ids', '=', False),
-            ('website_ids', 'in', request.website.id)]
+            ('website_ids', 'in', http.request.website.id)]
         return domain
 
     def _request_new_get_public_types(self, type_id=None, category_id=None,
@@ -351,7 +350,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         domain = self._request_new_get_public_types_domain(
             type_id=type_id, category_id=category_id, **kwargs)
 
-        return request.env['request.type'].search(domain)
+        return http.request.env['request.type'].search(domain)
 
     @http.route(["/requests/new/step/type"], type='http', auth="public",
                 methods=['GET', 'POST'], website=True)
@@ -362,8 +361,8 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                         **kwargs)
         req_type = self._id_to_record('request.type', type_id)
         req_category = self._id_to_record('request.category', category_id)
-        if request.httprequest.method == 'POST' and req_type:
-            return request.redirect(keep(
+        if http.request.httprequest.method == 'POST' and req_type:
+            return http.request.redirect(keep(
                 '/requests/new/step/data', type_id=req_type.id,
                 category_id=req_category.id, **kwargs))
 
@@ -371,7 +370,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             type_id=type_id, category_id=req_category.id, **kwargs)
 
         if len(public_types) == 1 and not http.request.debug:
-            return request.redirect(keep(
+            return http.request.redirect(keep(
                 '/requests/new/step/data', type_id=public_types.id,
                 category_id=req_category.id, **kwargs))
 
@@ -383,7 +382,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'get_redirect': get_redirect,
         }
 
-        return request.render(
+        return http.request.render(
             "crnd_wsd.wsd_requests_new_select_type", values)
 
     def _request_new_process_data(self, req_type, req_category=False,
@@ -415,36 +414,50 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                     'error_text': _(
                         "Please, specify your email address!"),
                 }
+
+        if http.request.website.is_request_author_phone_required():
+            if not data.get('author_phone'):
+                errors.update({
+                    'request_author_phone': {
+                        'error_text': _(
+                            "Please, specify your phone number!")}})
         return errors
 
     def _request_new_prepare_data(self, req_type, req_category,
                                   req_text, **post):
-        channel_website = request.env.ref(
+        channel_website = http.request.env.ref(
             'generic_request.request_channel_website')
         res = {
             'category_id': req_category and req_category.id,
             'type_id': req_type.id,
             'request_text': req_text,
             'channel_id': channel_website.id,
-            'website_id': request.website.id,
+            'website_id': http.request.website.id,
         }
         company = http.request.env.user.company_id
         if http.request.website.is_request_create_public():
-            author_id = request.env[
+            res['created_by_id'] = http.request.env.ref('base.user_root').id
+            is_create = company.request_mail_create_author_contact_from_email
+            author_id = http.request.env[
                 'request.request'
             ].sudo()._get_or_create_partner_from_email(
                 post.get('request_author_email'),
-                force_create=company.request_mail_create_partner_from_email,
+                force_create=is_create,
             )
             if author_id:
                 res['author_id'] = author_id
             else:
                 res['author_id'] = False
-                author_name, author_email = request.env[
+                author_name, author_email = http.request.env[
                     'res.partner'
                 ]._parse_partner_name(post.get('request_author_email'))
                 res['email_from'] = author_email
                 res['author_name'] = author_name
+
+            # TODO: Maybe need add validation for phone number?
+            author_phone = post.get('request_author_phone')
+            if author_phone:
+                res['author_phone'] = author_phone
         return res
 
     @http.route(["/requests/new/step/data"],
@@ -453,10 +466,11 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
     @guard_access
     def request_new_fill_data(self, type_id=None, category_id=None,
                               req_text=None, **kwargs):
+        # pylint: disable=too-many-locals
         req_type = self._id_to_record('request.type', type_id)
 
         if not req_type:
-            return request.redirect(QueryURL(
+            return http.request.redirect(QueryURL(
                 '/requests/new/step/type', [])(
                     type_id=type_id, category_id=category_id, **kwargs))
 
@@ -464,12 +478,10 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
 
         values = self._request_new_process_data(
             req_type, req_category, req_text=req_text, **kwargs)
-        values.update({
-            'get_redirect': get_redirect,
-        })
+        values['get_redirect'] = get_redirect
         values['validation_errors'] = {}
 
-        if request.httprequest.method == 'POST':
+        if http.request.httprequest.method == 'POST':
             req_data = self._request_new_prepare_data(
                 req_type, req_category, req_text, **kwargs)
 
@@ -477,18 +489,25 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                 req_type, req_category, req_text, req_data, **kwargs)
 
             if not validation_errors:
-                Request = request.env['request.request']
-                if request.website.is_request_create_public():
+                Request = http.request.env['request.request']
+                if http.request.website.is_request_create_public():
                     # If it is allowed to create request for public users and
                     # current user is public user, then we have to use sudo
                     # to handle access rights issues
                     Request = Request.sudo()
                 try:
-                    req = Request.create(req_data)
-                    req._request_bind_attachments()
+                    # Try to create request with savepoint, to avoid
+                    # duplication of requests, when there were error triggered
+                    # by automated action after request created
+                    with http.request.env.cr.savepoint():
+                        req = Request.create(req_data)
+                        req._request_bind_attachments()
                 except (UserError, AccessError, ValidationError) as exc:
+                    error_msg = "\n".join(
+                        str(a) for a in exc.args if a
+                    )
                     validation_errors.update({'error': {
-                        'error_text': ustr(exc)}})
+                        'error_text': error_msg}})
                 except Exception:
                     _logger.error(
                         "Error caught during request creation", exc_info=True)
@@ -496,21 +515,57 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                         'error_text':
                             _("Unknown server error. See server logs.")}})
                 else:
-                    return request.render(
-                        "crnd_wsd.wsd_requests_new_congratulation",
-                        {'req': req.sudo()})
+                    # Decide where to redirect user after request was created
+                    redirect_after_request_created = (
+                        http.request.website
+                        .request_redirect_after_created_on_website
+                    )
+                    redirect_params = {}
+                    if redirect_after_request_created == 'req_page':
+                        redirect_url = "/requests/request/%s" % req.id
+                        redirect_params['show_congrats_msg'] = True
+                    else:
+                        redirect_url = "/requests/congrats/%s" % req.id
+
+                    if http.request.website.is_request_create_public():
+                        redirect_params.update({
+                            'access_token': req._portal_ensure_token(),
+                        })
+
+                    if redirect_params:
+                        redirect_url += "?" + werkzeug.urls.url_encode(
+                            redirect_params)
+                    return http.request.redirect(redirect_url)
 
             values['validation_errors'] = validation_errors
             values.update(req_data)
-        return request.render(
+        return http.request.render(
             "crnd_wsd.wsd_requests_new_request_data", values)
+
+    @http.route(["/requests/congrats/<int:req_id>"],
+                type='http', auth="public", website=True)
+    def request_congrat(self, req_id, access_token=None, **kw):
+        keep = QueryURL('', [], access_token=access_token, **kw)
+        req = self._id_to_record(
+            'request.request', req_id,
+            access_token=access_token)
+        if req.website_id and req.website_id != http.request.website:
+            raise http.request.not_found()
+
+        return http.request.render(
+            "crnd_wsd.wsd_requests_new_congratulation",
+            {
+                'req': req,
+                'keep': keep,
+            }
+        )
 
 
 class RequestCustomerPortal(CustomerPortal):
     def _prepare_portal_layout_values(self):
         values = super(
             RequestCustomerPortal, self)._prepare_portal_layout_values()
-        user = request.env.user
+        user = http.request.env.user
         values['request_count'] = request.env['request.request'].search_count(
             ['|', '|', ('created_by_id', '=', user.id),
              ('user_id', '=', user.id),

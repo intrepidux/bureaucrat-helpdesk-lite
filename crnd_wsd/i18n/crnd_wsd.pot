@@ -14,10 +14,57 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ".\n"
+"\n"
+"                             Following popular Mime Types could be used:"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "<b><i>Allow to create request</i></b> - unauthorized users will be able to create requests in system without need to login or register."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "<b><i>Redirect to congratulation page</i></b>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "<b><i>Redirect to login</i></b> - unauthorized users will be automatically redirected to login page."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "<b><i>Redirect to request page</i></b>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "<b><i>Restricted UI</i></b> - unauthorized users will be able to pass all steps of creating a request but unable to submit request until logged in. Also, on all screens they will see small block that asks them to login or register (with links to both actions)."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "<small id=\"request_author_email_help\" class=\"form-text text-muted\">\n"
+"                                    Please, enter here your email address.\n"
+"                                </small>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "<small id=\"request_author_phone_help\" class=\"form-text text-muted\">\n"
+"                                    Please, enter here your phone number.\n"
+"                                </small>"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.request_short_info
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "<span class=\"fa fa-bars mr4\" title=\"Category\"/>"
 msgstr ""
 
@@ -36,6 +83,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "<span class=\"fa fa-hashtag mr4\" title=\"Type\"/>"
 msgstr ""
 
@@ -49,6 +97,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "<span class=\"fa fa-square mr4\" title=\"Kind\"/>"
 msgstr ""
 
@@ -60,7 +109,7 @@ msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
-msgid "<span class=\"pull-right label\" id=\"characters_left_label\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"Remaining characters.\"/>"
+msgid "<span class=\"pull-right badge\" id=\"characters_left_label\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"Remaining characters.\"/>"
 msgstr ""
 
 #. module: crnd_wsd
@@ -85,11 +134,11 @@ msgid "<strong>Created</strong>"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:104
-#: code:addons/crnd_wsd/controllers/helpers.py:110
-#: code:addons/crnd_wsd/controllers/helpers.py:117
-#: code:addons/crnd_wsd/controllers/helpers.py:143
-#: code:addons/crnd_wsd/controllers/helpers.py:154
+#: code:addons/crnd_wsd/controllers/helpers.py:162
+#: code:addons/crnd_wsd/controllers/helpers.py:168
+#: code:addons/crnd_wsd/controllers/helpers.py:175
+#: code:addons/crnd_wsd/controllers/helpers.py:201
+#: code:addons/crnd_wsd/controllers/helpers.py:212
 #, python-format
 msgid "Access denied"
 msgstr ""
@@ -97,6 +146,11 @@ msgstr ""
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_filterbox
 msgid "All"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_wsd_public_ui_visibility:0
+msgid "Allow to create request"
 msgstr ""
 
 #. module: crnd_wsd
@@ -135,13 +189,8 @@ msgid "Back"
 msgstr ""
 
 #. module: crnd_wsd
-#: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_stage_route_form
-msgid "Button Style"
-msgstr ""
-
-#. module: crnd_wsd
-#: model:ir.model.fields,help:crnd_wsd.field_request_stage_route__website_button_style
-msgid "Buttons style for website"
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
+msgid "Bureaucrat Website Settings"
 msgstr ""
 
 #. module: crnd_wsd
@@ -157,6 +206,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Category"
 msgstr ""
 
@@ -167,6 +217,27 @@ msgid "Category\n"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Choose if you need to use the author`s phone on the creation page of the request."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
+msgid "Choose the layout style applied for request creation steps."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Choose the way to redirect after request created."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Choose what public (unregistered) users can see or can do."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
 msgid "Close"
 msgstr ""
@@ -193,6 +264,7 @@ msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Comments"
 msgstr ""
 
@@ -243,16 +315,6 @@ msgid "Current stage"
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Danger"
-msgstr ""
-
-#. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Dark"
-msgstr ""
-
-#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_action_log
 msgid "Date assigned"
 msgstr ""
@@ -269,16 +331,13 @@ msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Deadline: {{req.deadline_date}}"
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Default"
-msgstr ""
-
-#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param__selection__radio
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param__selection__tile
 msgid "Description"
 msgstr ""
 
@@ -308,6 +367,12 @@ msgid "Edit"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Ensure, that your proxy server (nginx, apache, etc) allows to upload files of selected size,\n"
+"                            because it is frequent case, when uploading of large files is blocked on nginx level."
+msgstr ""
+
+#. module: crnd_wsd
 #. openerp-web
 #: code:addons/crnd_wsd/static/src/js/request_actions.js:201
 #: code:addons/crnd_wsd/static/src/js/request_actions.js:214
@@ -323,8 +388,24 @@ msgid "Extra Action"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "File Types Allowed to Upload"
+msgstr ""
+
+#. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/helpers.py:107
+#, python-format
+msgid "File size is too big!"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
 msgid "Following errors happened during request creation!"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_limit_max_upload_file_size_uom:0
+msgid "GB"
 msgstr ""
 
 #. module: crnd_wsd
@@ -338,14 +419,9 @@ msgid "Hours"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:24
+#: code:addons/crnd_wsd/controllers/helpers.py:26
 #, python-format
 msgid "Image size excessive, uploaded images must be smaller than 42 million pixel"
-msgstr ""
-
-#. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Info"
 msgstr ""
 
 #. module: crnd_wsd
@@ -354,21 +430,32 @@ msgid "It will be reviewed soon"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+msgid "It will be reviewed soon."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "John Doe <john.doe@johnmail.com>"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_limit_max_upload_file_size_uom:0
+msgid "KB"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.request_short_info
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Kind"
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Light"
-msgstr ""
-
-#. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Link"
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
+msgid "Layout for request creation steps"
 msgstr ""
 
 #. module: crnd_wsd
@@ -376,6 +463,21 @@ msgstr ""
 #: code:addons/crnd_wsd/static/src/js/blockui.js:10
 #, python-format
 msgid "Loading..."
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_limit_max_upload_file_size_uom:0
+msgid "MB"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "MIME-Types"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Maximum File Size Allowed to Upload"
 msgstr ""
 
 #. module: crnd_wsd
@@ -406,8 +508,18 @@ msgid "Next Activity Deadline"
 msgstr ""
 
 #. module: crnd_wsd
+#: selection:res.company,request_wsd_public_use_author_phone:0
+msgid "No Phone"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_filterbox
 msgid "Open"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_wsd_public_use_author_phone:0
+msgid "Optional Phone"
 msgstr ""
 
 #. module: crnd_wsd
@@ -430,8 +542,15 @@ msgid "Please, fill response text!"
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Primary"
+#: code:addons/crnd_wsd/controllers/main.py:414
+#, python-format
+msgid "Please, specify your email address!"
+msgstr ""
+
+#. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/main.py:422
+#, python-format
+msgid "Please, specify your phone number!"
 msgstr ""
 
 #. module: crnd_wsd
@@ -445,8 +564,18 @@ msgid "Read more"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_on_request_creating_redirect_to
+msgid "Redirect after request created on Website"
+msgstr ""
+
+#. module: crnd_wsd
 #: selection:request.stage.route,website_extra_action:0
 msgid "Redirect to My Requests"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:website,request_redirect_after_created_on_website:0
+msgid "Redirect to congratulation page"
 msgstr ""
 
 #. module: crnd_wsd
@@ -455,12 +584,8 @@ msgid "Redirect to login"
 msgstr ""
 
 #. module: crnd_wsd
-#: model:ir.model.fields,help:crnd_wsd.field_res_config_settings__request_wsd_public_ui_visibility
-msgid "Redirect to login - unauthorized users will be\n"
-"         automatically redirected to login page.\n"
-"         Restricted UI - unauthorized users will be able to pass\n"
-"         all steps of creating a request but unable to submit\n"
-"         request until logged in."
+#: selection:website,request_redirect_after_created_on_website:0
+msgid "Redirect to request page"
 msgstr ""
 
 #. module: crnd_wsd
@@ -475,14 +600,43 @@ msgid "Request\n"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_allowed_upload_file_types
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_allowed_upload_file_types
+msgid "Request Allowed Upload File Types"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_request_category
 msgid "Request Category"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_create_step_layout
+#: model:ir.model.fields,field_description:crnd_wsd.field_website__request_create_step_layout
+msgid "Request Create Step Layout"
 msgstr ""
 
 #. module: crnd_wsd
 #: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_limit_max_text_size
 #: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_limit_max_text_size
 msgid "Request Limit Max Text Size"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_limit_max_upload_file_size
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_limit_max_upload_file_size
+msgid "Request Limit Max Upload File Size"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_limit_max_upload_file_size_uom
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_limit_max_upload_file_size_uom
+msgid "Request Limit Max Upload File Size Uom"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_website__request_redirect_after_created_on_website
+msgid "Request Redirect After Created On Website"
 msgstr ""
 
 #. module: crnd_wsd
@@ -501,18 +655,23 @@ msgid "Request Wsd Public Ui Visibility"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_wsd_public_use_author_phone
+msgid "Request Wsd Public Use Author Phone"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_request_kind
 msgid "Request kind"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:403
+#: code:addons/crnd_wsd/controllers/main.py:402
 #, python-format
 msgid "Request text is empty!"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:410
+#: code:addons/crnd_wsd/controllers/main.py:409
 #, python-format
 msgid "Request text is too long!"
 msgstr ""
@@ -521,6 +680,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_navigation
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_portal_my_home
 msgid "Requests"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_wsd_public_use_author_phone:0
+msgid "Required Phone"
 msgstr ""
 
 #. module: crnd_wsd
@@ -540,11 +704,6 @@ msgstr ""
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_filterbox
 msgid "Search by name, type, category or request message"
-msgstr ""
-
-#. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Secondary"
 msgstr ""
 
 #. module: crnd_wsd
@@ -583,6 +742,13 @@ msgid "Service Desk Website user (All requests)"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Set the maximum size of request text.\n"
+"                            When user tries to enter more symbols than allowed by this option,\n"
+"                            system will not allow him to do this."
+msgstr ""
+
+#. module: crnd_wsd
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_kind__show_as_website_filter
 msgid "Show As Website Filter"
 msgstr ""
@@ -610,8 +776,19 @@ msgid "Small-sized image of this contact. It is automatically resized as a 64x64
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Specify here maximum size of files allowed to upload.\n"
+"                            If user will try to upload larger file, he will get message that file is too large."
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 msgid "Stage"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:website,request_create_step_layout:0
+msgid "Standard"
 msgstr ""
 
 #. module: crnd_wsd
@@ -629,11 +806,6 @@ msgid "Still loading...<br />Please be patient."
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Success"
-msgstr ""
-
-#. module: crnd_wsd
 #. openerp-web
 #: code:addons/crnd_wsd/static/src/js/blockui.js:17
 #, python-format
@@ -641,8 +813,26 @@ msgid "Take a minute to get a coffee,<br />because it's loading..."
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "The list of allowed file types allowed to upload in request.\n"
+"                             This field must contain coma-separated list of"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "The type of uploaded file, now also validated on backend side.\n"
+"                                 In order to make file upload restriction work properly on backend side,\n"
+"                                 now it is recommended to install"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests
 msgid "There are currently no requests."
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:website,request_create_step_layout:0
+msgid "Tiles"
 msgstr ""
 
 #. module: crnd_wsd
@@ -671,6 +861,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_simplified_line
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Type"
 msgstr ""
 
@@ -681,14 +872,25 @@ msgid "Type\n"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:468
+#: code:addons/crnd_wsd/controllers/main.py:516
 #, python-format
 msgid "Unknown server error. See server logs."
 msgstr ""
 
 #. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/helpers.py:72
+#, python-format
+msgid "Unsupported file format!"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:res.groups,comment:crnd_wsd.group_service_desk_website_user_all_requests
 msgid "Users in this groups can see all requests in system, but still not have access to internal UI."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+msgid "View in internal"
 msgstr ""
 
 #. module: crnd_wsd
@@ -707,11 +909,7 @@ msgid "Visible in Website"
 msgstr ""
 
 #. module: crnd_wsd
-#: selection:request.stage.route,website_button_style:0
-msgid "Warning"
-msgstr ""
-
-#. module: crnd_wsd
+#: model:ir.model,name:crnd_wsd.model_website
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_category__website_ids
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_request__website_id
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_type__website_ids
@@ -719,11 +917,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_type_form
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_website_request_request_search
 msgid "Website"
-msgstr ""
-
-#. module: crnd_wsd
-#: model:ir.model.fields,field_description:crnd_wsd.field_request_stage_route__website_button_style
-msgid "Website Button Style"
 msgstr ""
 
 #. module: crnd_wsd
@@ -762,6 +955,11 @@ msgid "Website Service Desk (Public Visibility)"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_wsd_public_use_author_phone
+msgid "Website Service Desk (Use Author Phone)"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:res.groups,comment:crnd_wsd.group_service_desk_website_user_advanced
 msgid "Website advanced users of service desk. Users in this group can create requests with request types and categories they are subscribed for, even if these types and categories not website published."
 msgstr ""
@@ -779,8 +977,59 @@ msgid "You may not believe it, <br/> but the application is actually loading..."
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "Your Phone"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "Your email"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
 msgid "Your request has been submitted."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "application/msword"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "application/pdf"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "application/vnd.oasis.opendocument.text"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "audio/*"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+msgid "e.g +1 (123)-123-4567"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "image/*"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "image/*, application/pdf, application/msword"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "image/jpeg"
 msgstr ""
 
 #. module: crnd_wsd
@@ -796,6 +1045,13 @@ msgid "of"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "of files\n"
+"                             allowed to upload.;\n"
+"                             In order to allow to upload all images, pdf and msword documents, you can use following value:"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
@@ -803,9 +1059,36 @@ msgid "or"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "python package, that is used to detect mimetype of uploaded file on backend.\n"
+"                                 To make it work properly, it is also required to install system dependency libmagic\n"
+"                                 (to do it on Debian/Ubuntu run"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "python-magic"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "sudo apt-get install libmagic1"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "text/*"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
 msgid "to be able to view and create requests."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "video/*"
 msgstr ""
 

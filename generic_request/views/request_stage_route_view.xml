@@ -79,9 +79,14 @@
                                     <field name="stage_to_id"
                                         options="{'no_create': True, 'no_create_edit': True}"
                                         domain="[('request_type_id', '=', request_type_id), ('id','!=', stage_from_id)]"/>
+                                    <field name="reopen_as_type_ids"
+                                           widget="many2many_tags"
+                                           attrs="{'invisible': [('close', '=', False)]}"/>
                                     <field name="close"/>
                                     <field name="require_response"
                                         attrs="{'invisible': [('close', '=', False)]}"/>
+                                    <field name="button_style"
+                                        string="Button Style"/>
                                 </group>
                                 <group name="group_access"
                                     string="Access">
