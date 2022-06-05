@@ -107,24 +107,62 @@ class TestWebsiteServiceDesk(TestPhantomTour):
         self._test_phantom_tour(
             '/', 'crnd_wsd_tour_request_public_user_redirect')
 
-    def test_tour_public_user_create_request(self):
+    def test_tour_public_user_create_request_to_congrat_page(self):
         self.env.user.company_id.request_wsd_public_ui_visibility = (
             'create-request')
+        default_website = self.env.ref('website.default_website')
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'congrats_page'
+        )
+
         request = self._test_phantom_tour_requests(
-            '/', 'crnd_wsd_tour_request_public_user_create_request')
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_congrat')
 
         self.assertEqual(len(request), 1)
         self.assertFalse(request.author_id)
         self.assertFalse(request.partner_id)
         self.assertEqual(request.author_name, 'John Doe')
         self.assertEqual(request.email_from, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))
+
+    def test_tour_public_user_create_request_to_request_page(self):
+        self.env.user.company_id.request_wsd_public_ui_visibility = (
+            'create-request')
+        default_website = self.env.ref('website.default_website')
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'congrats_page'
+        )
+        # Change settings for redirect
+        default_website.write({
+            'request_redirect_after_created_on_website': 'req_page'
+        })
+        self.assertEqual(
+            default_website.request_redirect_after_created_on_website,
+            'req_page'
+        )
+
+        request = self._test_phantom_tour_requests(
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_request')
+
+        self.assertEqual(len(request), 1)
+        self.assertFalse(request.author_id)
+        self.assertFalse(request.partner_id)
+        self.assertEqual(request.author_name, 'John Doe')
+        self.assertEqual(request.email_from, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))
 
     def test_tour_public_user_create_request_create_contact(self):
         self.env.user.company_id.request_wsd_public_ui_visibility = (
             'create-request')
-        self.env.user.company_id.request_mail_create_partner_from_email = True
+        company = self.env.user.company_id
+        company.request_mail_create_author_contact_from_email = True
         request = self._test_phantom_tour_requests(
-            '/', 'crnd_wsd_tour_request_public_user_create_request')
+            '/',
+            'crnd_wsd_tour_request_public_user_create_req_to_congrat')
 
         self.assertEqual(len(request), 1)
         self.assertTrue(request.author_id)
@@ -133,3 +171,4 @@ class TestWebsiteServiceDesk(TestPhantomTour):
         self.assertFalse(request.email_from)
         self.assertEqual(request.author_id.name, 'John Doe')
         self.assertEqual(request.author_id.email, 'john@doe.net')
+        self.assertEqual(request.created_by_id, self.env.ref('base.user_root'))

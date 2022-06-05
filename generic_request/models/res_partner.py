@@ -1,6 +1,8 @@
 from odoo import models, fields, api
 from odoo.osv import expression
 
+from odoo.addons.crnd_web_m2o_info_widget import helper_get_many2one_info_data
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -41,3 +43,22 @@ class ResPartner(models.Model):
                 default_partner_id=self.commercial_partner_id.id,
                 default_author_id=self.id,
             ))
+
+    def _request_helper_m2o_info_get_fields(self):
+        """ Find list of fields, that have to be displayed as partner info
+            on request form view in 'm2o_info' fields.
+
+            Could be overridden by third-party modules.
+        """
+        return [
+            'name', 'commercial_company_name', 'website',
+            'email', 'phone', 'mobile'
+        ]
+
+    def request_helper_m2o_info(self):
+        """ Technical method, that is used to perepear data for
+            m2o_info fields.
+        """
+        return helper_get_many2one_info_data(
+            self,
+            self._request_helper_m2o_info_get_fields())

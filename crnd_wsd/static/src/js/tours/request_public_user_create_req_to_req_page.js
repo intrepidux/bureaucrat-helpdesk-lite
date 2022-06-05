@@ -1,9 +1,9 @@
-odoo.define('crnd_wsd.tour_request_public_user_create_request', function (require) {
+odoo.define('crnd_wsd.tour_request_public_user_create_request_to_request', function (require) {
     'use strict';
 
     var tour = require('web_tour.tour');
 
-    tour.register('crnd_wsd_tour_request_public_user_create_request', {
+    tour.register('crnd_wsd_tour_request_public_user_create_req_to_request', {
         test: true,
         url: '/requests',
     }, [
@@ -76,14 +76,23 @@ odoo.define('crnd_wsd.tour_request_public_user_create_request', function (requir
             trigger: "button[type='submit']",
         },
         {
-            content: "Wait for congratulation page loaded",
-            trigger: "#wrap:has(h3:contains(" +
+            content: "Wait for congratulation message loaded",
+            trigger: "#wrap:has(div.alert-success h3:contains(" +
                 "'Your request has been submitted'))",
         },
         {
             content: "Check request text",
-            trigger: "#wrap:has(.wsd_requests_table .wsd_request " +
-                "div:containsExact('New request text'))",
+            trigger: "#wrap:has(#request-body-text-content " +
+                "p:containsExact('New request text'))",
+        },
+        {
+            content: "Check 'Requests' link",
+            trigger: "a:containsExact('Requests')",
+        },
+        {
+            content: "Wait for requests page loaded",
+            trigger: "#wrap:has(h3:contains(" +
+                "'There are currently no requests.'))",
         },
     ]);
     return {};

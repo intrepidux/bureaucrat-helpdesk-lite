@@ -326,6 +326,9 @@
                                     <field name="color" widget="color"/>
                                     <field name="tag_category_ids"
                                            widget="many2many_tags"/>
+                                    <field name="access_group_ids"
+                                           widget="many2many_tags"
+                                           options="{'no_create': true, 'no_quick_create': true}"/>
                                 </group>
                                 <group name="group_settings_priority" string="Priority">
                                     <field name="complex_priority"
@@ -351,7 +354,6 @@
                                            string="Timesheet Activities"/>
                                 </group>
                             </group>
-
                             <separator colspan="4" string="Description"/>
                             <field colspan="4" name="description"
                                    nolabel="1" select="2" placeholder="Description"/>

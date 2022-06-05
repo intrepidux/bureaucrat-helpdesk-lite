@@ -21,7 +21,7 @@ class RequestChannel(models.Model):
     active = fields.Boolean(default=True, index=True)
 
     request_ids = fields.One2many(
-        'request.request', 'kind_id', string='Requests')
+        'request.request', 'channel_id', string='Requests')
     request_count = fields.Integer(
         compute='_compute_request_count', readonly=True)
 

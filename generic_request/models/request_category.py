@@ -31,6 +31,14 @@ class RequestCategory(models.Model):
     description = fields.Text(translate=True)
     help_html = fields.Html(translate=True)
 
+    # Access rignts
+    access_group_ids = fields.Many2many(
+        'res.groups', string='Access groups',
+        help="If user belongs to one of groups specified in this field,"
+             " then he will be able to select this category during request"
+             " creation, even if this category is not published."
+    )
+
     # Stat
     request_ids = fields.One2many(
         'request.request', 'category_id', 'Requests', readonly=True)

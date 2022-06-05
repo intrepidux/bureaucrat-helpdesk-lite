@@ -126,7 +126,7 @@ class TestRequestAuthor(RequestCase):
             self.env[act['res_model']].search(act['domain']),
             author.request_ids)
         req = self.env['request.request'].with_context(
-            dict(act['context'])).create({
+            **act['context']).create({
                 'type_id': self.simple_type.id,
                 'request_text': 'Test',
             })
