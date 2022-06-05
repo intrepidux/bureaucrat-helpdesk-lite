@@ -1,5 +1,26 @@
 # Changelog
 
+## Version 1.83.0
+
+Added options in settings to choose the redirect way after request created
+
+
+## Version 1.78.0
+
+The type of uploaded file, now also validated on backend side.
+In order to make file upload restriction work properly on backend side,
+now it is recommended to install [python-magic](https://pypi.org/project/python-magic/) python package,
+that is used to detect mimetype of uploaded file on backend.
+To make it work properly, it is also required to install system dependency libmagic
+(to do it on Debian/Ubuntu run ```sudo apt-get install libmagic1```)
+
+
+## Version 1.76.0
+
+Added a link to a request on the website to go to this request in the
+internal interface for the allowed user group.
+
+
 ## Version 1.73.0
 
 Added new field Access Groups on the request category / type.

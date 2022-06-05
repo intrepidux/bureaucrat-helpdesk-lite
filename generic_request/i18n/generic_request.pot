@@ -32,6 +32,15 @@ msgid ""
 msgstr ""
 
 #. module: generic_request
+#: model:res.groups,comment:generic_request.group_request_show_searchpanel_view
+msgid ""
+"\n"
+"            If this group enabled, then users will see searchpanel\n"
+"            in request search view\n"
+"        "
+msgstr ""
+
+#. module: generic_request
 #: model:res.groups,comment:generic_request.group_request_manager
 msgid ""
 "\n"
@@ -104,6 +113,14 @@ msgid ""
 msgstr ""
 
 #. module: generic_request
+#: model:res.groups,comment:generic_request.group_request_user_read_all_request_types
+msgid ""
+"\n"
+"            Users of this group can read all request types\n"
+"        "
+msgstr ""
+
+#. module: generic_request
 #: code:addons/generic_request/models/request_timesheet_line.py:0
 #, python-format
 msgid "%s [Running]"
@@ -149,6 +166,23 @@ msgstr ""
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
 msgid "<i class=\"fa fa-user mr4\" title=\"Moved by user\"/>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+msgid ""
+"<i title=\"Date Assigned\" class=\"fa fa-calendar mr4\" "
+"attrs=\"{'invisible': [('date_assigned', '=', False)]}\"/>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+msgid "<i title=\"Date Closed\" class=\"fa fa-calendar mr4\"/>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+msgid "<i title=\"Date Created\" class=\"fa fa-calendar mr4\"/>"
 msgstr ""
 
 #. module: generic_request
@@ -242,6 +276,11 @@ msgstr ""
 
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
+msgid "<span title=\"Subrequests\" class=\"fa fa-sitemap mr4\"/>"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
 msgid "<span>Undefined</span>"
 msgstr ""
 
@@ -281,6 +320,12 @@ msgid "Access"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_category__access_group_ids
+#: model:ir.model.fields,field_description:generic_request.field_request_type__access_group_ids
+msgid "Access groups"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_kind__menuaction_name
 msgid "Action Name"
 msgstr ""
@@ -292,6 +337,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_stage_route__message_needaction
 #: model:ir.model.fields,field_description:generic_request.field_request_type__message_needaction
 msgid "Action Needed"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model,name:generic_request.model_ir_actions_act_window
+msgid "Action Window"
 msgstr ""
 
 #. module: generic_request
@@ -377,11 +427,6 @@ msgstr ""
 
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
-msgid "Add parent / child relationship"
-msgstr ""
-
-#. module: generic_request
-#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "Addon requires installation."
 msgstr ""
 
@@ -398,8 +443,8 @@ msgid "All requests"
 msgstr ""
 
 #. module: generic_request
-#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
-msgid "Allow users to reopen requests with another request type"
+#: model:request.event.type,name:generic_request.request_event_type_task_all_tasks_closed
+msgid "All subrequests closed"
 msgstr ""
 
 #. module: generic_request
@@ -433,6 +478,11 @@ msgstr ""
 #. module: generic_request
 #: model:request.timesheet.activity,name:generic_request.request_timesheet_activity_analysis
 msgid "Analysis"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_set_parent_form_view
+msgid "Apply"
 msgstr ""
 
 #. module: generic_request
@@ -595,6 +645,11 @@ msgid "Author Name"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_request__author_phone
+msgid "Author Phone"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__author_related_request_closed_count
 msgid "Author Related Request Closed Count"
 msgstr ""
@@ -606,6 +661,7 @@ msgstr ""
 
 #. module: generic_request
 #: model:ir.model.fields,help:generic_request.field_request_request__author_id
+#: model:ir.model.fields,help:generic_request.field_request_wizard_set_parent__author_id
 msgid "Author of this request"
 msgstr ""
 
@@ -625,6 +681,13 @@ msgid "Authored requests"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_res_company__request_mail_auto_subscribe_cc_contacts
+#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_mail_auto_subscribe_cc_contacts
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Auto subscribe CC contacts on mail"
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "Automated Actions"
 msgstr ""
@@ -632,6 +695,16 @@ msgstr ""
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "Automatically add / remove tags"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Automatically create CC contacts for requests"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Automatically create author contacts for requests"
 msgstr ""
 
 #. module: generic_request
@@ -652,7 +725,7 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_res_company__request_event_auto_remove
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_event_auto_remove
-msgid "Automatically remove events older then"
+msgid "Automatically remove events older than"
 msgstr ""
 
 #. module: generic_request
@@ -665,6 +738,17 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields.selection,name:generic_request.selection__request_request__kanban_state__blocked
 msgid "Blocked"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_stage_route__button_style
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_route_form
+msgid "Button Style"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_request_stage_route__button_style
+msgid "Buttons style"
 msgstr ""
 
 #. module: generic_request
@@ -707,6 +791,7 @@ msgstr ""
 #: model:request.stage.type,name:generic_request.request_stage_type_cancel
 #: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_assign_form_view
 #: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_close_form_view
+#: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_set_parent_form_view
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_wizard_stop_work_form
 msgid "Cancel"
 msgstr ""
@@ -725,6 +810,12 @@ msgstr ""
 msgid ""
 "Cannot delete stage %(stage_name)s because it is referenced from following routes:\n"
 "%(routes)s"
+msgstr ""
+
+#. module: generic_request
+#: code:addons/generic_request/models/request_request.py:0
+#, python-format
+msgid "Cannot move request (%(request)s) by this route (%(route)s)"
 msgstr ""
 
 #. module: generic_request
@@ -753,6 +844,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_searchpanel
 msgid "Category"
 msgstr ""
 
@@ -782,6 +874,11 @@ msgid "Category..."
 msgstr ""
 
 #. module: generic_request
+#: model:ir.actions.act_window,name:generic_request.action_request_wizard_set_parent
+msgid "Change parent request"
+msgstr ""
+
+#. module: generic_request
 #: model:request.event.type,name:generic_request.request_event_type_changed
 msgid "Changed"
 msgstr ""
@@ -799,10 +896,15 @@ msgid "Channel of request"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_res_company__request_preferred_list_view_mode
+#: model:ir.model.fields,help:generic_request.field_res_config_settings__request_preferred_list_view_mode
+msgid "Choose preferred view type for requests"
+msgstr ""
+
+#. module: generic_request
 #: code:addons/generic_request/models/request_type.py:0
 #: model:ir.actions.act_window,name:generic_request.action_request_wizard_close
 #: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_close_form_view
-#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_route_search
 #, python-format
 msgid "Close"
@@ -1011,8 +1113,14 @@ msgid "Create default"
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_res_company__request_mail_create_partner_from_email
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_mail_create_partner_from_email
+#: model:ir.model.fields,field_description:generic_request.field_res_company__request_mail_create_cc_contact_from_email
+#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_mail_create_cc_contact_from_email
+msgid "Create partners from CC of incoming emails"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_res_company__request_mail_create_author_contact_from_email
+#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_mail_create_author_contact_from_email
 msgid "Create partners from incoming emails"
 msgstr ""
 
@@ -1065,6 +1173,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__create_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__create_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__create_uid
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__create_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__create_uid
 #: model_terms:ir.ui.view,arch_db:generic_request.message_request_notification__request_info
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
@@ -1086,6 +1195,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__create_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__create_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__create_date
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__create_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__create_date
 msgid "Created on"
 msgstr ""
@@ -1109,6 +1219,16 @@ msgstr ""
 #: model:ir.model.fields.selection,name:generic_request.selection__request_type__default_priority__5
 #, python-format
 msgid "Critical"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__danger
+msgid "Danger"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__dark
+msgid "Dark"
 msgstr ""
 
 #. module: generic_request
@@ -1195,6 +1315,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:generic_request.message_request_created__author
 #: model_terms:ir.ui.view,arch_db:generic_request.message_request_reopened__author
 msgid "Dear"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__default
+#: model:ir.model.fields.selection,name:generic_request.selection__res_company__request_preferred_list_view_mode__default
+msgid "Default"
 msgstr ""
 
 #. module: generic_request
@@ -1285,6 +1411,7 @@ msgstr ""
 
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_generic_tag_category__display_name
+#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_category__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_channel__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template__display_name
@@ -1302,6 +1429,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__display_name
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__display_name
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__display_name
 #: model:ir.model.fields,field_description:generic_request.field_res_company__display_name
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__display_name
@@ -1377,6 +1505,12 @@ msgid "Email address of the contact"
 msgstr ""
 
 #. module: generic_request
+#: code:addons/generic_request/models/request_request.py:0
+#, python-format
+msgid "Error! You cannot create recursive requests."
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.request_event_view_form
 msgid "Event Data"
 msgstr ""
@@ -1394,6 +1528,11 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__request_event_ids
 msgid "Events"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_wizard_set_parent__warning_type__few_parent
+msgid "Few parent"
 msgstr ""
 
 #. module: generic_request
@@ -1495,6 +1634,11 @@ msgid "Group By"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__group_request_show_searchpanel_view
+msgid "Group Request Show Searchpanel View"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__group_request_show_stat_on_kanban_views
 msgid "Group Request Show Stat On Kanban Views"
 msgstr ""
@@ -1510,6 +1654,11 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__module_generic_assignment_hr
 msgid "HR Assignments"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+msgid "Has Subrequests"
 msgstr ""
 
 #. module: generic_request
@@ -1585,6 +1734,7 @@ msgstr ""
 
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_generic_tag_category__id
+#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window__id
 #: model:ir.model.fields,field_description:generic_request.field_request_category__id
 #: model:ir.model.fields,field_description:generic_request.field_request_channel__id
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template__id
@@ -1602,6 +1752,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__id
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__id
 #: model:ir.model.fields,field_description:generic_request.field_res_company__id
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__id
@@ -1651,11 +1802,29 @@ msgid ""
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,help:generic_request.field_res_company__request_mail_create_partner_from_email
-#: model:ir.model.fields,help:generic_request.field_res_config_settings__request_mail_create_partner_from_email
+#: model:ir.model.fields,help:generic_request.field_res_company__request_mail_auto_subscribe_cc_contacts
+#: model:ir.model.fields,help:generic_request.field_res_config_settings__request_mail_auto_subscribe_cc_contacts
+msgid ""
+"If set to True, CC contacts will be automatically subscribed on the "
+"specified mail"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_res_company__request_mail_create_author_contact_from_email
+#: model:ir.model.fields,help:generic_request.field_res_config_settings__request_mail_create_author_contact_from_email
 msgid ""
 "If set to True, then if request came from email that has no related partner,"
-" then partner will be created automatically."
+" then partner will be created automatically. Also, same logic applied to "
+"requests created from website by unregistered users."
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_res_company__request_mail_create_cc_contact_from_email
+#: model:ir.model.fields,help:generic_request.field_res_config_settings__request_mail_create_cc_contact_from_email
+msgid ""
+"If set to True, then if request came from email where CC has no related "
+"partner, then partner will be created automatically. Also, same logic "
+"applied to requests created from website by unregistered users."
 msgstr ""
 
 #. module: generic_request
@@ -1667,6 +1836,48 @@ msgstr ""
 #: model:ir.model.fields,help:generic_request.field_request_stage_route__require_response
 #: model:ir.model.fields,help:generic_request.field_request_wizard_close__require_response
 msgid "If set, then user will be asked for comment on this route"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid ""
+"If the checkbox is checked, CC contacts\n"
+"                                    will be\n"
+"                                    automatically subscribed on the\n"
+"                                    specified mail"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid ""
+"If the checkbox is checked, for any\n"
+"                                        email\n"
+"                                        mentioned in CC header new contact\n"
+"                                        will\n"
+"                                        be created (if not exists yet)"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid ""
+"If this group enabled, then users will see searchpanel\n"
+"                                    in request search view"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_request_category__access_group_ids
+msgid ""
+"If user belongs to one of groups specified in this field, then he will be "
+"able to select this category during request creation, even if this category "
+"is not published."
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_request_type__access_group_ids
+msgid ""
+"If user belongs to one of groups specified in this field, then he will be "
+"able to select this type during request creation, even if this category is "
+"not published."
 msgstr ""
 
 #. module: generic_request
@@ -1691,6 +1902,7 @@ msgid "Incoming routes"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__info
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_category_form
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_form
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_route_form
@@ -1740,6 +1952,11 @@ msgstr ""
 
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+msgid "Is Subrequest"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
 msgid "Is assigned"
 msgstr ""
 
@@ -1758,6 +1975,11 @@ msgstr ""
 #: code:addons/generic_request/models/request_request.py:0
 #, python-format
 msgid "It is not allowed to change request type"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__res_company__request_preferred_list_view_mode__kanban
+msgid "Kanban"
 msgstr ""
 
 #. module: generic_request
@@ -1814,6 +2036,7 @@ msgstr ""
 
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_generic_tag_category____last_update
+#: model:ir.model.fields,field_description:generic_request.field_ir_actions_act_window____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_category____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_channel____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_creation_template____last_update
@@ -1831,6 +2054,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close____last_update
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent____last_update
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work____last_update
 #: model:ir.model.fields,field_description:generic_request.field_res_company____last_update
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings____last_update
@@ -1859,6 +2083,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__write_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__write_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__write_uid
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__write_uid
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -1878,6 +2103,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_type__write_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_assign__write_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__write_date
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__write_date
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -1890,6 +2116,16 @@ msgid "Less"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__light
+msgid "Light"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__link
+msgid "Link"
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "Link any Odoo documents to requests"
 msgstr ""
@@ -1897,6 +2133,11 @@ msgstr ""
 #. module: generic_request
 #: model:generic.tag,name:generic_request.tag_platform_linux
 msgid "Linux"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__res_company__request_preferred_list_view_mode__list
+msgid "List"
 msgstr ""
 
 #. module: generic_request
@@ -2224,11 +2465,6 @@ msgid "Need Install Generic Request Mail"
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__need_install_generic_request_parent
-msgid "Need Install Generic Request Parent"
-msgstr ""
-
-#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__need_install_generic_request_related_doc
 msgid "Need Install Generic Request Related Doc"
 msgstr ""
@@ -2236,11 +2472,6 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__need_install_generic_request_related_requests
 msgid "Need Install Generic Request Related Requests"
-msgstr ""
-
-#. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__need_install_generic_request_reopen_as
-msgid "Need Install Generic Request Reopen As"
 msgstr ""
 
 #. module: generic_request
@@ -2344,6 +2575,11 @@ msgid "New Priority"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__new_request_text
+msgid "New Request Text"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_category__request_open_last_24h_count
 #: model:ir.model.fields,field_description:generic_request.field_request_channel__request_open_last_24h_count
 #: model:ir.model.fields,field_description:generic_request.field_request_kind__request_open_last_24h_count
@@ -2396,6 +2632,16 @@ msgid "New User"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__new_request_category_id
+msgid "New category"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__new_request_type_id
+msgid "New type"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr ""
@@ -2408,11 +2654,6 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
-
-#. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_request_request__next_stage_ids
-msgid "Next Stage"
 msgstr ""
 
 #. module: generic_request
@@ -2429,6 +2670,11 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields.selection,name:generic_request.selection__request_request__timesheet_start_status__not-started
 msgid "Not Started"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+msgid "Not Subrequest"
 msgstr ""
 
 #. module: generic_request
@@ -2573,6 +2819,11 @@ msgid "Old User"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_wizard_set_parent__warning_type__one_parent
+msgid "One  parent"
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
 msgid "Open"
 msgstr ""
@@ -2635,17 +2886,90 @@ msgstr ""
 
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_category__parent_id
+#: model:ir.model.fields,field_description:generic_request.field_request_request__parent_id
 msgid "Parent"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__parent_new_id
+msgid "Parent New"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__parent_new_stage_id
+msgid "Parent New Stage"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__parent_old_id
+msgid "Parent Old"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__parent_old_stage_id
+msgid "Parent Old Stage"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_category__parent_path
+#: model:ir.model.fields,field_description:generic_request.field_request_request__parent_path
 msgid "Parent Path"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__parent_id
+#: model_terms:ir.ui.view,arch_db:generic_request.message_request_notification__request_info
+msgid "Parent Request"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__parent_route_id
+msgid "Parent Route"
 msgstr ""
 
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_category_form
 msgid "Parent category..."
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_request_request__parent_id
+msgid "Parent request"
+msgstr ""
+
+#. module: generic_request
+#: model:request.event.category,name:generic_request.event_category_parent_request_events
+msgid "Parent request Events"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__author_id
+msgid "Parent request author"
+msgstr ""
+
+#. module: generic_request
+#: model:request.event.type,name:generic_request.request_event_type_parent_request_changed
+msgid "Parent request changed"
+msgstr ""
+
+#. module: generic_request
+#: model:request.event.type,name:generic_request.request_event_type_parent_request_closed
+msgid "Parent request closed"
+msgstr ""
+
+#. module: generic_request
+#: model:request.event.type,name:generic_request.request_event_type_parent_request_stage_changed
+msgid "Parent request stage changed"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__request_text_sample
+msgid "Parent request text"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+msgid "Parent..."
 msgstr ""
 
 #. module: generic_request
@@ -2692,6 +3016,11 @@ msgid "Pause"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,help:generic_request.field_request_request__author_phone
+msgid "Phone of author"
+msgstr ""
+
+#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_category_form
 msgid "Place category description here..."
 msgstr ""
@@ -2710,8 +3039,19 @@ msgid "Platform"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_res_company__request_preferred_list_view_mode
+#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__request_preferred_list_view_mode
+msgid "Preferred view type"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_stage__previous_stage_ids
 msgid "Previous stages"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__primary
+msgid "Primary"
 msgstr ""
 
 #. module: generic_request
@@ -2782,8 +3122,18 @@ msgid "Remaining time"
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__module_generic_request_reopen_as
-msgid "Reopen Requests"
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__reopen
+msgid "Reopen"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_close_form_view
+msgid "Reopen as"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_stage_route__reopen_as_type_ids
+msgid "Reopen request type"
 msgstr ""
 
 #. module: generic_request
@@ -2827,6 +3177,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_timesheet_line__request_id
 #: model:ir.model.fields,field_description:generic_request.field_request_timesheet_report__request_id
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_close__request_id
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__request_ids
 #: model:ir.model.fields,field_description:generic_request.field_request_wizard_stop_work__request_id
 #: model:ir.model.fields,field_description:generic_request.field_res_partner__request_ids
 #: model:ir.model.fields,field_description:generic_request.field_res_users__request_ids
@@ -3081,6 +3432,11 @@ msgid "Request Wizard: Close"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model,name:generic_request.model_request_wizard_set_parent
+msgid "Request Wizard: Set Parent"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model,name:generic_request.model_request_wizard_stop_work
 msgid "Request Wizard: Stop Work"
 msgstr ""
@@ -3234,6 +3590,11 @@ msgid "Request user"
 msgstr ""
 
 #. module: generic_request
+#: model:res.groups,name:generic_request.group_request_user_read_all_request_types
+msgid "Request user (Read all types)"
+msgstr ""
+
+#. module: generic_request
 #: model:res.groups,name:generic_request.group_request_user_see_all_requests
 msgid "Request user (See all requests)"
 msgstr ""
@@ -3378,8 +3739,44 @@ msgid "SLA Service"
 msgstr ""
 
 #. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid ""
+"Same bechavior will be applied to\n"
+"                                        requests\n"
+"                                        created on website by unregistered\n"
+"                                        users."
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid ""
+"Same bechavior will be applied to requests created on website by "
+"unregistered users."
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__secondary
+msgid "Secondary"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,help:generic_request.field_request_stage__use_custom_colors
 msgid "Select colors from the palette manually"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Select preferred view mode"
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Select your preferred view type."
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_set_parent_form_view
+msgid "Selected requests has different parents!"
 msgstr ""
 
 #. module: generic_request
@@ -3552,10 +3949,21 @@ msgid ""
 msgstr ""
 
 #. module: generic_request
+#: model:res.groups,name:generic_request.group_request_show_searchpanel_view
+#: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
+msgid "Show searchpanel in request search view"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,help:generic_request.field_request_kind__menuitem_toggle
 msgid ""
 "Show/Hide menuitem for requests of this kind. To see new menuitem, please "
 "reload the page."
+msgstr ""
+
+#. module: generic_request
+#: model_terms:ir.ui.view,arch_db:generic_request.request_wizard_set_parent_form_view
+msgid "Some of selected requests already has parent!"
 msgstr ""
 
 #. module: generic_request
@@ -3592,6 +4000,11 @@ msgid "Stage Label Color"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_request__stage_route_out_json
+msgid "Stage Route Out Json"
+msgstr ""
+
+#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_type__route_ids
 msgid "Stage Routes"
 msgstr ""
@@ -3600,6 +4013,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:generic_request.field_request_request__stage_type_id
 #: model:ir.model.fields,field_description:generic_request.field_request_stage__type_id
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_searchpanel
 msgid "Stage Type"
 msgstr ""
 
@@ -3689,8 +4103,65 @@ msgid "Stop Work"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__subrequest_id
+msgid "Subrequest"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_request__child_count
+msgid "Subrequest Count"
+msgstr ""
+
+#. module: generic_request
+#: model:request.event.category,name:generic_request.event_category_subrequest_events
+msgid "Subrequest Events"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__subrequest_new_stage_id
+msgid "Subrequest New Stage"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_event__subrequest_old_stage_id
+msgid "Subrequest Old Stage"
+msgstr ""
+
+#. module: generic_request
+#: model:mail.message.subtype,name:generic_request.mt_request_subrequest_closed
+#: model:request.event.type,name:generic_request.request_event_type_subrequest_closed
+msgid "Subrequest closed"
+msgstr ""
+
+#. module: generic_request
+#: model:mail.message.subtype,name:generic_request.mt_request_subrequest_created
+msgid "Subrequest created"
+msgstr ""
+
+#. module: generic_request
+#: model:mail.message.subtype,name:generic_request.mt_request_subrequest_reopened
+msgid "Subrequest reopened"
+msgstr ""
+
+#. module: generic_request
+#: model:mail.message.subtype,name:generic_request.mt_request_subrequest_stage_changed
+#: model:request.event.type,name:generic_request.request_event_type_subrequest_stage_changed
+msgid "Subrequest stage changed"
+msgstr ""
+
+#. module: generic_request
+#: code:addons/generic_request/models/request_request.py:0
+#: code:addons/generic_request/models/request_request.py:0
+#: model:ir.model.fields,field_description:generic_request.field_request_request__child_ids
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__module_generic_request_action_subrequest
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
+#, python-format
 msgid "Subrequests"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__success
+msgid "Success"
 msgstr ""
 
 #. module: generic_request
@@ -3733,6 +4204,7 @@ msgstr ""
 #. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__tag_ids
 #: model:ir.model.fields,field_description:generic_request.field_res_config_settings__module_generic_request_action_tag
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_searchpanel
 msgid "Tags"
 msgstr ""
 
@@ -3961,6 +4433,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_form
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_kanban
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_searchpanel
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_route_search
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_stage_search
 msgid "Type"
@@ -4093,11 +4566,6 @@ msgid "Use Services"
 msgstr ""
 
 #. module: generic_request
-#: model:ir.model.fields,field_description:generic_request.field_res_config_settings__module_generic_request_parent
-msgid "Use Subrequests"
-msgstr ""
-
-#. module: generic_request
 #: model:ir.model.fields,field_description:generic_request.field_request_request__use_timesheet
 #: model:ir.model.fields,field_description:generic_request.field_request_type__use_timesheet
 #: model_terms:ir.ui.view,arch_db:generic_request.view_request_type_form
@@ -4168,6 +4636,16 @@ msgid "WSD Legal"
 msgstr ""
 
 #. module: generic_request
+#: model:ir.model.fields.selection,name:generic_request.selection__request_stage_route__button_style__warning
+msgid "Warning"
+msgstr ""
+
+#. module: generic_request
+#: model:ir.model.fields,field_description:generic_request.field_request_wizard_set_parent__warning_type
+msgid "Warning Type"
+msgstr ""
+
+#. module: generic_request
 #: model:request.channel,name:generic_request.request_channel_web
 msgid "Web"
 msgstr ""
@@ -4207,9 +4685,9 @@ msgstr ""
 #. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid ""
-"When request created from incoming email, and author of email is not present"
-" in odoo's contacts database, then create new contact (partner) for this "
-"email address."
+"When request created from incoming email or by unregistered user on website,\n"
+"                                    and author is not present in odoo's contacts database,\n"
+"                                    then create new contact (partner) for this email address."
 msgstr ""
 
 #. module: generic_request
@@ -4231,14 +4709,6 @@ msgstr ""
 #: code:addons/generic_request/models/request_request.py:0
 #, python-format
 msgid "You can not assign this (%(request)s) request"
-msgstr ""
-
-#. module: generic_request
-#: code:addons/generic_request/models/request_request.py:0
-#, python-format
-msgid ""
-"You can not assign this request (%(request)s), because this request is "
-"closed."
 msgstr ""
 
 #. module: generic_request

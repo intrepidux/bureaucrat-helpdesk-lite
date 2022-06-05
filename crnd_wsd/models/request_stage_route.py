@@ -8,18 +8,6 @@ class RequestStageRoute(models.Model):
     # website_published field, thus implement it in explicit way here insetead
     # of inheriting from "website.published.mixin"
     website_published = fields.Boolean('Visible in Website', copy=False)
-    website_button_style = fields.Selection([
-        ('default', 'Default'),
-        ('primary', 'Primary'),
-        ('secondary', 'Secondary'),
-        ('success', 'Success'),
-        ('danger', 'Danger'),
-        ('warning', 'Warning'),
-        ('info', 'Info'),
-        ('light', 'Light'),
-        ('dark', 'Dark'),
-        ('link', 'Link'),
-    ], default='default', help='Buttons style for website')
     website_extra_action = fields.Selection(
         [('redirect_to_my', 'Redirect to My Requests')])
 

@@ -22,10 +22,8 @@ FEATURE_MODULES = [
     'generic_request_field',
     'generic_request_invoicing',
     'generic_request_mail',
-    'generic_request_parent',
     'generic_request_related_doc',
     'generic_request_related_requests',
-    'generic_request_reopen_as',
     'generic_request_route_auto',
     'generic_request_sale',
     'generic_request_service',
@@ -62,14 +60,10 @@ class ResConfigSettings(models.TransientModel):
         string="Log Service Level")
     module_generic_request_field = fields.Boolean(
         string="Use Custom Fields in Requests")
-    module_generic_request_parent = fields.Boolean(
-        string="Use Subrequests")
     module_generic_request_related_doc = fields.Boolean(
         string="Documents Related to Requests")
     module_generic_request_related_requests = fields.Boolean(
         string="Related Requests")
-    module_generic_request_reopen_as = fields.Boolean(
-        string="Reopen Requests")
     module_generic_request_route_auto = fields.Boolean(
         string="Use Automatic Routes")
     module_generic_request_service = fields.Boolean(
@@ -136,13 +130,9 @@ class ResConfigSettings(models.TransientModel):
         compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_field = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
-    need_install_generic_request_parent = fields.Boolean(
-        compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_related_doc = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_related_requests = fields.Boolean(
-        compute="_compute_generic_request_modules_can_install", readonly=True)
-    need_install_generic_request_reopen_as = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_route_auto = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
@@ -208,9 +198,23 @@ class ResConfigSettings(models.TransientModel):
         group='base.group_user',
         implied_group='generic_request.'
                       'group_request_show_stat_on_kanban_views')
-    request_mail_create_partner_from_email = fields.Boolean(
-        related='company_id.request_mail_create_partner_from_email',
+    request_mail_create_author_contact_from_email = fields.Boolean(
+        related='company_id.request_mail_create_author_contact_from_email',
         readonly=False)
+    request_preferred_list_view_mode = fields.Selection(
+        related='company_id.request_preferred_list_view_mode', readonly=False)
+    request_mail_create_cc_contact_from_email = fields.Boolean(
+        related='company_id.request_mail_create_cc_contact_from_email',
+        readonly=False
+    )
+    request_mail_auto_subscribe_cc_contacts = fields.Boolean(
+        related='company_id.request_mail_auto_subscribe_cc_contacts',
+        readonly=False
+    )
+    group_request_show_searchpanel_view = fields.Boolean(
+        group='base.group_user',
+        implied_group='generic_request.'
+                      'group_request_show_searchpanel_view')
 
     @api.depends('company_id')
     def _compute_generic_request_modules_can_install(self):

@@ -1,6 +1,9 @@
 from odoo import models, fields, api
 from odoo.osv import expression
 
+from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
+from odoo.addons.crnd_web_m2o_info_widget import helper_get_many2one_info_data
+
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
@@ -53,23 +56,26 @@ class ResUsers(models.Model):
     @api.depends('assigned_request_ids', 'assigned_request_ids.closed',
                  'created_request_ids', 'created_request_ids.closed')
     def _compute_request_stored_fields(self):
-        RequestRequest = self.env['request.request']
+        assigned_map = read_counts_for_o2m(
+            records=self,
+            field_name='assigned_request_ids',
+            sudo=True)
+        assigned_open_map = read_counts_for_o2m(
+            records=self,
+            field_name='assigned_request_ids',
+            domain=[('closed', '=', False)],
+            sudo=True)
+        assigned_closed_map = read_counts_for_o2m(
+            records=self,
+            field_name='assigned_request_ids',
+            domain=[('closed', '=', True)],
+            sudo=True)
         for record in self:
-            # TODO: optimize
-            record.assigned_request_count = (
-                RequestRequest.search_count([
-                    ('user_id', '=', record.id),
-                ]))
-            record.assigned_request_open_count = (
-                RequestRequest.search_count([
-                    ('closed', '=', False),
-                    ('user_id', '=', record.id),
-                ]))
-            record.assigned_request_closed_count = (
-                RequestRequest.search_count([
-                    ('closed', '=', True),
-                    ('user_id', '=', record.id),
-                ]))
+            record.assigned_request_count = assigned_map.get(record.id, 0)
+            record.assigned_request_open_count = assigned_open_map.get(
+                record.id, 0)
+            record.assigned_request_closed_count = assigned_closed_map.get(
+                record.id, 0)
 
     @api.depends('assigned_request_ids', 'assigned_request_ids.closed',
                  'created_request_ids', 'created_request_ids.closed',
@@ -126,3 +132,22 @@ class ResUsers(models.Model):
                 default_partner_id=self.partner_id.commercial_partner_id.id,
                 default_author_id=self.partner_id.id,
             ))
+
+    def _request_helper_m2o_info_get_fields(self):
+        """ Find list of fields, that have to be displayed as user info
+            on request form view in 'm2o_info' fields.
+
+            Could be overridden by third-party modules.
+        """
+        return [
+            'name', 'commercial_company_name', 'website',
+            'email', 'phone', 'mobile'
+        ]
+
+    def request_helper_m2o_info(self):
+        """ Technical method, that is used to perepear data for
+            m2o_info fields.
+        """
+        return helper_get_many2one_info_data(
+            self,
+            self._request_helper_m2o_info_get_fields())

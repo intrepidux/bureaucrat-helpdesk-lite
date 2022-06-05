@@ -62,12 +62,12 @@ class RequestRequest(models.Model):
             'res_id': self.id,
         })
 
-    def _notification_recipients(self, message, groups):
+    def _notify_get_groups(self, *args, **kwargs):
         """ Display access button in mails to portal users
         """
         self.ensure_one()
-        groups = super(RequestRequest, self)._notification_recipients(
-            message, groups)
+        groups = super(RequestRequest, self)._notify_get_groups(
+            *args, **kwargs)
 
         # pylint: disable=unused-variable
         for group_name, group_method, group_data in groups:

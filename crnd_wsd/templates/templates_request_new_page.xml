@@ -276,20 +276,24 @@
                         <t t-call="crnd_wsd.wsd_request_new_selection_box"/>
                     </div>
 
-                    <section t-if="validation_errors" id="request-error-list" class="row">
-                        <div class="alert alert-danger alert-dismissible show col-sm-12" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span>X</span>
-                            </button>
-                            <h4 class="alert-heading">Following errors happened during request creation!</h4>
-                            <hr/>
-                            <ul>
-                                <t t-foreach="validation_errors.keys()" t-as="error_field">
-                                    <li t-esc="validation_errors[error_field]['error_text']"/>
-                                </t>
-                            </ul>
-                        </div>
-                    </section>
+                    <div t-if="validation_errors" class="row">
+                        <section id="request-error-list" class="col-sm-12">
+                            <div class="alert alert-danger alert-dismissible show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span>X</span>
+                                </button>
+                                <h4 class="alert-heading">Following errors happened during request creation!</h4>
+                                <hr/>
+                                <ul>
+                                    <li t-foreach="validation_errors.keys()" t-as="error_field">
+                                        <t t-foreach="validation_errors[error_field]['error_text'].split('\n')" t-as="error_line">
+                                            <p t-esc="error_line"/>
+                                        </t>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
 
                     <t t-if="request.website.is_public_user()">
                         <div t-if="request.website.get_request_public_ui() == 'restrict'"
@@ -310,7 +314,7 @@
                         <div t-elif="request.website.get_request_public_ui() == 'create-request'"
                              class="row">
                             <div class="oe_structure col-sm-12"/>
-                            <div class="form-group col-sm-12">
+                            <div class="form-group col-sm-12 col-md-6">
                                 <label for="request_author_email">Your email</label>
                                 <input type="text"
                                        t-attf-class="form-control {{ 'is-invalid' if validation_errors.get('request_author_email') else '' }}"
@@ -320,6 +324,29 @@
                                 <small id="request_author_email_help"
                                        class="form-text text-muted">
                                     Please, enter here your email address.
+                                </small>
+                            </div>
+                            <div t-if="request.website.get_request_public_use_author_phone() in ['optional-phone', 'required-phone']"
+                                 class="form-group col-sm-12 col-md-6">
+                                <label for="request_author_phone">Your Phone</label>
+                                <t t-if="request.website.get_request_public_use_author_phone() == 'required-phone'">
+                                    <input type="text"
+                                           t-attf-class="form-control"
+                                           required="required"
+                                           id="request_author_phone"
+                                           name="request_author_phone"
+                                           placeholder="e.g +1 (123)-123-4567"/>
+                                </t>
+                                <t t-else="">
+                                    <input type="text"
+                                           t-attf-class="form-control"
+                                           id="request_author_phone"
+                                           name="request_author_phone"
+                                           placeholder="e.g +1 (123)-123-4567"/>
+                                </t>
+                                <small id="request_author_phone_help"
+                                       class="form-text text-muted">
+                                    Please, enter here your phone number.
                                 </small>
                             </div>
                             <div class="oe_structure col-sm-12"/>
@@ -428,9 +455,119 @@
                 <div class="row">
                     <div class="oe_structure col-md-8 offset-md-2"/>
                     <div class="col-md-8 offset-md-2 mb16">
-                        <t t-call="crnd_wsd.wsd_request_table">
-                            <t t-set="reqs" t-value="req"/>
-                        </t>
+                        <table class="table mt16 wsd_requests_table">
+                            <tbody>
+                                <tr>
+                                    <td class="wsd_request">
+                                        <div class="request_top">
+                                            <span class="request-title">
+                                                <t t-if="request.website.is_public_user()">
+                                                    <a class="request-name"
+                                                        t-att-href="req.get_portal_url()">
+                                                        <t t-esc="req.name"/>
+                                                    </a>
+                                                </t>
+                                                <t t-else="">
+                                                    <a class="request-name"
+                                                       t-attf-href="/requests/request/{{req.id}}">
+                                                        <t t-esc="req.name"/>
+                                                    </a>
+                                                </t>
+                                            </span>
+                                            <span class="request-shortcuts ml8">
+                                                <a t-attf-href="/requests/request/{{req.id}}#discussion"
+                                                   title="Comments"
+                                                   class="fa fa-comments mr4">
+                                                </a>
+                                            </span>
+
+                                            <div class="right_info">
+                                                <span t-if="req.deadline_date"
+                                                      class="request-deadline mr4"
+                                                      t-attf-title="Deadline: {{req.deadline_date}}">
+                                                    <span t-if="req.deadline_state == 'ok'"
+                                                          class="text-success fa fa-clock-o"/>
+                                                    <span t-if="req.deadline_state == 'today'"
+                                                          class="text-warning fa fa-clock-o"/>
+                                                    <span t-if="req.deadline_state == 'overdue'"
+                                                          class="text-danger fa fa-clock-o"/>
+                                                    <span t-field="req.deadline_date" class="text-muted"/>
+                                                </span>
+                                                <span class="badge"
+                                                      t-attf-style="background-color: {{req.stage_bg_color}}; color: {{req.stage_label_color}}">
+                                                     <t t-esc="req.stage_id.name"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <t t-esc="req.request_text_sample"/>
+                                        </div>
+                                        <div class="request_content">
+                                            <div class="content_info">
+                                                <div class="text-muted">
+
+                                                    <div t-if="req.category_id" class="content-info-category">
+                                                        <span class="fa fa-bars mr4" title="Category"/>
+                                                        <span t-field="req.category_id.display_name" title="Category"/>
+
+                                                        <span t-if="req.category_id.description"
+                                                            role="button" data-toggle="popover"
+                                                            title="Category"
+                                                            data-placement="right"
+                                                            data-trigger="hover"
+                                                            class="fa fa-question text-muted"
+                                                            t-attf-data-content="{{ req.category_id.description }}"/>
+
+                                                    </div>
+
+                                                    <div class="content-info-type">
+                                                        <span class="fa fa-hashtag mr4" title="Type"/>
+                                                        <span t-field="req.type_id.name" title="Type"/>
+
+                                                        <span t-if="req.type_id.description"
+                                                           role="button" data-toggle="popover"
+                                                           title="Type"
+                                                           data-placement="right"
+                                                           data-trigger="hover"
+                                                           class="fa fa-question text-muted"
+                                                           t-attf-data-content="{{ req.type_id.description }}"/>
+
+                                                    </div>
+
+                                                    <div t-if="req.kind_id" class="content-info-kind">
+                                                        <span class="fa fa-square mr4" title="Kind"/>
+                                                        <span t-field="req.kind_id.display_name" title="Kind"/>
+                                                        <span t-if="req.kind_id.description"
+                                                              role="button" data-toggle="popover"
+                                                              title="Kind"
+                                                              data-placement="right"
+                                                              data-trigger="hover"
+                                                              class="fa fa-question text-muted"
+                                                              t-attf-data-content="{{ req.kind_id.description }}"/>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="content_dates hidden-xs">
+                                                <span t-field="req.author_avatar" t-att-title="req.sudo().author_id.name" t-options="{'widget': 'image', 'class': 'img-rounded user_image mr8'}"/>
+                                                <span t-field="req.date_created" class="date"/>
+                                                <t t-if="req.date_assigned">
+                                                    <span class="fa fa-angle-right mr8 ml8"></span>
+                                                    <span t-field="req.assignee_avatar" t-att-title="req.sudo().user_id.name" t-options="{'widget': 'image', 'class': 'img-rounded user_image mr8'}"/>
+                                                    <span t-field="req.date_assigned" class="date"/>
+                                                </t>
+                                                <t t-if="req.date_closed">
+                                                    <span class="fa fa-angle-right mr8 ml8"></span>
+                                                    <span t-field="req.closed_by_avatar" t-att-title="req.sudo().closed_by_id.name" t-options="{'widget': 'image', 'class': 'img-rounded user_image mr8'}"/>
+                                                    <span t-field="req.date_closed" class="date"/>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="oe_structure col-md-8 offset-md-2"/>
                 </div>
