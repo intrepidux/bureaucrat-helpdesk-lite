@@ -6,13 +6,10 @@ addons-list:
     - name: crnd_service_desk
     - name: crnd_wsd
     - name: generic_request
-    - name: web_view_searchpanel
 
 git-sources:
     - crnd: crnd/bureaucrat-generics
       name: bureaucrat_generics_98
-    - github: OCA/web
-      name: oca_web_91
 
 
 known-addons:
@@ -23,3 +20,4 @@ known-addons:
     - generic_tag
     - crnd_web_m2o_info_widget
     - web_widget_colorpicker
+    - web_view_searchpanel
