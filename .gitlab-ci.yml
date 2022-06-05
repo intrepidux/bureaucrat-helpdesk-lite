@@ -15,6 +15,7 @@ cache: {}
 
 stages:
     - package
+    - build
     - deploy
 
 .do_package_definition: &do_package_definition
@@ -32,12 +33,14 @@ do_package_on_commit:
         variables:
             # Do not run package on commits created by packager itself
             - $CI_COMMIT_MESSAGE =~ /\[odoo-packager\]/
+            - $CI_COMMIT_MESSAGE =~ /\[yodoo-cockpit\]/
         refs:
             - "15.0"
             - web
+            - api
     only:
-        variables:
-            - $CI_MERGE_REQUEST_IID
+        refs:
+            - branches
         changes:
             - "odoo-packager.yml"
 
@@ -48,6 +51,7 @@ do_package_manual_or_api:
     only:
         - web
         - api
+
 
 
 
