@@ -887,6 +887,8 @@ msgstr ""
 #: model:ir.actions.act_window,name:generic_request.action_channel_window
 #: model:ir.model.fields,field_description:generic_request.field_request_request__channel_id
 #: model:ir.ui.menu,name:generic_request.menu_channel_view
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_search
+#: model_terms:ir.ui.view,arch_db:generic_request.view_request_request_searchpanel
 msgid "Channel"
 msgstr ""
 

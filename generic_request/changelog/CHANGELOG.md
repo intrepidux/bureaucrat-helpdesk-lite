@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.164.1
+
+Added ability to show/hide columns in tree view
+
+
 ## Version 1.156.0
 
 Added ability to search requests by following fields:
