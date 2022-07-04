@@ -1,9 +1,9 @@
-from odoo.tests import HttpCase
+from odoo.addons.generic_mixin.tests.common import WebTourCase
 
 from odoo.addons.generic_mixin.tests.common import deactivate_records_for_model
 
 
-class TestPhantomTour(HttpCase):
+class TestPhantomTour(WebTourCase):
 
     def setUp(self):
         super(TestPhantomTour, self).setUp()
@@ -14,14 +14,7 @@ class TestPhantomTour(HttpCase):
     def _test_phantom_tour(self, start_url, tour_name, **kw):
         """ Wrapper to run web tours
         """
-        tour_service = "odoo.__DEBUG__.services['web_tour.tour']"
-        js_run_tour = tour_service + ".run('%s')"
-        js_tours_tour = tour_service + ".tours.%s.ready"
-        self.browser_js(
-            url_path=start_url,
-            code=js_run_tour % tour_name,
-            ready=js_tours_tour % tour_name,
-            **kw)
+        return self.run_js_tour(start_url, tour_name, **kw)
 
     def _test_phantom_tour_requests(self, start_url, tour_name, **kw):
         """ Same as _test_phantom_tour but returns list of requests
