@@ -147,23 +147,28 @@ class RequestEvent(models.Model):
         """ Run vacuum for events.
             Delete all events older than <days>
         """
+        live_time_uom = self.env.user.company_id.request_event_live_time_uom
+        event_auto_remove = self.env.user.company_id.request_event_auto_remove
+
+        if not (live_time_uom and event_auto_remove):
+            return
+
         if days:
             _logger.warning(
                 "Passing request event's time to live in scheduler is"
                 " deprecated! Please, update cron job to "
                 "call '_scheduler_vacuum' without arguments")
 
-        if self.env.user.company_id.request_event_live_time_uom == 'days':
+        if live_time_uom == 'days':
             delta = relativedelta(
                 days=+self.env.user.company_id.request_event_live_time)
-        elif self.env.user.company_id.request_event_live_time_uom == 'weeks':
+        elif live_time_uom == 'weeks':
             delta = relativedelta(
                 days=+self.env.user.company_id.request_event_live_time*7)
-        elif self.env.user.company_id.request_event_live_time_uom == 'months':
+        elif live_time_uom == 'months':
             delta = relativedelta(
                 months=+self.env.user.company_id.request_event_live_time)
         vacuum_date = datetime.datetime.now() - delta
-        if self.env.user.company_id.request_event_auto_remove:
-            self.sudo().search(
-                [('date', '<', fields.Datetime.to_string(vacuum_date))],
-            ).unlink()
+        self.sudo().search(
+            [('date', '<', fields.Datetime.to_string(vacuum_date))],
+        ).unlink()

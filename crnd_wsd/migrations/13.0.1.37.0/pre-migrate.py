@@ -1,3 +1,7 @@
+from odoo.addons.generic_mixin.tools.migration_utils import ensure_version
+
+
+@ensure_version('1.37.0')
 def migrate(cr, installed_version):
     cr.execute("""
         -- Delete views that inherits thats are defined in crnd_wsd_timesheet
