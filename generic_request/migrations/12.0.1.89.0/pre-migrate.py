@@ -1,3 +1,7 @@
+from odoo.addons.generic_mixin.tools.migration_utils import ensure_version
+
+
+@ensure_version('1.89.0')
 def migrate(cr, installed_version):
     cr.execute("""
         -- Update view for users form to avoid migration errors

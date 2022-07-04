@@ -73,6 +73,7 @@
                                         />
                                         <field name="request_event_live_time_uom"
                                                style="width: auto; margin-left: 8px;"
+                                               attrs="{'required': [('request_event_auto_remove', '!=', False)]}"
                                         />
                                     </div>
                                 </div>

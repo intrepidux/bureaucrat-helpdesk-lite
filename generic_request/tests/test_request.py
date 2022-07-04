@@ -885,3 +885,23 @@ class TestRequestBase(RequestCase):
             request_act.read(['views'])[0]['views'][0][1], 'pivot')
         self.assertEqual(
             request_act.read(['views'])[0]['views'][1][1], 'kanban')
+
+    def test_request_event_live_time_uom_false(self):
+        with freeze_time('2018-07-09'):
+            request = self.env['request.request'].create({
+                'type_id': self.simple_type.id,
+                'request_text': 'Test autovacuum',
+            })
+            company = request.created_by_id.company_id
+            company.request_event_auto_remove = True
+            company.request_event_live_time = 2
+            company.request_event_live_time_uom = False
+            self.assertEqual(request.request_event_count, 1)
+
+        with freeze_time('2018-07-12'):
+            # Test autovacuum of events (set 2 day)
+            # No events was removed, autovacuum skipped (uom = False)
+            cron_job = self.env.ref(
+                'generic_request.ir_cron_request_vacuum_events')
+            cron_job.method_direct_trigger()
+            self.assertEqual(request.request_event_count, 1)
