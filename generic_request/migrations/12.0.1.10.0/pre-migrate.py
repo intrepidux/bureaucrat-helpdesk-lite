@@ -1,6 +1,8 @@
 from odoo.tools.sql import column_exists
+from odoo.addons.generic_mixin.tools.migration_utils import ensure_version
 
 
+@ensure_version('1.10.0')
 def migrate(cr, installed_version):
     if not column_exists(cr, 'request_request', 'author_id'):
         cr.execute("""
