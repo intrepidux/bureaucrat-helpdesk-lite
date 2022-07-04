@@ -490,32 +490,53 @@
         <field name="model">request.request</field>
         <field name="arch" type="xml">
             <tree decoration-bf="message_needaction==True">
-                <field name="message_needaction" invisible="1"/>
-                <field name="is_priority_complex" invisible='1'/>
-                <field name="stage_bg_color" invisible="1"/>
-                <field name="stage_label_color" invisible="1"/>
-                <field name="name"/>
-                <field name="type_id"/>
-                <field name="category_id"/>
-                <field name="parent_id"/>
-                <field name="author_id"/>
-                <field name="user_id"/>
-                <field name="request_text_sample" string="Description"
+                <field name="message_needaction"
+                       invisible="1"/>
+                <field name="is_priority_complex"
+                       invisible='1'/>
+                <field name="stage_bg_color"
+                       invisible="1"/>
+                <field name="stage_label_color"
+                       invisible="1"/>
+                <field name="name" />
+                <field name="type_id"
+                       optional="show"/>
+                <field name="category_id"
+                       optional="show"/>
+                <field name="parent_id"
+                       optional="show"/>
+                <field name="author_id"
+                       optional="show"/>
+                <field name="user_id"
+                       optional="show"/>
+                <field name="request_text_sample"
+                       string="Description"
                        widget="dynamic_popover_text"
-                       options="{'max_width': '350px', 'line_clamp': '3'}"/>
-                <field name="date_created"/>
-                <field name="date_closed"/>
-                <field name="deadline_date" string="Deadline"/>
+                       options="{'max_width': '350px', 'line_clamp': '3'}"
+                       optional="show"/>
+                <field name="date_created"
+                       optional="show"/>
+                <field name="date_closed"
+                       optional="show"/>
+                <field name="deadline_date"
+                       string="Deadline"
+                       optional="show"/>
                 <field name="stage_id"
-                       options="{'field_bg_color': 'stage_bg_color', 'field_label_color': 'stage_label_color'}"/>
-                <field name="kanban_state" widget="state_selection"/>
+                       options="{'field_bg_color': 'stage_bg_color', 'field_label_color': 'stage_label_color'}"
+                       optional="show"/>
+                <field name="kanban_state"
+                       widget="state_selection"
+                       optional="show"/>
                 <field name="tag_ids"
                        options="{'color_field': 'color'}"
                        widget="many2many_tags"
                        placeholder="Tags..."
-                       context="{'default_model': 'request.request'}"/>
-                <field name="use_timesheet" invisible="1"/>
-                <field name="timesheet_start_status" invisible="1"/>
+                       context="{'default_model': 'request.request'}"
+                       optional="show"/>
+                <field name="use_timesheet"
+                       invisible="1"/>
+                <field name="timesheet_start_status"
+                       invisible="1"/>
                 <button name="action_start_work"
                         type="object"
                         string="Start"
@@ -530,7 +551,8 @@
                         attrs="{'invisible': ['|', ('use_timesheet', '=', False), ('timesheet_start_status', '=', 'not-started')]}"/>
                 <field name="priority"
                        widget="priority"
-                       attrs="{'readonly': [('is_priority_complex', '=', True)]}"/>
+                       attrs="{'readonly': [('is_priority_complex', '=', True)]}"
+                       optional="show"/>
             </tree>
         </field>
     </record>
@@ -898,6 +920,9 @@
                     <filter name="filter_group_by_priority"
                             string="Priority"
                             context="{'group_by': 'priority'}"/>
+                    <filter name="filter_group_by_channel"
+                            string="Channel"
+                            context="{'group_by': 'channel_id'}"/>
                 </group>
             </search>
         </field>
@@ -948,6 +973,7 @@
                     <field name="stage_type_id" string="Stage Type"/>
                     <field name="tag_ids" string="Tags" select="multi"
                            domain="[('model_id.model', '=', 'request.request')]"/>
+                    <field name="channel_id" string="Channel"/>
                 </searchpanel>
             </xpath>
         </field>
