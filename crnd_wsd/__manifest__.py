@@ -6,7 +6,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'license': 'LGPL-3',
-    'version': '15.0.1.87.0',
+    'version': '15.0.1.91.0',
 
     'depends': [
         'mail',
@@ -74,6 +74,8 @@
             'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_congrat_page.js',
             'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_req_page.js',
             'crnd_wsd/static/src/js/tours/request_filter_kind.js',
+            'crnd_wsd/static/src/js/tours/request_author_no_phone.js',
+            'crnd_wsd/static/src/js/tours/request_author_phone_required.js',
         ],
         'web.assets_qweb': [
             'crnd_wsd/static/src/xml/templates.xml',

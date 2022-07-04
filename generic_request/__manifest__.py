@@ -11,7 +11,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'category': 'Generic Request',
-    'version': '15.0.1.161.0',
+    'version': '15.0.1.165.0',
     'external_dependencies': {
         'python': [
             'html2text',
