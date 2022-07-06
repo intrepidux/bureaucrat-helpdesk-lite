@@ -1,4 +1,5 @@
 # Automatically-generated odoo_requirements based on Known Git Sources section of assembly.
 --repo https://github.com/crnd-inc/crnd-web.git
 --repo https://github.com/crnd-inc/generic-addons.git
+--repo https://github.com/straga/odoo_vik_main.git
 --repo https://github.com/OCA/web.git
