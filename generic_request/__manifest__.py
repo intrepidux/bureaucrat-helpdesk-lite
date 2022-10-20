@@ -11,7 +11,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'category': 'Generic Request',
-    'version': '15.0.1.165.0',
+    'version': '15.0.1.180.0',
     'external_dependencies': {
         'python': [
             'html2text',
@@ -29,6 +29,7 @@
         'crnd_web_tree_colored_field',
         'crnd_web_m2o_info_widget',
         'base_setup',
+        'base_field_m2m_view',
     ],
 
     # always loaded
@@ -67,6 +68,7 @@
         'views/generic_tag_menu.xml',
         'views/request_timesheet_activity.xml',
         'views/request_timesheet_line.xml',
+        'views/request_mail_templates_menu.xml',
         'wizard/request_wizard_close.xml',
         'wizard/request_wizard_assign.xml',
         'wizard/request_wizard_stop_work.xml',
@@ -99,7 +101,6 @@
             'generic_request/static/src/scss/request_dashboard_kanban.scss',
 
             'generic_request/static/src/js/field_request_html.js',
-            'generic_request/static/src/js/request_tag_widget.js',
 
             'generic_request/static/src/js/stage_route_out/form_controller.js',
             'generic_request/static/src/js/stage_route_out/form_renderer.js',
