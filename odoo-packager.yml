@@ -20,4 +20,5 @@ known-addons:
     - generic_tag
     - crnd_web_m2o_info_widget
     - web_widget_colorpicker
+    - base_field_m2m_view
     - web_view_searchpanel
