@@ -20,7 +20,7 @@ class RequestRequest(models.Model):
         "Assignee (Avatar)", related='user_id.image_128')
     closed_by_avatar = fields.Binary(
         "Closed By (Avatar)", related='closed_by_id.image_128')
-    website_id = fields.Many2one('website')
+    website_id = fields.Many2one('website', index=True)
 
     def _compute_access_url(self):
         res = super(RequestRequest, self)._compute_access_url()
@@ -37,9 +37,14 @@ class RequestRequest(models.Model):
             user = self.env['res.users'].sudo().browse(access_uid)
             record = self.with_user(user)
         if user.share:
+            access_url = (
+                record._get_share_url()
+                if self.env.company.request_mail_link_access == 'shared-link'
+                else record.access_url
+            )
             return {
                 'type': 'ir.actions.act_url',
-                'url': record.access_url,
+                'url': access_url,
                 'target': 'self',
                 'res_id': self.id,
             }
@@ -76,6 +81,11 @@ class RequestRequest(models.Model):
             group_data['has_button_access'] = True
 
         return groups
+
+    def get_mail_url(self, pid=None):
+        if self.env.user.company_id.request_mail_link_access == 'shared-link':
+            return self._get_share_url(redirect=True, pid=pid)
+        return super().get_mail_url(pid=pid)
 
     def action_show_on_website(self):
         self.ensure_one()

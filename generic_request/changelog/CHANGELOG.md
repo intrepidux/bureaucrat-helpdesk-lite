@@ -1,5 +1,35 @@
 # Changelog
 
+## Version 1.178.0
+
+Refactored settings UI: moved mail-related settings to separate section
+
+
+## Version 1.173.0
+
+Fixed bug in event notifications, 
+that happens when default notification settings set to False
+and event messages of subrequest didn't  deliver to parent request.
+
+
+## Version 1.171.0
+
+***FR2207947***
+
+Added notifications about subrequest events, 
+such as ```created```, ```assigned```, ```closed```, ```reopened```, in parent request.
+
+
+## Version 1.170.0
+
+Improved appearance of request tags on kanban view
+
+
+## Version 1.167.0
+
+Added settings menu for request mail templates
+
+
 ## Version 1.164.1
 
 Added ability to show/hide columns in tree view

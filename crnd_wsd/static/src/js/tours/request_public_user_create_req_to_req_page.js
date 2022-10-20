@@ -14,7 +14,7 @@ odoo.define('crnd_wsd.tour_request_public_user_create_request_to_request', funct
         {
             content: "Select request category SaAS / Support",
             trigger: "h4:has(label:containsExact('SaAS / Support'))" +
-                " input[name='category_id']",
+                ":contains() input[name='category_id']",
         },
         {
             content: "Click 'Next' button",
@@ -32,7 +32,7 @@ odoo.define('crnd_wsd.tour_request_public_user_create_request_to_request', funct
         {
             content: "Select request type Generic Question",
             trigger: "h4:has(label:containsExact('Generic Question'))" +
-                " input[name='type_id']",
+                ":contains() input[name='type_id']",
         },
         {
             content: "Click 'Next' button",
@@ -78,12 +78,12 @@ odoo.define('crnd_wsd.tour_request_public_user_create_request_to_request', funct
         {
             content: "Wait for congratulation message loaded",
             trigger: "#wrap:has(div.alert-success h3:contains(" +
-                "'Your request has been submitted'))",
+                "'Your request has been submitted')):contains()",
         },
         {
             content: "Check request text",
             trigger: "#wrap:has(#request-body-text-content " +
-                "p:containsExact('New request text'))",
+                "p:containsExact('New request text')):contains()",
         },
         {
             content: "Check 'Requests' link",
@@ -92,7 +92,7 @@ odoo.define('crnd_wsd.tour_request_public_user_create_request_to_request', funct
         {
             content: "Wait for requests page loaded",
             trigger: "#wrap:has(h3:contains(" +
-                "'There are currently no requests.'))",
+                "'There are currently no requests.')):contains()",
         },
     ]);
     return {};
