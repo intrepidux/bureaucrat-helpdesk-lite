@@ -19,3 +19,4 @@ known-addons:
     - generic_mixin
     - generic_tag
     - crnd_web_m2o_info_widget
+    - base_field_m2m_view
