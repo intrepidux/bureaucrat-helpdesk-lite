@@ -22,6 +22,12 @@
 
     .request-head-info {
         margin-bottom: 0;
+        margin-top: 0;
+
+        .request-head-info-left,
+        .request-head-info-right {
+            margin-bottom: 0;
+        }
 
         .request-head-info-left .request-head-info-item {
             padding-right: 8px;
@@ -55,6 +61,14 @@
     .o_notebook.request-notebook {
         margin-top: 0;
 
+        .tab-pane.active {
+            padding-top: 4px;
+        }
+
+        .request-author-and-partner a.o_form_uri.o_field_widget {
+            margin-bottom: 0;
+        }
+
         div.request-partner-author-field {
             width: 100% !important;
             display: flex;
@@ -65,6 +79,8 @@
             }
         }
     }
+
+
 
     // Based on mail chatter date separator
     .request-separator {

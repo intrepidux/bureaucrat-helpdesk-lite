@@ -1,9 +1,11 @@
 import logging
+import re
 from odoo.tests import HttpCase
 from odoo.tools.misc import mute_logger
 from odoo.addons.generic_mixin.tests.common import (
     TEST_URL,
     AccessRulesFixMixinMT,
+    FindNew,
 )
 from .common import disable_mail_auto_delete
 
@@ -109,3 +111,91 @@ class TestRequestMailNotificationLinks(AccessRulesFixMixinMT, HttpCase):
         self.assertNotRegex(res.url, r'^%s/web/login.*$' % self.base_url)
         self.assertRegex(
             res.url, r'^%s/web#.*id=%s.*$' % (self.base_url, request.id))
+
+    def test_subrequest_event_message(self):
+        Request = self.env['request.request']
+        simple_type = self.env.ref('generic_request.request_type_simple')
+
+        # create parent request
+        parent_request = Request.create({
+            'type_id': simple_type.id,
+            'category_id': self.env.ref(
+                'generic_request.request_category_demo_general').id,
+            'request_text': 'Parent test request'
+        })
+
+        # create child request
+        with FindNew(self.env, 'request.request', 'mail.message') as nr:
+            Request.create({
+                'type_id': simple_type.id,
+                'category_id': self.env.ref(
+                    'generic_request.request_category_demo_general').id,
+                'request_text': 'Parent test request',
+                'parent_id': parent_request.id,
+            })
+
+        # check that child request created
+        child_request = nr['request.request']
+        self.assertTrue(child_request.exists())
+
+        # assure that parent request has notification about child creation
+        message = nr['mail.message'].filtered(
+            lambda x: x.res_id == parent_request.id)
+        message_text = re.sub('<.*?>', '', message.body)
+        self.assertEqual(message_text,
+                         'Subrequest %s of type %s has been created. '
+                         % (child_request.name, child_request.type_id.name))
+
+        # check that child_request not assigned
+        self.assertFalse(child_request.user_id)
+
+        # assign child request
+        with FindNew(self.env, 'mail.message') as nr:
+            child_request.action_request_assign_to_me()
+
+        # assure that parent request has notification about child assignment
+        message = nr['mail.message'].filtered(
+            lambda x: x.res_id == parent_request.id)
+        message_text = re.sub('<.*?>', '', message.body)
+        self.assertEqual(message_text,
+                         'Subrequest %s assigned to: %s. '
+                         % (child_request.name, self.env.user.name))
+
+        # set notification settings about event 'closed' to False
+        simple_type.sudo().send_default_closed_notification = False
+
+        # change child request stage to 'sent'
+        child_request.write({
+            'stage_id': self.env.ref(
+                'generic_request.request_stage_type_simple_sent').id
+        })
+
+        # change child request stage to 'rejected' (closed)
+        with FindNew(self.env, 'mail.message') as nr:
+            child_request.write({
+                'stage_id': self.env.ref(
+                    'generic_request.request_stage_type_simple_rejected').id
+            })
+
+        # assure that parent request has notification about child closing
+        message = nr['mail.message'].filtered(
+            lambda x: x.res_id == parent_request.id)
+        message_text = re.sub('<.*?>', '', message.body)
+        self.assertEqual(message_text,
+                         'Subrequest %s has been closed. '
+                         % child_request.name)
+
+        # reopen closed child request
+        with FindNew(self.env, 'mail.message') as nr:
+            child_request.write({
+                'stage_id': self.env.ref(
+                    'generic_request.request_stage_type_simple_draft').id
+            })
+
+        # assure that parent request has notification about child reopening
+        message = nr['mail.message'].filtered(
+            lambda x: x.res_id == parent_request.id)
+        message_text = re.sub('<.*?>', '', message.body)
+        self.assertEqual(message_text,
+                         'Subrequest %s has been reopened. '
+                         % child_request.name)

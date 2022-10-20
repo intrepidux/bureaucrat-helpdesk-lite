@@ -20,7 +20,7 @@
 
     <menuitem name="Request Tags"
               id="menu_request_tags"
-              parent="generic_request.menu_configuration"
+              parent="generic_request.menu_configuration_requests"
               groups="generic_request.group_request_manager"
               action="action_generic_request_tags_view"
               sequence="120"/>

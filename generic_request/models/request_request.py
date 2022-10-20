@@ -6,6 +6,8 @@ from odoo import models, fields, api, tools, _, http, exceptions, SUPERUSER_ID
 from odoo.addons.generic_mixin import pre_write, post_write, pre_create
 from odoo.osv import expression
 from odoo.exceptions import ValidationError
+from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
+from odoo.addons.generic_mixin.tools.sql import create_sql_view
 from ..tools.utils import html2text
 from ..constants import (
     TRACK_FIELD_CHANGES,
@@ -281,6 +283,18 @@ class RequestRequest(models.Model):
     child_count = fields.Integer(
         'Subrequest Count', compute='_compute_child_count')
 
+    sec_view_access_partner_ids = fields.Many2manyView(
+        comodel_name='res.partner',
+        relation='request_access_follower_partner_rel_view',
+        column1='request_id',
+        column2='partner_id',
+        readonly=True,
+        copy=False,
+        help="Technical field to represent all partners that "
+             "follow this request, or its parent request, or any of its child "
+             "request. It is used for access-rights checks."
+    )
+
     _sql_constraints = [
         ('name_uniq',
          'UNIQUE (name)',
@@ -346,8 +360,11 @@ class RequestRequest(models.Model):
 
     @api.depends('request_event_ids')
     def _compute_request_event_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='request_event_ids', sudo=True)
         for record in self:
-            record.request_event_count = len(record.request_event_ids)
+            record.request_event_count = mapped_data.get(record.id, 0)
 
     @api.depends()
     def _compute_is_new_request(self):
@@ -573,8 +590,46 @@ class RequestRequest(models.Model):
 
     @api.depends('child_ids')
     def _compute_child_count(self):
-        for rec in self:
-            rec.child_count = len(rec.child_ids)
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='child_ids')
+        for record in self:
+            record.child_count = mapped_data.get(record.id, 0)
+
+    @api.model
+    def init(self):
+        res = super().init()
+
+        # Making this view to improve performance on
+        # access rights check for requests.
+        create_sql_view(
+            self._cr, 'request_access_follower_partner_rel_view',
+            """
+                SELECT mf.res_id AS request_id,
+                    mf.partner_id AS partner_id
+                FROM mail_followers AS mf
+                WHERE mf.res_model = 'request.request'
+                  AND mf.partner_id IS NOT NULL
+                UNION
+                SELECT rr.id AS request_id,
+                       mf.partner_id AS partner_id
+                FROM request_request AS rr
+                LEFT JOIN mail_followers  AS mf ON (
+                    mf.res_model = 'request.request' AND
+                    mf.partner_id IS NOT NULL AND
+                    mf.res_id = rr.parent_id)
+                WHERE rr.parent_id IS NOT NULL
+                UNION
+                SELECT rr.parent_id AS request_id,
+                       mf.partner_id AS partner_id
+                FROM request_request AS rr
+                LEFT JOIN mail_followers  AS mf ON (
+                    mf.res_model = 'request.request' AND
+                    mf.partner_id IS NOT NULL AND
+                    mf.res_id = rr.id)
+                WHERE rr.parent_id IS NOT NULL
+            """)
+        return res
 
     @api.constrains('parent_id')
     def _recursion_constraint(self):
@@ -1057,6 +1112,15 @@ class RequestRequest(models.Model):
                 **message_data)
 
     def _send_default_notification_created(self, event):
+        # if created request has parent,
+        # send the event message to parent in any case
+        # regardless of request type notification setting
+        if self.parent_id:
+            log_note = 'Subrequest <a href="%s">%s</a> of type <i>%s</i> ' \
+                       'has been created. ' \
+                       % (self.get_mail_url(), self.name, self.type_id.name)
+            self.parent_id._message_log(body=log_note)
+
         if not self.sudo().type_id.send_default_created_notification:
             return
 
@@ -1070,6 +1134,14 @@ class RequestRequest(models.Model):
         )
 
     def _send_default_notification_assigned(self, event):
+        # if assigned request has parent,
+        # send the event message to parent in any case
+        # regardless of request type notification setting
+        if self.parent_id:
+            log_note = 'Subrequest <a href="%s">%s</a> assigned to: %s. ' \
+                       % (self.get_mail_url(), self.name, self.user_id.name)
+            self.parent_id._message_log(body=log_note)
+
         if not self.sudo().type_id.send_default_assigned_notification:
             return
 
@@ -1083,6 +1155,16 @@ class RequestRequest(models.Model):
         )
 
     def _send_default_notification_closed(self, event):
+        # if closed request has parent,
+        # send the event message to parent in any case
+        # regardless of request type notification setting
+        if self.parent_id:
+            log_note = 'Subrequest <a href="%s">%s</a> has been closed. ' \
+                       % (self.get_mail_url(), self.name)
+            if self.response_text:
+                log_note += '<br> %s' % self.response_text
+            self.parent_id._message_log(body=log_note)
+
         if not self.sudo().type_id.send_default_closed_notification:
             return
 
@@ -1096,6 +1178,14 @@ class RequestRequest(models.Model):
         )
 
     def _send_default_notification_reopened(self, event):
+        # if reopened request has parent,
+        # send the event message to parent in any case
+        # regardless of request type notification setting
+        if self.parent_id:
+            log_note = 'Subrequest <a href="%s">%s</a> has been reopened. ' \
+                       % (self.get_mail_url(), self.name)
+            self.parent_id._message_log(body=log_note)
+
         if not self.sudo().type_id.send_default_reopened_notification:
             return
 
@@ -1138,8 +1228,10 @@ class RequestRequest(models.Model):
         event = self.env['request.event'].sudo().create(event_data)
         self.handle_request_event(event)
 
-    def get_mail_url(self):
+    def get_mail_url(self, pid=None):
         """ Get request URL to be used in mails
+
+            :param int pid: ID of partner. reserver for portal usage
         """
         return "/mail/view/request/%s" % self.id
 
@@ -1151,6 +1243,7 @@ class RequestRequest(models.Model):
             *args, **kwargs)
 
         view_title = _('View Request')
+        # TODO: generate separate link for each partner
         access_link = self.get_mail_url()
 
         # pylint: disable=unused-variable
@@ -1435,7 +1528,7 @@ class RequestRequest(models.Model):
             "Cannot move request (%(request)s) by this route (%(route)s)"
         ) % {
             'request': self.name,
-            'route': route.name,
+            'route': route.display_name,
         })
 
     def action_show_request_events(self):

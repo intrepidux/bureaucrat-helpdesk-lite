@@ -146,8 +146,8 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'request.kind', post.get('kind_id'), no_raise=True)
         request_kinds = http.request.env['request.kind'].search([
             ('show_as_website_filter', '=', True),
-            ('request_ids', '!=', False),
-        ]).filtered(lambda r: r.request_ids)
+            ('request_ids.id', '!=', False),
+        ])
 
         return {
             'request_kinds': request_kinds,
@@ -155,7 +155,18 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         }
 
     def _request_page_get_extra_context(self, req_id, **post):
-        return {}
+        # We have to  pass additional params to template to be able to use
+        # chatter for partners authenticated via access token
+        res = {}
+        if post.get('pid'):
+            res['pid'] = post['pid']
+        if post.get('hash'):
+            res['hash'] = post['hash']
+        if post.get('token'):
+            res['token'] = post['token']
+        elif post.get('access_token'):
+            res['token'] = post['access_token']
+        return res
 
     @http.route(['/requests',
                  '/requests/<string:req_status>',
@@ -246,10 +257,10 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
 
     @http.route(["/requests/request/<int:req_id>"],
                 type='http', auth="public", website=True)
-    def request(self, req_id, access_token=None, **kw):
+    def request(self, req_id, **kw):
         req = self._id_to_record(
             'request.request', req_id,
-            access_token=access_token)
+            access_token=kw.get('access_token'))
         if req.website_id and req.website_id != http.request.website:
             raise http.request.not_found()
 
