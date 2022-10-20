@@ -13,6 +13,7 @@ git-sources:
 
 
 known-addons:
+    - base_field_m2m_view
     - crnd_web_list_popover_widget
     - crnd_web_tree_colored_field
     - crnd_web_diagram_plus
