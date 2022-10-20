@@ -14,7 +14,7 @@ odoo.define('crnd_wsd.tour_request_author_no_phone', function (require) {
         {
             content: "Select request category SaAS / Support",
             trigger: "h4:has(label:containsExact('SaAS / Support'))" +
-                " input[name='category_id']",
+                ":contains() input[name='category_id']",
         },
         {
             content: "Click 'Next' button",
@@ -32,7 +32,7 @@ odoo.define('crnd_wsd.tour_request_author_no_phone', function (require) {
         {
             content: "Select request type Generic Question",
             trigger: "h4:has(label:containsExact('Generic Question'))" +
-                " input[name='type_id']",
+                ":contains() input[name='type_id']",
         },
         {
             content: "Click 'Next' button",
@@ -68,7 +68,7 @@ odoo.define('crnd_wsd.tour_request_author_no_phone', function (require) {
         {
             content: "Wait for congratulation page loaded",
             trigger: "#wrap:has(h3:contains(" +
-                "'Your request has been submitted'))",
+                "'Your request has been submitted')):contains()",
         },
         {
             content: "Click on request name ot open it",
@@ -76,7 +76,7 @@ odoo.define('crnd_wsd.tour_request_author_no_phone', function (require) {
         },
         {
             content: "Wait for request page loaded",
-            trigger: "#wrap:has(h3:contains('Req-'))",
+            trigger: "#wrap:has(h3:contains('Req-')):contains()",
         },
     ]);
     return {};

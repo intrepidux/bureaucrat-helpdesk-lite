@@ -228,6 +228,8 @@
                  class="hidden-print request_comments_chatter"
                  t-att-data-token="token"
                  t-att-data-res_model="req._name"
+                 t-att-data-pid="pid"
+                 t-att-data-hash="hash"
                  t-att-data-res_id="req.id"
                  t-att-data-pager_step="message_per_page or 10"
                  t-att-data-allow_composer="'0' if disable_composer else '1'">

@@ -10,7 +10,9 @@
                 <sheet>
                     <field name="close_route_id"
                            context="{'name_only': True}"
-                           options="{'no_create': True, 'no_quick_create': True}"/>
+                           options="{'no_create': True, 'no_quick_create': True}"
+                           readonly="context.get('default_close_route_id')"
+                           required="not context.get('default_close_route_id')"/>
                     <notebook>
                         <page string="Response" name="response">
                             <field name="response_text"
