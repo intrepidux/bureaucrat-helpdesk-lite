@@ -1,6 +1,7 @@
 # WARNING: This file is generated automatically! Do not edit it manually!
 #          This file will be regenerated on next update
 
+
 addons-list:
     - name: bureaucrat_helpdesk_lite
     - name: crnd_service_desk
