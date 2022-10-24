@@ -21,7 +21,8 @@ odoo.define('crnd_wsd.tour_request_actions_redirect', function (require) {
         {
             content: "Wait Generic Question found",
             trigger: ".wsd_requests .wsd_request:first " +
-                ".content_info:has(span:containsExact('Generic Question'))",
+                ".content_info:has(span:containsExact('Generic Question'))" +
+                ":contains()",
         },
         {
             content: "Click on first selected request",
@@ -34,8 +35,7 @@ odoo.define('crnd_wsd.tour_request_actions_redirect', function (require) {
         },
         {
             content: "Check if it's stage is 'Draft'",
-            trigger: "#request-head #request-type" +
-                " span:containsExact('Generic Question')",
+            trigger: "#request-top-head-stage:containsExact('Draft')",
         },
         {
             content: "Click on action Send",

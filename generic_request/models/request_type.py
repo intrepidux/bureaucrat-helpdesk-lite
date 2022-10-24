@@ -1,12 +1,14 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api, _
+from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
 from .request_request import (AVAILABLE_PRIORITIES,
                               AVAILABLE_IMPACTS,
                               AVAILABLE_URGENCIES)
 
 
 class RequestType(models.Model):
+    # pylint: disable=too-many-locals
     _name = "request.type"
     _inherit = [
         'mail.thread',
@@ -179,104 +181,141 @@ class RequestType(models.Model):
 
     @api.depends('request_ids')
     def _compute_request_count(self):
-        RequestRequest = self.env['request.request']
         now = datetime.now()
+        today_start = now.replace(
+            hour=0, minute=0, second=0, microsecond=0)
+        yesterday = now - relativedelta(days=1)
+        week_ago = now - relativedelta(weeks=1)
+        month_ago = now - relativedelta(months=1)
+        mapped_data_all = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids')
+        mapped_data_closed = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('closed', '=', True)])
+        mapped_data_open = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('closed', '=', False)])
+        mapped_data_open_today = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_created', '>=', today_start),
+                    ('closed', '=', False)])
+        mapped_data_open_last_24h = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_created', '>', yesterday),
+                    ('closed', '=', False)])
+        mapped_data_open_week = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_created', '>', week_ago),
+                    ('closed', '=', False)])
+        mapped_data_open_month = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_created', '>', month_ago),
+                    ('closed', '=', False)])
+        mapped_data_closed_today = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_closed', '>=', today_start),
+                    ('closed', '=', True)])
+        mapped_data_closed_24h = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_closed', '>', yesterday),
+                    ('closed', '=', True)])
+        mapped_data_closed_week = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_closed', '>', week_ago),
+                    ('closed', '=', True)])
+        mapped_data_closed_month = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('date_closed', '>', month_ago),
+                    ('closed', '=', True)])
+        mapped_deadline_today = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('deadline_date', '>=', today_start),
+                    ('closed', '=', False)])
+        mapped_deadline_24 = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('deadline_date', '>', yesterday),
+                    ('closed', '=', False)])
+        mapped_deadline_week = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('deadline_date', '>', week_ago),
+                    ('closed', '=', False)])
+        mapped_deadline_month = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('deadline_date', '>', month_ago),
+                    ('closed', '=', False)])
+        mapped_unassigned = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids',
+            domain=[('user_id', '=', False)])
         for record in self:
-            record.request_count = len(record.request_ids)
-            record.request_closed_count = RequestRequest.search_count([
-                ('closed', '=', True),
-                ('type_id', '=', record.id)
-            ])
-            record.request_open_count = RequestRequest.search_count([
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
+            record.request_count = mapped_data_all.get(record.id, 0)
+            record.request_closed_count = mapped_data_closed.get(record.id, 0)
+            record.request_open_count = mapped_data_open.get(record.id, 0)
 
-            today_start = now.replace(
-                hour=0, minute=0, second=0, microsecond=0)
-            yesterday = now - relativedelta(days=1)
-            week_ago = now - relativedelta(weeks=1)
-            month_ago = now - relativedelta(months=1)
             # Open requests
-            record.request_open_today_count = RequestRequest.search_count([
-                ('date_created', '>=', today_start),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
-            record.request_open_last_24h_count = RequestRequest.search_count([
-                ('date_created', '>', yesterday),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
-            record.request_open_week_count = RequestRequest.search_count([
-                ('date_created', '>', week_ago),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
-            record.request_open_month_count = RequestRequest.search_count([
-                ('date_created', '>', month_ago),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
+            record.request_open_today_count = mapped_data_open_today.get(
+                record.id, 0)
+            record.request_open_last_24h_count = mapped_data_open_last_24h.get(
+                record.id, 0)
+            record.request_open_week_count = mapped_data_open_week.get(
+                record.id, 0)
+            record.request_open_month_count = mapped_data_open_month.get(
+                record.id, 0)
+
             # Closed requests
-            record.request_closed_today_count = RequestRequest.search_count([
-                ('date_closed', '>=', today_start),
-                ('closed', '=', True),
-                ('type_id', '=', record.id)
-            ])
-            record.request_closed_last_24h_count = (
-                RequestRequest.search_count([
-                    ('date_closed', '>', yesterday),
-                    ('closed', '=', True),
-                    ('type_id', '=', record.id)
-                ]))
-            record.request_closed_week_count = RequestRequest.search_count([
-                ('date_closed', '>', week_ago),
-                ('closed', '=', True),
-                ('type_id', '=', record.id)
-            ])
-            record.request_closed_month_count = RequestRequest.search_count([
-                ('date_closed', '>', month_ago),
-                ('closed', '=', True),
-                ('type_id', '=', record.id)
-            ])
+            record.request_closed_today_count = mapped_data_closed_today.get(
+                record.id, 0)
+            record.request_closed_last_24h_count = mapped_data_closed_24h.get(
+                record.id, 0)
+            record.request_closed_week_count = mapped_data_closed_week.get(
+                record.id, 0)
+            record.request_closed_month_count = mapped_data_closed_month.get(
+                record.id, 0)
+
             # Deadline requests
-            record.request_deadline_today_count = RequestRequest.search_count([
-                ('deadline_date', '>=', today_start),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
-            record.request_deadline_last_24h_count = (
-                RequestRequest.search_count([
-                    ('deadline_date', '>', yesterday),
-                    ('closed', '=', False),
-                    ('type_id', '=', record.id)
-                ]))
-            record.request_deadline_week_count = RequestRequest.search_count([
-                ('deadline_date', '>', week_ago),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
-            record.request_deadline_month_count = RequestRequest.search_count([
-                ('deadline_date', '>', month_ago),
-                ('closed', '=', False),
-                ('type_id', '=', record.id)
-            ])
+            record.request_deadline_today_count = mapped_deadline_today.get(
+                record.id, 0)
+            record.request_deadline_last_24h_count = mapped_deadline_24.get(
+                record.id, 0)
+            record.request_deadline_week_count = mapped_deadline_week.get(
+                record.id, 0)
+            record.request_deadline_month_count = mapped_deadline_month.get(
+                record.id, 0)
+
             # Unassigned requests
-            record.request_unassigned_count = RequestRequest.search_count([
-                ('user_id', '=', False),
-                ('type_id', '=', record.id)
-            ])
+            record.request_unassigned_count = mapped_unassigned.get(
+                record.id, 0)
 
     @api.depends('stage_ids')
     def _compute_stage_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='stage_ids')
         for record in self:
-            record.stage_count = len(record.stage_ids)
+            record.stage_count = mapped_data.get(record.id, 0)
 
     @api.depends('route_ids')
     def _compute_route_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='route_ids')
         for record in self:
-            record.route_count = len(record.route_ids)
+            record.route_count = mapped_data.get(record.id, 0)
 
     @api.depends('stage_ids', 'stage_ids.sequence',
                  'stage_ids.request_type_id')
@@ -394,7 +433,7 @@ class RequestType(models.Model):
         self.ensure_one()
         today_start = datetime.now().replace(
             hour=0, minute=0, second=0, microsecond=0)
-        return self.env['generic.mixin.get.action'].get_action_by_xml(
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
             'generic_request.action_stat_request_count',
             context={'search_default_filter_closed': 1},
             domain=[
@@ -405,7 +444,7 @@ class RequestType(models.Model):
     def action_type_request_closed_last_24h_count(self):
         self.ensure_one()
         yesterday = datetime.now() - relativedelta(days=1)
-        return self.env['generic.mixin.get.action'].get_action_by_xml(
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
             'generic_request.action_stat_request_count',
             context={'search_default_filter_closed': 1},
             domain=[
@@ -416,7 +455,7 @@ class RequestType(models.Model):
     def action_type_request_closed_week_count(self):
         self.ensure_one()
         week_ago = datetime.now() - relativedelta(weeks=1)
-        return self.env['generic.mixin.get.action'].get_action_by_xml(
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
             'generic_request.action_stat_request_count',
             context={'search_default_filter_closed': 1},
             domain=[
@@ -427,7 +466,7 @@ class RequestType(models.Model):
     def action_type_request_closed_month_count(self):
         self.ensure_one()
         month_ago = datetime.now() - relativedelta(months=1)
-        return self.env['generic.mixin.get.action'].get_action_by_xml(
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
             'generic_request.action_stat_request_count',
             context={'search_default_filter_closed': 1},
             domain=[

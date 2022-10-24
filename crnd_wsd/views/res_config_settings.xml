@@ -5,7 +5,9 @@
         <field name="priority" eval="20"/>
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='request_global_settings']" position="inside">
+            <xpath expr="//div[@name='request_global_settings']" position="after">
+            <h2>Website settings</h2>
+            <div class="row mt16 o_settings_container" name="request_website_settings">
                 <div class="col-xs-12 col-md-6 o_setting_box">
                     <div class="o_setting_left_pane">
                     </div>
@@ -19,10 +21,6 @@
                             When user tries to enter more symbols than allowed by this option,
                             system will not allow him to do this.
                         </div>
-                    </div>
-                    <div class="o_setting_left_pane">
-                    </div>
-                    <div class="o_setting_right_pane">
                         <label for="request_limit_max_upload_file_size"
                                string="Maximum File Size Allowed to Upload"/>
                         <div>
@@ -40,12 +38,6 @@
                             Ensure, that your proxy server (nginx, apache, etc) allows to upload files of selected size,
                             because it is frequent case, when uploading of large files is blocked on nginx level.
                         </div>
-                    </div>
-                </div>
-                <div class="col-xs-12 col-md-6 o_setting_box">
-                    <div class="o_setting_left_pane">
-                    </div>
-                    <div class="o_setting_right_pane">
                         <label for="request_allowed_upload_file_types"
                                string="File Types Allowed to Upload"/>
                         <div>
@@ -53,32 +45,32 @@
                                    style="width:100%"/>
                         </div>
                         <div class="text-muted">
-                             The list of allowed file types allowed to upload in request.
-                             This field must contain coma-separated list of
-                             <a href="https://www.iana.org/assignments/media-types/media-types.xhtml" target="_blank">MIME-Types</a> of files
-                             allowed to upload.;
-                             In order to allow to upload all images, pdf and msword documents, you can use following value:
-                             <pre>image/*, application/pdf, application/msword</pre>.
+                            The list of allowed file types allowed to upload in request.
+                            This field must contain coma-separated list of
+                            <a href="https://www.iana.org/assignments/media-types/media-types.xhtml" target="_blank">MIME-Types</a> of files
+                            allowed to upload.;
+                            In order to allow to upload all images, pdf and msword documents, you can use following value:
+                            <pre>image/*, application/pdf, application/msword</pre>.
 
-                             Following popular Mime Types could be used:
-                             <ul>
-                                 <li>image/*</li>
-                                 <li>image/jpeg</li>
-                                 <li>audio/*</li>
-                                 <li>video/*</li>
-                                 <li>application/pdf</li>
-                                 <li>application/msword</li>
-                                 <li>text/*</li>
-                                 <li>application/vnd.oasis.opendocument.text</li>
-                             </ul>
-                             <p>
-                                 The type of uploaded file, now also validated on backend side.
-                                 In order to make file upload restriction work properly on backend side,
-                                 now it is recommended to install <a href="https://pypi.org/project/python-magic/" target="_blank">python-magic</a>
-                                 python package, that is used to detect mimetype of uploaded file on backend.
-                                 To make it work properly, it is also required to install system dependency libmagic
-                                 (to do it on Debian/Ubuntu run <pre>sudo apt-get install libmagic1</pre>)
-                             </p>
+                            Following popular Mime Types could be used:
+                            <ul>
+                                <li>image/*</li>
+                                <li>image/jpeg</li>
+                                <li>audio/*</li>
+                                <li>video/*</li>
+                                <li>application/pdf</li>
+                                <li>application/msword</li>
+                                <li>text/*</li>
+                                <li>application/vnd.oasis.opendocument.text</li>
+                            </ul>
+                            <p>
+                                The type of uploaded file, now also validated on backend side.
+                                In order to make file upload restriction work properly on backend side,
+                                now it is recommended to install <a href="https://pypi.org/project/python-magic/" target="_blank">python-magic</a>
+                                python package, that is used to detect mimetype of uploaded file on backend.
+                                To make it work properly, it is also required to install system dependency libmagic
+                                (to do it on Debian/Ubuntu run <pre>sudo apt-get install libmagic1</pre>)
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -108,8 +100,6 @@
                              class="text-muted">
                             Choose if you need to use the author`s phone on the creation page of the request.
                         </div>
-                    </div>
-                    <div class="o_setting_right_pane">
                         <label for="request_on_request_creating_redirect_to"/>
                         <div>
                             <field name="request_on_request_creating_redirect_to"/>
@@ -121,34 +111,60 @@
                                 <li><b><i>Redirect to request page</i></b></li>
                             </ul>
                         </div>
-                    </div>
-                </div>
-            </xpath>
-        </field>
-    </record>
+                        <label for="request_mail_link_access"/>
+                        <div>
+                            <field name="request_mail_link_access"/>
+                        </div>
+                        <div class="text-muted">
+                            Choose the the kind of access for link provided in emails.
+                            <ul>
+                                <li>
+                                    <b><i>Require login</i></b> - if user is not authenticated,
+                                    then redirect to login page first, and after user logged in,
+                                    redirect back to request page (website for portal users, and web for internal users)</li>
+                                <li>
+                                    <b><i>Shared link</i></b> - in this case, the mail link will
+                                    contain <i>access_token</i>, thus if user is not logged in, the website page of request
+                                    will be displayed for this user with limited functionality
+                                    (no ability to edit request text, no ability to move request to next stage, etc).
+                                    In case if it is default notification email, or if email contains id of partner,
+                                    only chatter could work.</li>
+                            </ul>
+                        </div>
+                        <div class="alert alert-info" role="status">
+                            <p>
+                                If you want to provide link to request in your custom email template,
+                                use following method to get the link:
+                            </p>
+                            <code>
+                                object.get_mail_url()
+                            </code>
 
-    <record id="generic_request_website_res_config_settings_view_form" model="ir.ui.view">
-        <field name="model">res.config.settings</field>
-        <field name="priority" eval="200"/>
-        <field name="inherit_id" ref="website.res_config_settings_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@data-key='website']" position="inside">
-                <h2>Bureaucrat Website Settings</h2>
-                <div class="row mt16 o_settings_container" id="bureaucrat_website_settings">
-                    <div class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_right_pane">
-                            <label for="request_create_step_layout"
-                                   string="Layout for request creation steps"/>
-                            <div>
-                                <field name="request_create_step_layout"
-                                       widget="radio"/>
-                            </div>
-                            <div class="text-muted">
-                                Choose the layout style applied for request creation steps.
-                            </div>
+                            <p>
+                                Or, if you have partner in context, then you can call this method providing ID
+                                of partner, to generate link specific for this partner.
+                            </p>
+                            <code>
+                                object.get_mail_url(pid)
+                            </code>
+                            <p>In example above <i>pid</i> is ID for the partner to generate link for.</p>
                         </div>
                     </div>
                 </div>
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_right_pane">
+                        <label for="request_create_step_layout"
+                               string="Layout for request creation steps"/>
+                        <div>
+                            <field name="request_create_step_layout"
+                                   widget="radio"/>
+                        </div>
+                        <div class="text-muted">
+                            Choose the layout style applied for request creation steps.
+                        </div>
+                    </div>
+                </div>
+            </div>
             </xpath>
         </field>
     </record>

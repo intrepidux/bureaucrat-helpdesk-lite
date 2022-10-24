@@ -30,6 +30,14 @@ class PortalRequestChatter(PortalChatter):
             # message is received in plaintext and saved in html
             # if message:
             #     message = plaintext2html(message)
+
+            if kw.get('pid'):
+                # Enforce covertion of 'pid' param to int if present
+                # This is needed to bypass bug in odoo code, that try to
+                # browse partner record with string ID. So, this way,
+                # we can ensure that everything will work fine.
+                kw = dict(kw, pid=int(kw['pid']))
+
             post_values = {
                 'res_model': res_model,
                 'res_id': res_id,
@@ -39,7 +47,9 @@ class PortalRequestChatter(PortalChatter):
             }
             post_values.update(
                 (fname, kw.get(fname))
-                for fname in self._portal_post_filter_params())
+                for fname in self._portal_post_filter_params()
+            )
+            post_values['_hash'] = kw.get('hash')
             message = _message_post_helper(**post_values)
             result.update({'default_message_id': message.id})
 

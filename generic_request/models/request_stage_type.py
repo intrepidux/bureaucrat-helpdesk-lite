@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
 from .request_stage import DEFAULT_BG_COLOR, DEFAULT_LABEL_COLOR
 
 
@@ -25,8 +26,11 @@ class RequestStageType(models.Model):
 
     @api.depends('request_ids')
     def _compute_request_count(self):
-        for rec in self:
-            rec.request_count = len(rec.request_ids)
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids')
+        for record in self:
+            record.request_count = mapped_data.get(record.id, 0)
 
     def action_show_requests(self):
         self.ensure_one()

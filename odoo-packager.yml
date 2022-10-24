@@ -1,6 +1,7 @@
 # WARNING: This file is generated automatically! Do not edit it manually!
 #          This file will be regenerated on next update
 
+
 addons-list:
     - name: bureaucrat_helpdesk_lite
     - name: crnd_service_desk
@@ -13,6 +14,7 @@ git-sources:
 
 
 known-addons:
+    - base_field_m2m_view
     - crnd_web_list_popover_widget
     - crnd_web_tree_colored_field
     - crnd_web_diagram_plus
