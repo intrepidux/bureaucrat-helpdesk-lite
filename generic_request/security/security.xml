@@ -139,7 +139,7 @@
     <record id="rule_request_category_user_by_subscription" model="ir.rule">
         <field name="name">request categories by subscription</field>
         <field name="model_id" ref="generic_request.model_request_category"/>
-        <field name="domain_force">[('message_partner_ids', 'child_of', user.commercial_partner_id.id)]</field>
+        <field name="domain_force">[('message_partner_ids', 'child_of', [user.commercial_partner_id.id])]</field>
         <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
         <field eval="0" name="perm_unlink"/>
         <field eval="0" name="perm_write"/>
@@ -159,7 +159,7 @@
     <record id="rule_request_type_user_by_subscription" model="ir.rule">
         <field name="name">request types by subscription</field>
         <field name="model_id" ref="generic_request.model_request_type"/>
-        <field name="domain_force">[('message_partner_ids', 'child_of', user.commercial_partner_id.id)]</field>
+        <field name="domain_force">[('message_partner_ids', 'child_of', [user.commercial_partner_id.id])]</field>
         <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
         <field eval="0" name="perm_unlink"/>
         <field eval="0" name="perm_write"/>
@@ -187,14 +187,24 @@
         <field eval="0" name="perm_create"/>
     </record>
     <record id="rule_request_request_by_subscription" model="ir.rule">
-        <field name="name">Followed requests</field>
+        <field name="name">Followed requests (or parent requests or child requests)</field>
         <field name="model_id" ref="generic_request.model_request_request"/>
-        <field name="domain_force">[('message_partner_ids', 'child_of', user.commercial_partner_id.id)]</field>
+        <field name="domain_force">[('sec_view_access_partner_ids', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
+        <field eval="0" name="perm_unlink"/>
+        <field eval="1" name="perm_write"/> <!-- TODO: Do we need write access to followers? May be for chatter? -->
+        <field eval="1" name="perm_read"/>
+        <field eval="0" name="perm_create"/>
+    </record>
+    <record id="rule_request_request_by_author" model="ir.rule">
+        <field name="name">Author's requests</field>
+        <field name="model_id" ref="generic_request.model_request_request"/>
+        <field name="domain_force">[('author_id', 'child_of', user.commercial_partner_id.id)]</field>
         <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
         <field eval="0" name="perm_unlink"/>
         <field eval="1" name="perm_write"/>
         <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
+        <field eval="1" name="perm_create"/>
     </record>
     <record id="rule_request_request_by_partner" model="ir.rule">
         <field name="name">Partner's requests</field>
@@ -271,28 +281,8 @@
         <field eval="1" name="perm_read"/>
         <field eval="1" name="perm_create"/>
     </record>
-    <record id="rule_request_request_parent_by_child_subscription" model="ir.rule">
-        <field name="name">Requests that have followed subrequests</field>
-        <field name="model_id" ref="generic_request.model_request_request"/>
-        <field name="domain_force">[('child_ids.message_partner_ids', 'child_of', user.commercial_partner_id.id)]</field>
-        <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
-        <field eval="0" name="perm_unlink"/>
-        <field eval="0" name="perm_write"/>
-        <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
-    </record>
-    <record id="rule_request_request_child_by_parent_subscription" model="ir.rule">
-        <field name="name">Subrequests of followed requests</field>
-        <field name="model_id" ref="generic_request.model_request_request"/>
-        <field name="domain_force">[('parent_id.message_partner_ids', 'child_of', user.commercial_partner_id.id)]</field>
-        <field name="groups" eval="[(4, ref('generic_request.group_request_user_implicit'))]"/>
-        <field eval="0" name="perm_unlink"/>
-        <field eval="0" name="perm_write"/>
-        <field eval="1" name="perm_read"/>
-        <field eval="0" name="perm_create"/>
-    </record>
 
-<!--    timesheets    -->
+    <!--    timesheets    -->
     <record id="rule_request_timesheet_line_by_creator_id" model="ir.rule">
         <field name="name">Created by me timesheet lines</field>
         <field name="model_id" ref="generic_request.model_request_timesheet_line"/>

@@ -11,7 +11,8 @@ class RequestType(models.Model):
     # Request type has no websitepublish url yet, so we just need
     # website_published field, thus implement it in explicit way here insetead
     # of inheriting from "website.published.mixin"
-    website_published = fields.Boolean('Visible in Website', copy=False)
+    website_published = fields.Boolean(
+        'Visible in Website', copy=False, index=True)
     website_ids = fields.Many2many('website')
 
     # Help message for request text

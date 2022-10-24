@@ -21,7 +21,8 @@ odoo.define('crnd_wsd.tour_request_actions_ok', function (require) {
         {
             content: "Wait Generic Question found",
             trigger: ".wsd_requests .wsd_request:first " +
-                ".content_info:has(span:containsExact('Generic Question'))",
+                ".content_info:has(span:containsExact('Generic Question'))" +
+                ":contains()",
         },
         {
             content: "Click on first selected request",
@@ -61,7 +62,7 @@ odoo.define('crnd_wsd.tour_request_actions_ok', function (require) {
         },
         {
             content: "Click on Save button",
-            trigger: ".modal-dialog:has('#dialog-response-text')" +
+            trigger: ".modal-dialog:has('#dialog-response-text'):contains()" +
                 " .modal-footer .o_save_button",
         },
         {

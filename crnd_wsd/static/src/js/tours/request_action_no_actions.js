@@ -21,7 +21,8 @@ odoo.define('crnd_wsd.tour_request_actions_not_allowed', function (require) {
         {
             content: "Wait Generic Question found",
             trigger: ".wsd_requests .wsd_request:first " +
-                ".content_info:has(span:containsExact('Generic Question'))",
+                ".content_info:has(span:containsExact('Generic Question'))" +
+                ":contains()",
         },
         {
             content: "Click on first selected request",
