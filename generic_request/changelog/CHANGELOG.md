@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.181.0
+
+***BUG220930***
+Fixed bug, when contact related request count shown wrong after merging them
+
+
 ## Version 1.178.0
 
 Refactored settings UI: moved mail-related settings to separate section

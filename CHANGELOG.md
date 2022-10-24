@@ -1,11 +1,11 @@
 # Changelog
 
-## Release 15.0.0.1.0 (2022-Oct-20 08:23:32)
+## Release 15.0.0.1.0 (2022-Oct-24 16:01:51)
 
 ### Updated addons:
 
 - crnd_wsd (15.0.1.91.0 -> 15.0.1.94.0)
-- generic_request (15.0.1.165.0 -> 15.0.1.180.0)
+- generic_request (15.0.1.165.0 -> 15.0.1.181.0)
 
 ### Notable changes:
 
@@ -20,6 +20,12 @@
 
 
 #### generic_request
+##### Version 1.181.0
+
+***BUG220930***
+Fixed bug, when contact related request count shown wrong after merging them
+
+
 ##### Version 1.178.0
 
 Refactored settings UI: moved mail-related settings to separate section
