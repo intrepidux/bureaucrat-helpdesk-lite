@@ -909,3 +909,28 @@ class TestRequestBase(RequestCase):
                 'generic_request.ir_cron_request_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 1)
+
+    def test_wizard_base_partner_merge(self):
+        # Check that request counter of demo_user matchs its request amount
+        self.assertEqual(self.demo_user.request_count,
+                         len(self.demo_user.request_ids))
+        demo_user_request_count = self.demo_user.request_count
+
+        # Check that request counter of request_user matchs its request amount
+        self.assertEqual(self.request_user.request_count,
+                         len(self.request_user.request_ids))
+        request_user_request_count = self.request_user.request_count
+
+        # Create and action merge wizard
+        wizard = self.env['base.partner.merge.automatic.wizard'].create({
+            'dst_partner_id': self.demo_user.partner_id.id,
+            'partner_ids': [(4, self.request_user.partner_id.id),
+                            (4, self.demo_user.partner_id.id)]
+        })
+        wizard.action_merge()
+
+        # Check that target user merged the requests of source contact
+        self.assertEqual(self.demo_user.request_count,
+                         demo_user_request_count + request_user_request_count)
+        self.assertEqual(self.demo_user.request_count,
+                         len(self.demo_user.request_ids))

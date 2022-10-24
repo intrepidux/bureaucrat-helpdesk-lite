@@ -1,4 +1,5 @@
 from odoo import models, fields, api, exceptions, _
+from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
 
 
 DEFAULT_BG_COLOR = 'rgba(120,120,120,1)'
@@ -84,13 +85,19 @@ class RequestStage(models.Model):
 
     @api.depends('route_in_ids')
     def _compute_routes_in_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='route_in_ids')
         for record in self:
-            record.route_in_count = len(record.route_in_ids)
+            record.route_in_count = mapped_data.get(record.id, 0)
 
     @api.depends('route_out_ids')
     def _compute_routes_out_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='route_out_ids')
         for record in self:
-            record.route_out_count = len(record.route_out_ids)
+            record.route_out_count = mapped_data.get(record.id, 0)
 
     @api.depends('bg_color', 'label_color', 'type_id', 'use_custom_colors')
     def _compute_custom_colors(self):

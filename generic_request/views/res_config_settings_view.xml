@@ -92,6 +92,35 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="request_preferred_list_view_mode" title="Select preferred view mode">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="request_preferred_list_view_mode"/>
+                                <div class="text-muted">
+                                    Select your preferred view type.
+                                </div>
+                                <div class="mt8">
+                                    <field name="request_preferred_list_view_mode" class="o_light_label" widget="radio"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="group_request_show_searchpanel_view"
+                                       string="Show searchpanel in request search view"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_request_show_searchpanel_view"/>
+                                <div class="text-muted">
+                                    If this group enabled, then users will see searchpanel
+                                    in request search view
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>Email settings</h2>
+                    <div class="row mt16 o_settings_container" name="request_email_settings">
                         <div class="col-xs-12 col-md-6 o_setting_box">
                             <div class="o_setting_left_pane">
                                 <field name="request_mail_suggest_partner"/>
@@ -126,18 +155,6 @@
                                     and author is not present in odoo's contacts database,
                                     then create new contact (partner) for this email address.</p>
                                     <p>Same bechavior will be applied to requests created on website by unregistered users.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box" id="request_preferred_list_view_mode" title="Select preferred view mode">
-                            <div class="o_setting_left_pane"/>
-                            <div class="o_setting_right_pane">
-                                <label for="request_preferred_list_view_mode"/>
-                                <div class="text-muted">
-                                    Select your preferred view type.
-                                </div>
-                                <div class="mt8">
-                                    <field name="request_preferred_list_view_mode" class="o_light_label" widget="radio"/>
                                 </div>
                             </div>
                         </div>
@@ -176,26 +193,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-md-6 o_setting_box">
-                            <div class="o_setting_left_pane">
-                                <field name="group_request_show_searchpanel_view"
-                                       string="Show searchpanel in request search view"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="group_request_show_searchpanel_view"/>
-                                <div class="text-muted">
-                                    If this group enabled, then users will see searchpanel
-                                    in request search view
-                                </div>
-                            </div>
-                        </div>
                     </div>
+
+                    <h2>Automated Actions</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 o_setting_box">
                             <b>Note</b>: Setting the checkboxes will automatically install additional modules that provide selected functionality. Inactive checkbox means you don't have the required module in your system. You can download it from Odoo marketplace individually or as part of a bundle. Look at the <a href="https://crnd.pro/product-comparison" target="_blank">Product comparison table</a> to see which modules are included in each bundle.
                         </div>
                     </div>
-                    <h2>Automated Actions</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-6 o_setting_box">
                             <div class="o_setting_left_pane">
