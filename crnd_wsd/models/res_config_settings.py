@@ -36,3 +36,8 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         string='Redirect after request created on Website'
     )
+
+    request_mail_link_access = fields.Selection(
+        related='company_id.request_mail_link_access',
+        readonly=False,
+        string='Choose what kind of link to request will be used in emails.')

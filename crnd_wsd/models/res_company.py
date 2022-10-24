@@ -26,6 +26,11 @@ class ResCompany(models.Model):
         ('gbytes', 'GB'),
         ('mbytes', 'MB'),
         ('kbytes', 'KB')], default='mbytes')
+    request_mail_link_access = fields.Selection(
+        selection=[
+            ('require-login', 'Require login'),
+            ('shared-link', 'Shared link'),
+        ], default='require-login')
 
     def _get_request_max_upload_file_size(self):
         if self.request_limit_max_upload_file_size_uom == 'gbytes':

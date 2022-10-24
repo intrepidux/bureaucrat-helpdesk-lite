@@ -13,6 +13,13 @@ class PortalRequestChatter(http.Controller):
         if message:
             # message is received in plaintext and saved in html
             # message = plaintext2html(message)
+
+            if kw.get('pid'):
+                # Enforce covertion of 'pid' param to int if present
+                # This is needed to bypass bug in odoo code, that try to
+                # browse partner record with string ID. So, this way,
+                # we can ensure that everything will work fine.
+                kw = dict(kw, pid=int(kw['pid']))
             _message_post_helper(res_model, int(res_id), message, **kw)
             url = url + "#discussion"
         return http.request.redirect(url)

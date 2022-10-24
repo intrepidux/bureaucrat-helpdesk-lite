@@ -33,7 +33,8 @@ odoo.define('crnd_wsd.tour_request_base', function (require) {
         {
             content: "Wait Printer Request found",
             trigger: ".wsd_requests .wsd_request:first" +
-                " .content_info:has(span:containsExact('Printer Request'))",
+                " .content_info:has(span:containsExact('Printer Request'))" +
+                ":contains()",
         },
         {
             content: "Click on first selected request",
@@ -41,7 +42,7 @@ odoo.define('crnd_wsd.tour_request_base', function (require) {
         },
         {
             content: "Wait for request page loaded",
-            trigger: "#wrap:has(h3:contains('RSR-'))",
+            trigger: "#wrap:has(h3:contains('RSR-')):contains()",
         },
         {
             content: "Check if it's type is 'Printer Request'",

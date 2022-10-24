@@ -73,6 +73,14 @@
                                    widget="state_selection"
                                    class="request-kanban-state ml8"/>
                         </h2>
+                        <field name="tag_ids"
+                               options="{'color_field': 'color'}"
+                               widget="many2many_tags"
+                               placeholder="Tags..."
+                               class="oe_inline"
+                               nolabel="1"
+                               domain="[('model_id.model', '=', 'request.request'),'|', ('category_id', '=', False), ('category_id.request_type_ids.id', '=', type_id)]"
+                               context="{'default_model': 'request.request'}"/>
                     </div>
                     <group name="request_head_info" class="request-head-info">
                         <group name="request_head_info_left" class="request-head-info-left">
@@ -167,19 +175,6 @@
                                            class="oe_inline"/>
                                 </span>
                             </div>
-                            <div colspan="2" name="header_tags" class="request-head-info-item">
-                                <span class="field-with-icon">
-                                    <span class="field-icon fa fa-tags oe_inline"
-                                          title="Tags"/>
-                                    <field name="tag_ids"
-                                           options="{'color_field': 'color'}"
-                                           widget="many2many_tags"
-                                           placeholder="Tags..."
-                                           class="oe_inline"
-                                           domain="[('model_id.model', '=', 'request.request'),'|', ('category_id', '=', False), ('category_id.request_type_ids.id', '=', type_id)]"
-                                           context="{'default_model': 'request.request'}"/>
-                                </span>
-                            </div>
                         </group>
                     </group>
                     <notebook class="request-notebook">
@@ -189,7 +184,7 @@
                                  attrs="{'invisible': ['|', ('note_html', '=', False), ('id', '!=', False)]}">
                                 <span class="request-separator-text">Info</span>
                             </div>
-                            <group name="group_author" class="mb0">
+                            <group name="group_author" class="request-author-and-partner mb0">
                                 <group class="mb0 mt0">
                                     <label for="author_id"/>
                                     <div name="div_author" class="request-partner-author-field o_row">
@@ -651,7 +646,7 @@
                             </div>
                             <div class="request_kanban_tags">
                                 <field name="tag_ids"
-                                       widget="request_tag"
+                                       widget="many2many_tags"
                                        options="{'color_field': 'color'}"/>
                             </div>
                             <div class="o_request_kanban_content">
