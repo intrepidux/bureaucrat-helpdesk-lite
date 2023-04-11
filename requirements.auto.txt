@@ -2,3 +2,4 @@
 # This file contains automatically detected python dependencies for this
 # assembly and will be regenerated on next update
 html2text
+pdf2image
