@@ -16,6 +16,8 @@ class TestUploadFile(TestPhantomTour):
         self.user = self.env.ref('crnd_wsd.user_demo_service_desk_website')
         self.request_type = self.env.ref(
             'crnd_service_desk.request_type_incident')
+        self.default_service = self.env.ref(
+            'generic_service.generic_service_default')
 
     def get_csrf_token(self):
         token = self.session.sid
@@ -142,9 +144,13 @@ class TestUploadFile(TestPhantomTour):
             "%s%s" % (TEST_URL, attachment_url_image))
         self.assertEqual(response_attachment.status_code, 200)
         self.assertEqual(attachment_url_image[:11], '/web/image/')
+        self.assertIn(self.default_service, self.request_type.service_ids)
 
         url = '%s/requests/new/step/data' % TEST_URL
         data = {
+            # It is necessary to add the service to the parameters,
+            # since the request type is tied to the service.
+            'service_id': self.default_service.id,
             'type_id': self.request_type.id,
             'req_text': 'test request with attachment' +
                         attachment_url_image + attachment_url_file,

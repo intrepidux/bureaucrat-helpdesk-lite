@@ -100,7 +100,7 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
 
             if is_image:
                 data_base64 = tools.image_process(
-                    data_base64, verify_resolution=True)
+                    data_base64, verify_resolution=False)
 
             attachment = request.env['ir.attachment'].sudo().create(dict(
                 attachment_data,

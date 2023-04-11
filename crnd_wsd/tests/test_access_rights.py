@@ -28,6 +28,17 @@ class TestWSDRequestAccessRights(AccessRightsCase):
         # Request category
         cls.ut_category_demo_general = cls.ut_env.ref(
             'generic_request.request_category_demo_general')
+        cls.demo_service_user = cls.env['res.users'].create({
+            'name': 'Service user',
+            'login': 'service_demo_user',
+            'password': 'demo',
+        })
+
+        # Envs
+        cls.u_env = cls.env(user=cls.demo_service_user)
+        # Request Service
+        cls.uservice_demo_rent = cls.u_env.ref(
+            'generic_service.generic_service_rent_notebook')
 
     def test_category_acces_rights_0010(self):
 
@@ -118,3 +129,48 @@ class TestWSDRequestAccessRights(AccessRightsCase):
         # simple_category is readable
         self.assertTrue(self.ut_simple_type.with_user(
             self.demo_test_user_1).read(['name']))
+
+    def test_service_access_rights(self):
+        self.assertFalse(
+            self.uservice_demo_rent.sudo().website_published)
+        with mute_logger('odoo.models'):
+            with self.assertRaises(exceptions.AccessError):
+                # pylint: disable=pointless-statement
+                self.uservice_demo_rent.with_user(
+                    self.demo_service_user).read(['name'])
+
+        simple_group = self.env['res.groups'].create({
+            'name': 'Test simple group'
+        })
+        self.assertFalse(
+            simple_group in
+            self.uservice_demo_rent.sudo().access_group_ids)
+
+        # Add to Request Category Access Group new simple_group
+        self.uservice_demo_rent.sudo().write({
+            'access_group_ids': [(4, simple_group.id)],
+        })
+
+        self.assertTrue(
+            simple_group in
+            self.uservice_demo_rent.sudo().access_group_ids)
+
+        with mute_logger('odoo.models'):
+            with self.assertRaises(exceptions.AccessError):
+                # pylint: disable=pointless-statement
+                self.uservice_demo_rent.with_user(
+                    self.demo_service_user).read(['name'])
+
+        website_user = self.env.ref(
+            'crnd_wsd.group_service_desk_website_user')
+
+        self.assertTrue(self.demo_service_user in website_user.users)
+
+        # Add demo-user to 'simple_group'
+        self.demo_service_user.groups_id |= simple_group
+
+        # Ensure, after adding to group simple_group the
+        # simple_category is readable
+        self.assertTrue(
+            self.uservice_demo_rent.with_user(
+                self.demo_service_user).read(['name']))

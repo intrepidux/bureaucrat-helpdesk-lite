@@ -16,6 +16,7 @@
                 <li>draft -> sent -> rejected</li>
             </ul>
         ]]></field>
+        <field name="service_ids" eval="[(4, ref('generic_service.generic_service_default'))]"/>
         <field name="category_ids"
                eval="[(6, 0, [ref('generic_request.request_category_demo_general')])]"/>
         <field name="kind_id" ref="request_kind_demo"/>
@@ -236,6 +237,9 @@
             </p>
 
             <p>Please, help me!</p>
+        ]]></field>
+        <field name="internal_note_text"><![CDATA[
+            <p>This request is created to test how very long request text is handled</p>
         ]]></field>
         <field name="type_id" ref="request_type_simple"/>
         <field name="created_by_id" ref="user_demo_request"/>

@@ -3,6 +3,11 @@
 
     <template id="wsd_requests_new_progress" name="New request (progress)">
         <ul class="flow mb16">
+            <li id="step_service" t-att-class="(step=='service' and 'active') or 'text-muted'"
+                groups="generic_request.group_request_use_services">
+                Service
+                <span/>
+            </li>
             <li id="step_category" t-att-class="(step=='category' and 'active') or 'text-muted'">
                 Category
                 <span/>
@@ -24,6 +29,18 @@
     <template id="wsd_request_new_selection_box" name="New request (Selection Box)">
         <div id="request-selection-box" class="d-none d-lg-block col-lg-6">
             <div class="pull-right">
+                <div t-if="service" id="request-service"
+                     groups="generic_request.group_request_use_services">
+                    <span class="fa fa-square-o mr4" title="Service"/>
+                    <span t-field="service.display_name" title="Service"/>
+                    <span t-if="service.description"
+                          role="button" data-toggle="popover"
+                          title="Service"
+                          data-placement="right"
+                          data-trigger="hover"
+                          class="fa fa-question text-muted"
+                          t-attf-data-content="{{ service.description }}"/>
+                </div>
                 <div t-if="req_category" id="request-category">
                     <span class="fa fa-bars mr4" title="Category"/>
                     <span t-field="req_category.display_name"/>
@@ -263,8 +280,12 @@
                       method="POST" enctype="multipart/form-data"
                       t-attf-class="form-horizontal wsd-request-create-form wsd-request-create-form-layout-{{request.website.request_create_step_layout}}">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="service_id" t-att-value="service.id"
+                           groups="generic_request.group_request_use_services"/>
                     <input type="hidden" name="type_id" t-att-value="req_type.id"/>
                     <input type="hidden" name="category_id" t-att-value="req_category.id"/>
+
+                    <div class="oe_structure col-sm-12"/> <!-- TODO may be it have sense to remove this div -->
 
                     <div class="row">
                         <div class="oe_structure col-sm-6">
@@ -505,7 +526,19 @@
                                         <div class="request_content">
                                             <div class="content_info">
                                                 <div class="text-muted">
-
+                                                    <!-- Show service on request congratulation page -->
+                                                    <div t-if="req.service_id" class="content-info-service"
+                                                         groups="generic_request.group_request_use_services">
+                                                        <span class="fa fa-square-o mr4" title="Service"/>
+                                                        <span t-field="req.service_id.display_name" title="Service"/>
+                                                        <span t-if="req.service_id.description"
+                                                              role="button" data-toggle="popover"
+                                                              title="Service"
+                                                              data-placement="right"
+                                                              data-trigger="hover"
+                                                              class="fa fa-question text-muted"
+                                                              t-attf-data-content="{{ req.service_id.description }}"/>
+                                                    </div>
                                                     <div t-if="req.category_id" class="content-info-category">
                                                         <span class="fa fa-bars mr4" title="Category"/>
                                                         <span t-field="req.category_id.display_name" title="Category"/>

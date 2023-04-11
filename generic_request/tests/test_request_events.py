@@ -10,11 +10,12 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
     def setUpClass(cls):
         super(TestRequestEvents, cls).setUpClass()
         cls.event_category_request_event = cls.env.ref(
-            'generic_request.event_category_request_events')
+            'generic_request.system_event_category_request_events')
         cls.event_category = cls.env.ref(
-            'generic_request.event_category_subrequest_events')
+            'generic_request.system_event_category_request_sub_request_events')
         cls.event_category_parent = cls.env.ref(
-            'generic_request.event_category_parent_request_events')
+            'generic_request.'
+            'system_event_category_request_parent_request_events')
         cls.parent_request = cls.env.ref(
             'generic_request.request_request_type_simple_demo_1')
         cls.parent_stage1 = cls.env.ref(
@@ -45,7 +46,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
     def test_request_event(self):
         event = self.env['request.event'].search([
             ('request_id', '=', self.parent_request.id),
-            ('event_type_id.category_id', '=', self.event_category.id)
+            ('event_type_id.event_category_id', '=', self.event_category.id)
         ])
         self.assertEqual(len(event), 0)
         self.assertEqual(self.subrequest1.stage_id, self.subrequest1_stage1)
@@ -54,7 +55,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
         self.subrequest1.stage_id = self.subrequest1_stage12.id
         event = self.env['request.event'].search([
             ('request_id', '=', self.parent_request.id),
-            ('event_type_id.category_id', '=', self.event_category.id)
+            ('event_type_id.event_category_id', '=', self.event_category.id)
         ])
         self.assertEqual(len(event), 1)
         self.assertEqual(self.subrequest1.stage_id, self.subrequest1_stage12)
@@ -69,7 +70,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
         self.subrequest2.stage_id = self.subrequest2_stage12.id
         event = self.env['request.event'].search([
             ('request_id', '=', self.parent_request.id),
-            ('event_type_id.category_id', '=', self.event_category.id)
+            ('event_type_id.event_category_id', '=', self.event_category.id)
         ])
         self.assertEqual(len(event), 2)
         self.assertEqual(self.subrequest2.stage_id, self.subrequest2_stage12)
@@ -92,7 +93,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
 
         event = self.env['request.event'].search([
             ('request_id', '=', self.parent_request.id),
-            ('event_type_id.category_id', '=', self.event_category.id)
+            ('event_type_id.event_category_id', '=', self.event_category.id)
         ])
         self.assertEqual(len(event), 4)
         self.assertEqual(self.subrequest1.stage_id, self.subrequest1_stage2)
@@ -103,7 +104,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
         self.subrequest2.stage_id = self.subrequest2_stage2.id
         event = self.env['request.event'].search([
             ('request_id', '=', self.parent_request.id),
-            ('event_type_id.category_id', '=', self.event_category.id)
+            ('event_type_id.event_category_id', '=', self.event_category.id)
         ])
         self.assertEqual(len(event), 7)
         self.assertEqual(self.subrequest2.stage_id, self.subrequest2_stage2)
@@ -136,14 +137,16 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
         self.parent_request.stage_id = self.parent_stage2
         event = self.env['request.event'].search([
             ('request_id', '=', self.subrequest1.id),
-            ('event_type_id.category_id', '=', self.event_category_parent.id)
+            ('event_type_id.event_category_id', '=',
+             self.event_category_parent.id)
         ])
         self.assertEqual(len(event), 1)
         self.assertEqual(event[0].event_code, 'parent-request-stage-changed')
 
         event = self.env['request.event'].search([
             ('request_id', '=', self.subrequest2.id),
-            ('event_type_id.category_id', '=', self.event_category_parent.id)
+            ('event_type_id.event_category_id', '=',
+             self.event_category_parent.id)
         ])
         self.assertEqual(len(event), 1)
         self.assertEqual(event[0].event_code, 'parent-request-stage-changed')
@@ -151,7 +154,8 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
         self.parent_request.stage_id = self.parent_stage3
         event = self.env['request.event'].search([
             ('request_id', '=', self.subrequest1.id),
-            ('event_type_id.category_id', '=', self.event_category_parent.id)
+            ('event_type_id.event_category_id', '=',
+             self.event_category_parent.id)
         ])
         self.assertEqual(len(event), 3)
         self.assertEqual(event[0].event_code, 'parent-request-closed')
@@ -160,7 +164,8 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
 
         event = self.env['request.event'].search([
             ('request_id', '=', self.subrequest2.id),
-            ('event_type_id.category_id', '=', self.event_category_parent.id)
+            ('event_type_id.event_category_id', '=',
+             self.event_category_parent.id)
         ])
         self.assertEqual(len(event), 3)
         self.assertEqual(event[0].event_code, 'parent-request-closed')
@@ -179,7 +184,7 @@ class TestRequestEvents(ReduceLoggingMixin, TransactionCase):
 
         event = self.env['request.event'].search([
             ('request_id', '=', self.subrequest1.id),
-            ('event_type_id.category_id', '=',
-             self.event_category_request_event.id)
+            ('event_type_id.event_category_id', '=',
+             self.event_category_parent.id)
         ])
         self.assertEqual(event[0].event_code, 'parent-request-changed')

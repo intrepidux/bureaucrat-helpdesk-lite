@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record model="ir.ui.view" id="view_request_stage_route_search">
-        <field name="name">view.request.stage.route.search</field>
         <field name="model">request.stage.route</field>
         <field name="arch" type="xml">
             <search>
@@ -27,7 +26,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_stage_route_tree">
-        <field name="name">view.request.stage.route.tree</field>
         <field name="model">request.stage.route</field>
         <field name="arch" type="xml">
             <tree>
@@ -50,7 +48,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_stage_route_form">
-        <field name="name">view.request.stage.route.form</field>
         <field name="model">request.stage.route</field>
         <field name="arch" type="xml">
             <form>

@@ -13,6 +13,11 @@
                         <field name="user_id"/>
                         <field name="partner_id"
                                attrs="{'invisible': [('user_id', '=', False)]}"/>
+                        <field name="show_field_unsubscribe"
+                               invisible="1"/>
+                        <!-- We do not need to show unsubscribe checkbox if all requests are unassigned. -->
+                        <field name="unsubscribe_prev_assignee"
+                               attrs="{'invisible': [('show_field_unsubscribe', '=', False)]}"/>
                     </group>
                     <field name="comment"
                            nolabel="1"
@@ -41,6 +46,7 @@
        <field name="context">{
             'default_request_ids': [(6, 0, active_ids)],
         }</field>
+       <field name="groups_id" eval="[(4, ref('group_request_user'))]"/>
    </record>
 </odoo>
 

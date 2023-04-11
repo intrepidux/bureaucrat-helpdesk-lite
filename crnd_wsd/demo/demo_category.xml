@@ -28,4 +28,14 @@
         <field name="request_type_ids"
                eval="[(4, ref('crnd_service_desk.request_type_incident'))]"/>
     </record>
+
+    <record id="request_category_demo_website_general" model="request.category">
+        <field name="name">General</field>
+        <field name="code">saas-general</field>
+        <field name="description">General website requests</field>
+        <field name="website_published" eval="True"/>
+        <field name="parent_id" ref="request_category_demo_website"/>
+        <field name="request_type_ids"
+               eval="[(4, ref('crnd_service_desk.request_type_incident'))]"/>
+    </record>
 </odoo>

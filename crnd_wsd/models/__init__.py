@@ -1,4 +1,5 @@
 from . import (
+    generic_service,
     request_request,
     request_category,
     request_type,

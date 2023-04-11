@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record id="view_request_timesheet_report_search" model="ir.ui.view">
-        <field name="name">view.request.timesheet.report.search</field>
         <field name="model">request.timesheet.report</field>
         <field name="arch" type="xml">
             <search>
                 <field name="request_id"/>
+                <field name="request_service_id"/>
                 <field name="request_category_id"/>
                 <field name="request_type_id"/>
                 <field name="request_kind_id"/>
+                <field name="request_stage_type_id"/>
+                <field name="request_channel_id"/>
+                <field name="request_partner_id"/>
                 <field name="date"/>
                 <field name="user_id"/>
+                <field name="activity_id"/>
 
                 <filter name="filter_my"
                         string="My"
@@ -32,6 +36,15 @@
                         string="This year"
                         domain="[('date', '&gt;', (context_today() - relativedelta(years=1)).strftime('%%Y-%%m-%%d') )]"/>
 
+                <separator/>
+                <filter name="filter_closed"
+                        string="Request Closed"
+                        domain="[('request_closed', '=', True)]"/>
+                <separator/>
+                <filter name="filter_open"
+                        string="Request Open"
+                        domain="[('request_closed', '=', False)]"/>
+
                 <group string="Group By" name="groupby">
                     <filter name="date_groupby"
                             string="Date"
@@ -42,6 +55,9 @@
                     <filter name="activity_groupby"
                             string="Activity"
                             context="{'group_by': 'activity_id'}"/>
+                    <filter name="request_service_groupby"
+                            string="Request Service"
+                            context="{'group_by': 'request_service_id'}"/>
                     <filter name="request_category_groupby"
                             string="Request Category"
                             context="{'group_by': 'request_category_id'}"/>
@@ -51,6 +67,15 @@
                     <filter name="request_kind_groupby"
                             string="Request Kind"
                             context="{'group_by': 'request_kind_id'}"/>
+                    <filter name="request_stage_type_groupby"
+                            string="Request Stage Type"
+                            context="{'group_by': 'request_stage_type_id'}"/>
+                    <filter name="request_stage_groupby"
+                            string="Request Stage"
+                            context="{'group_by': 'request_stage_id'}"/>
+                    <filter name="request_channel_groupby"
+                            string="Request Channel"
+                            context="{'group_by': 'request_channel_id'}"/>
                     <filter name="request_author_groupby"
                             string="Request Author"
                             context="{'group_by': 'request_author_id'}"/>
@@ -63,7 +88,6 @@
     </record>
 
     <record id="view_timesheet_report_pivot" model="ir.ui.view">
-         <field name="name">view.timesheet.report.pivot</field>
          <field name="model">request.timesheet.report</field>
          <field name="arch" type="xml">
              <pivot display_quantity="true" disable_linking="True">
@@ -76,7 +100,6 @@
     </record>
 
     <record id="view_timesheet_report_graph" model="ir.ui.view">
-         <field name="name">view.timesheet.report.graph</field>
          <field name="model">request.timesheet.report</field>
          <field name="arch" type="xml">
              <graph>
@@ -87,12 +110,12 @@
     </record>
 
     <record id="view_timesheet_report_tree" model="ir.ui.view">
-         <field name="name">view.timesheet.report.tree</field>
          <field name="model">request.timesheet.report</field>
          <field name="arch" type="xml">
              <tree>
                  <field name="date"/>
                  <field name="request_id"/>
+                 <field name="request_service_id"/>
                  <field name="request_category_id"/>
                  <field name="request_type_id"/>
                  <field name="request_kind_id"/>

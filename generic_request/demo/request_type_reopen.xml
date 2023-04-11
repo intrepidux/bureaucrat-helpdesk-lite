@@ -19,11 +19,11 @@
         <field name="name">Request Reopen (category technical config)</field>
         <field name="code">request-reopen-categ-technical-config</field>
         <field name="description">Simple request type related to category 'Technical / Configuration'</field>
+        <field name="service_ids" eval="[(4, ref('generic_service.generic_service_default'))]"/>
         <field name="category_ids"
                eval="[(6, 0, [ref('generic_request.request_category_demo_technical_configuration')])]"/>
     </record>
     <!-- End test reopen request types -->
-
 
     <!-- Main Request -->
     <record id="request_type_reopen_main" model="request.type">

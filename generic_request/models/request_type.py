@@ -16,6 +16,7 @@ class RequestType(models.Model):
         'generic.mixin.track.changes',
     ]
     _description = "Request Type"
+    _order = 'name, id'
 
     name = fields.Char(copy=False)
     code = fields.Char(copy=False)
@@ -169,6 +170,10 @@ class RequestType(models.Model):
         relation='request_type__timesheet_activity__rel',
         column1='request_type_id',
         column2='activity_id')
+
+    service_ids = fields.Many2many(
+        'generic.service', 'generic_service_request_type_rel',
+        'type_id', 'service_id', string='Service')
 
     _sql_constraints = [
         ('name_uniq',
@@ -379,6 +384,9 @@ class RequestType(models.Model):
         self.ensure_one()
         action = self.env['generic.mixin.get.action'].get_action_by_xmlid(
             'generic_request.action_type_window',
+            name=_('Workflow: %(type_name)s') % {
+                'type_name': self.display_name,
+            },
             context={'default_request_type_id': self.id},
         )
         action.update({

@@ -31,7 +31,6 @@
     </record>
 
     <record id="request_category_view_dashboard" model="ir.ui.view">
-        <field name="name">request.category.dashbard</field>
         <field name="model">request.category</field>
         <field name="arch" type="xml">
             <kanban class="oe_background_grey o_request_dashboard_kanban">
@@ -190,7 +189,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_category_search">
-        <field name="name">view.request.category.search</field>
         <field name="model">request.category</field>
         <field name="arch" type="xml">
             <search>
@@ -209,7 +207,6 @@
         </field>
     </record>
     <record model="ir.ui.view" id="view_request_category_tree">
-        <field name="name">view.request.category.tree</field>
         <field name="model">request.category</field>
         <field name="arch" type="xml">
             <tree>
@@ -222,7 +219,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_category_form">
-        <field name="name">view.request.category.form</field>
         <field name="model">request.category</field>
         <field name="arch" type="xml">
             <form>
@@ -260,8 +256,6 @@
                         <page string="Info" name="page_info">
                             <group name="group_info_root">
                                 <group name="group_info_left">
-                                    <field name="request_type_ids" widget="many2many_tags"
-                                           placeholder="Request types"/>
                                 </group>
                                 <group name="group_info_right">
                                     <field name="code"
@@ -272,6 +266,14 @@
                                            options="{'no_create': true, 'no_quick_create': true}"/>
                                 </group>
                             </group>
+                        </page>
+                        <page string="Types" name="page_request_types">
+                            <field name="request_type_ids"/>
+                        </page>
+                        <page string="Services"
+                              name="page_request_services"
+                              groups="generic_request.group_request_use_services">
+                            <field name="service_ids"/>
                         </page>
                         <page string="Description" name="page_description">
                             <field name="description"

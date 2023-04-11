@@ -8,5 +8,6 @@ from . import (
     test_request_wizard_close,
     test_rpc_channel,
     test_request_events,
+    test_request_service,
     test_wizard_set_parent,
 )

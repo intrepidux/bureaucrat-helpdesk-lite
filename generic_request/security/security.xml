@@ -11,6 +11,8 @@
 
     <record id="group_request_user_implicit_ro" model="res.groups">
         <field name="name">Request user implicit (read only)</field>
+        <field name="implied_ids"
+               eval="[(4, ref('generic_service.group_generic_service_user_implicit'))]"/>
         <field name="category_id" ref="base.module_category_generic_request"/>
         <field name="comment">
             Group that adds readonly access to requests.
@@ -122,6 +124,13 @@
         <field name="comment">
             If this group enabled, then users will see searchpanel
             in request search view
+        </field>
+    </record>
+
+    <record id="group_request_use_services" model="res.groups">
+        <field name="name">Use services in requests</field>
+        <field name="comment">
+            If this group enabled, then users will be able to use services in requests
         </field>
     </record>
 

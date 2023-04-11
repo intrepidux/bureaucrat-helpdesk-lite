@@ -11,7 +11,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'category': 'Generic Request',
-    'version': '15.0.1.181.0',
+    'version': '15.0.3.8.0',
     'external_dependencies': {
         'python': [
             'html2text',
@@ -23,7 +23,9 @@
         'base',
         'mail',
         'generic_mixin',
+        'generic_service',
         'generic_tag',
+        'generic_system_event',
         'crnd_web_diagram_plus',
         'crnd_web_list_popover_widget',
         'crnd_web_tree_colored_field',
@@ -40,19 +42,20 @@
         'data/request_sequence.xml',
         'data/mail_subtype.xml',
         'data/request_stage_type.xml',
-        'data/request_event_type.xml',
-        'data/ir_cron.xml',
         'data/generic_tag_model.xml',
         'data/generic_tag_category.xml',
         'data/generic_tag.xml',
         'data/request_timesheet_activity.xml',
         'data/request_channel.xml',
+        'data/ir_cron.xml',
 
+        'views/generic_service.xml',
         'views/request_views.xml',
         'views/res_config_settings_view.xml',
         'views/request_category_view.xml',
         'views/request_type_view.xml',
         'views/request_kind.xml',
+        'views/request_service.xml',
         'views/request_stage_route_view.xml',
         'views/request_stage_view.xml',
         'views/request_stage_type_view.xml',
@@ -62,8 +65,6 @@
         'views/res_users.xml',
         'views/mail_templates.xml',
         'views/request_event.xml',
-        'views/request_event_category.xml',
-        'views/request_event_type.xml',
         'views/request_creation_template.xml',
         'views/generic_tag_menu.xml',
         'views/request_timesheet_activity.xml',
@@ -76,9 +77,14 @@
 
         'reports/request_timesheet_report.xml',
         'reports/request_graph_reports.xml',
+
+        'data/system_event_source.xml',
+        'data/system_event_category.xml',
+        'data/system_event_type.xml',
     ],
 
     'demo': [
+        'demo/response_attachments.xml',
         'demo/request_demo_users.xml',
         'demo/request_category_demo.xml',
         'demo/request_kind.xml',
@@ -94,7 +100,6 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'generic_request/static/src/scss/request_kanban_tags.scss',
             'generic_request/static/src/scss/request_timesheet.scss',
             'generic_request/static/src/scss/request_form.scss',
             'generic_request/static/src/scss/request_kanban.scss',
