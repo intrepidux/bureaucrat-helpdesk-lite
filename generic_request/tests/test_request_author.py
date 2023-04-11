@@ -51,6 +51,7 @@ class TestRequestAuthor(RequestCase):
         self.assertEqual(request.can_change_author, False)
 
     def test_author_compute(self):
+        # pylint: disable=too-many-statements
         partner = self.env.ref('base.res_partner_3')
         author = self.env.ref('base.res_partner_address_5')
 
@@ -72,7 +73,7 @@ class TestRequestAuthor(RequestCase):
         self.assertNotIn(author, request.message_partner_ids)
         self.assertNotIn(partner, request.message_partner_ids)
 
-        request = self.env['request.request'].create({
+        request2 = self.env['request.request'].create({
             'type_id': self.simple_type.id,
             'category_id': self.general_category.id,
             'request_text': 'Test request',
@@ -83,10 +84,10 @@ class TestRequestAuthor(RequestCase):
         self.assertEqual(partner.request_count, 2)
         self.assertFalse(author.request_ids)
         self.assertEqual(author.request_count, 0)
-        self.assertNotIn(author, request.message_partner_ids)
-        self.assertIn(partner, request.message_partner_ids)
+        self.assertNotIn(author, request2.message_partner_ids)
+        self.assertIn(partner, request2.message_partner_ids)
 
-        request = self.env['request.request'].create({
+        request3 = self.env['request.request'].create({
             'type_id': self.simple_type.id,
             'category_id': self.general_category.id,
             'request_text': 'Test request',
@@ -96,10 +97,10 @@ class TestRequestAuthor(RequestCase):
         self.assertEqual(partner.request_count, 3)
         self.assertTrue(author.request_ids)
         self.assertEqual(author.request_count, 1)
-        self.assertIn(author, request.message_partner_ids)
-        self.assertNotIn(partner, request.message_partner_ids)
+        self.assertIn(author, request3.message_partner_ids)
+        self.assertNotIn(partner, request3.message_partner_ids)
 
-        request = self.env['request.request'].create({
+        request4 = self.env['request.request'].create({
             'type_id': self.simple_type.id,
             'category_id': self.general_category.id,
             'request_text': 'Test request',
@@ -110,29 +111,55 @@ class TestRequestAuthor(RequestCase):
         self.assertEqual(partner.request_count, 3)
         self.assertTrue(author.request_ids)
         self.assertEqual(author.request_count, 2)
-        self.assertIn(author, request.message_partner_ids)
-        self.assertNotIn(partner, request.message_partner_ids)
+        self.assertIn(author, request4.message_partner_ids)
+        self.assertNotIn(partner, request4.message_partner_ids)
 
-        request.author_id = partner
-        self.assertIn(author, request.message_partner_ids)
-        self.assertIn(partner, request.message_partner_ids)
+        request4.author_id = partner
+        self.assertIn(author, request4.message_partner_ids)
+        self.assertIn(partner, request4.message_partner_ids)
+        self.assertEqual(partner.request_count, 4)
+        self.assertEqual(author.request_count, 1)
 
         # Test actions
         act = partner.action_show_related_requests()
         self.assertEqual(
             self.env[act['res_model']].search(act['domain']),
-            partner.request_ids)
+            request + request2 + request3 + request4)
         act = author.action_show_related_requests()
         self.assertEqual(
             self.env[act['res_model']].search(act['domain']),
-            author.request_ids)
-        req = self.env['request.request'].with_context(
+            request3)
+
+        # Create request from author's show requests action
+        request5 = self.env['request.request'].with_context(
             **act['context']).create({
                 'type_id': self.simple_type.id,
                 'request_text': 'Test',
             })
-        self.assertEqual(req.partner_id, partner)
-        self.assertEqual(req.author_id, author)
+        self.assertEqual(request5.partner_id, partner)
+        self.assertEqual(request5.author_id, author)
+        self.assertEqual(partner.request_count, 5)
+        self.assertEqual(author.request_count, 2)
+
+        # Try to delete request 3
+        request3.unlink()
+        self.assertEqual(partner.request_count, 4)
+        self.assertEqual(author.request_count, 1)
+        self.assertEqual(
+            partner.request_ids,
+            request + request2 + request4 + request5)
+        self.assertEqual(
+            author.request_ids, request5)
+
+        # Try to delete request 4
+        request4.unlink()
+        self.assertEqual(partner.request_count, 3)
+        self.assertEqual(author.request_count, 1)
+        self.assertEqual(
+            partner.request_ids,
+            request + request2 + request5)
+        self.assertEqual(
+            author.request_ids, request5)
 
     def test_author_compute_user_implicit(self):
         partner = self.env.ref('base.res_partner_3')

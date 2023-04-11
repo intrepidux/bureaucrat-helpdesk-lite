@@ -30,7 +30,7 @@
         <field name="inherit_id" ref="generic_request.view_request_request_search"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='group_group_by']" position="inside">
-                <filter name="filter_group_by_service"
+                <filter name="filter_group_by_website"
                         string="Website"
                         context="{'group_by': 'website_id'}"/>
             </xpath>

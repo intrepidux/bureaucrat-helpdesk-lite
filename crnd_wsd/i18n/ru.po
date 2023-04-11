@@ -20,11 +20,33 @@ msgstr ""
 "X-Generator: Weblate 4.3.2\n"
 
 #. module: crnd_wsd
+#: model:request.category,description:crnd_wsd.request_category_demo_website
+msgid ""
+"\n"
+"            SaAS related requests\n"
+"        "
+msgstr ""
+"\n"
+"            Запросы связанные с SaAS\n"
+"        "
+
+#. module: crnd_wsd
+#: model:request.category,description:crnd_wsd.request_category_demo_website_tech
+msgid ""
+"\n"
+"            Technical requests\n"
+"        "
+msgstr ""
+"\n"
+"            Технические запросы\n"
+"        "
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid ""
 ".\n"
 "\n"
-"                             Following popular Mime Types could be used:"
+"                            Following popular Mime Types could be used:"
 msgstr ""
 
 #. module: crnd_wsd
@@ -54,10 +76,66 @@ msgstr ""
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid ""
+"<b><i>Require login</i></b> - if user is not authenticated,\n"
+"                                    then redirect to login page first, and "
+"after user logged in,\n"
+"                                    redirect back to request page (website "
+"for portal users, and web for internal users)"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
 "<b><i>Restricted UI</i></b> - unauthorized users will be able to pass all "
 "steps of creating a request but unable to submit request until logged in. "
 "Also, on all screens they will see small block that asks them to login or "
 "register (with links to both actions)."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
+"<b><i>Shared link</i></b> - in this case, the mail link will\n"
+"                                    contain <i>access_token</i>, thus if "
+"user is not logged in, the website page of request\n"
+"                                    will be displayed for this user with "
+"limited functionality\n"
+"                                    (no ability to edit request text, no "
+"ability to move request to next stage, etc).\n"
+"                                    In case if it is default notification "
+"email, or if email contains id of partner,\n"
+"                                    only chatter could work."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
+"<code>\n"
+"                                object.get_mail_url()\n"
+"                            </code>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
+"<code>\n"
+"                                object.get_mail_url(pid)\n"
+"                            </code>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "<i class=\"fa fa-arrow-right\" title=\"Priority\"/>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "<i class=\"fa fa-clock-o\" title=\"Urgency\"/>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "<i class=\"fa fa-star-half-o\" title=\"Impact\"/>"
 msgstr ""
 
 #. module: crnd_wsd
@@ -123,6 +201,15 @@ msgid "<span class=\"fa fa-square mr4\" title=\"Kind\"/>"
 msgstr "<span class=\"fa fa-square mr4\" title=\"Вид\"/>"
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.request_short_info
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
+msgid "<span class=\"fa fa-square-o mr4\" title=\"Service\"/>"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 msgid ""
 "<span class=\"header-bg-filler\">Request</span>\n"
@@ -143,6 +230,14 @@ msgstr ""
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 msgid ""
+"<span class=\"wsd_request header-bg-filler\">Attachments</span>\n"
+"                                    <span class=\"header-separator-splitter"
+"\"/>"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+msgid ""
 "<span class=\"wsd_request header-bg-filler\">Response</span>\n"
 "                                    <span class=\"header-separator-splitter"
 "\"/>"
@@ -150,6 +245,14 @@ msgstr ""
 "<span class=\"wsd_request header-bg-filler\">Ответ</span>\n"
 "                                    <span class=\"header-separator-splitter"
 "\"/>"
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+msgid ""
+"<span class=\"wsd_request header-bg-filler\">Subrequests</span>\n"
+"                                        <span class=\"header-separator-"
+"splitter\"/>"
+msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_action_log
@@ -167,11 +270,16 @@ msgid "<strong>Created</strong>"
 msgstr "<strong>Создан</strong>"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:162
-#: code:addons/crnd_wsd/controllers/helpers.py:168
-#: code:addons/crnd_wsd/controllers/helpers.py:175
-#: code:addons/crnd_wsd/controllers/helpers.py:201
-#: code:addons/crnd_wsd/controllers/helpers.py:212
+#: model:request.stage,name:crnd_wsd.request_stage_type_upgrade_accepted
+msgid "Accepted"
+msgstr "Принят"
+
+#. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/helpers.py:143
+#: code:addons/crnd_wsd/controllers/helpers.py:149
+#: code:addons/crnd_wsd/controllers/helpers.py:156
+#: code:addons/crnd_wsd/controllers/helpers.py:182
+#: code:addons/crnd_wsd/controllers/helpers.py:193
 #, python-format
 msgid "Access denied"
 msgstr "Доступ запрещен"
@@ -222,9 +330,15 @@ msgid "Back"
 msgstr "Назад"
 
 #. module: crnd_wsd
-#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
-msgid "Bureaucrat Website Settings"
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "Below is example of list, that describes steps to solve request"
 msgstr ""
+"Ниже представлен пример списка, который описывает шаги для решения запроса"
+
+#. module: crnd_wsd
+#: model:request.type,name:crnd_wsd.request_type_bug_report
+msgid "Bug Report"
+msgstr "Отчет об ошибках"
 
 #. module: crnd_wsd
 #. openerp-web
@@ -260,13 +374,28 @@ msgid ""
 msgstr ""
 
 #. module: crnd_wsd
-#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
+#: model_terms:request.request,note_html:crnd_wsd.demo_request_request_printer_1
+msgid "Choose printer You want to get access for"
+msgstr "Выберите принтер, к которому хотите получить доступ"
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid "Choose the layout style applied for request creation steps."
 msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Choose the the kind of access for link provided in emails."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid "Choose the way to redirect after request created."
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_config_settings__request_mail_link_access
+msgid "Choose what kind of link to request will be used in emails."
 msgstr ""
 
 #. module: crnd_wsd
@@ -277,11 +406,17 @@ msgstr ""
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_bug_report_sent_to_closed
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_generic_sent_to_closed
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_without_service_sent_to_closed
 msgid "Close"
 msgstr "Закрыть"
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_filterbox
+#: model:request.stage,name:crnd_wsd.request_stage_type_bug_report_closed
+#: model:request.stage,name:crnd_wsd.request_stage_type_generic_closed
+#: model:request.stage,name:crnd_wsd.request_stage_type_without_service_closed
 msgid "Closed"
 msgstr "Закрыт"
 
@@ -374,6 +509,16 @@ msgid "Deadline: {{req.deadline_date}}"
 msgstr "Срок: {{req.deadline_date}}"
 
 #. module: crnd_wsd
+#: model:request.kind,name:crnd_wsd.request_kind_demo_wsd
+msgid "Demo WSD"
+msgstr "Демо WSD"
+
+#. module: crnd_wsd
+#: model:request.kind,description:crnd_wsd.request_kind_demo_wsd
+msgid "Demo website service desk requests"
+msgstr "Демо запросы службы поддержки с вебсайта"
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param__selection__radio
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_select_param__selection__tile
 msgid "Description"
@@ -398,6 +543,14 @@ msgstr "Отменить"
 #, python-format
 msgid "Don't leave yet,<br />it's still loading..."
 msgstr "Не уходите,<br />программа еще загружаеться..."
+
+#. module: crnd_wsd
+#: model:request.stage,name:crnd_wsd.request_stage_type_bug_report_draft
+#: model:request.stage,name:crnd_wsd.request_stage_type_generic_draft
+#: model:request.stage,name:crnd_wsd.request_stage_type_upgrade_draft
+#: model:request.stage,name:crnd_wsd.request_stage_type_without_service_draft
+msgid "Draft"
+msgstr "Черновик"
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
@@ -434,7 +587,7 @@ msgid "File Types Allowed to Upload"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:107
+#: code:addons/crnd_wsd/controllers/helpers.py:91
 #, python-format
 msgid "File size is too big!"
 msgstr ""
@@ -450,9 +603,39 @@ msgid "GB"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:request.category,name:crnd_wsd.request_category_demo_website_general
+msgid "General"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.category,description:crnd_wsd.request_category_demo_website_general
+msgid "General website requests"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.type,name:crnd_wsd.request_type_generic
+msgid "Generic Question"
+msgstr "Общий вопрос"
+
+#. module: crnd_wsd
+#: model:ir.model,name:crnd_wsd.model_generic_service
+msgid "Generic Service"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.type,description:crnd_wsd.request_type_generic
+msgid "Generic questions about anything"
+msgstr "Общие вопросы на любую тему"
+
+#. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_ir_http
 msgid "HTTP Routing"
 msgstr "Маршрутизация HTTP"
+
+#. module: crnd_wsd
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "Here is just example of instruction."
+msgstr "Это просто пример инструкции."
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_timesheet_info
@@ -460,13 +643,23 @@ msgid "Hours"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:26
-#, python-format
+#: model_terms:request.request,help_html:crnd_wsd.crnd_wsd_subrequest_parent_request
 msgid ""
-"Image size excessive, uploaded images must be smaller than 42 million pixel"
+"If you have some troubles with access (see access denied errors, etc)\n"
+"             then use this request type"
 msgstr ""
-"Размер изображения слишком большой, загружуемые изображения должны быть "
-"меньше чем 42 млн. пикселей"
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
+"If you want to provide link to request in your custom email template,\n"
+"                                use following method to get the link:"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "In example above <i>pid</i> is ID for the partner to generate link for."
+msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
@@ -498,7 +691,7 @@ msgid "Kind"
 msgstr "Вид"
 
 #. module: crnd_wsd
-#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_website_res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid "Layout for request creation steps"
 msgstr ""
 
@@ -557,6 +750,14 @@ msgid "No Phone"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:request.request,stage_help_html:crnd_wsd.crnd_wsd_subrequest_subrequest
+msgid ""
+"Now request is in <i>Draft</i> state.<br>\n"
+"            Please click 'Sent' stage on status bar (right-top corner)\n"
+"            to send it to our team."
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_filterbox
 msgid "Open"
 msgstr "Открыты"
@@ -564,6 +765,21 @@ msgstr "Открыты"
 #. module: crnd_wsd
 #: selection:res.company,request_wsd_public_use_author_phone:0
 msgid "Optional Phone"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid ""
+"Or, if you have partner in context, then you can call this method providing "
+"ID\n"
+"                                of partner, to generate link specific for "
+"this partner."
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+msgid "Parent Request"
 msgstr ""
 
 #. module: crnd_wsd
@@ -586,15 +802,30 @@ msgid "Please, fill response text!"
 msgstr "Пожалуйста, заполните текст ответа!"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:414
+#: code:addons/crnd_wsd/controllers/main.py:597
 #, python-format
 msgid "Please, specify your email address!"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:422
+#: code:addons/crnd_wsd/controllers/main.py:605
 #, python-format
 msgid "Please, specify your phone number!"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "Priority"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "Priority..."
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.type,name:crnd_wsd.request_type_without_service
+msgid "Question without service"
 msgstr ""
 
 #. module: crnd_wsd
@@ -631,6 +862,16 @@ msgstr "Перенаправить на страницу входа"
 #: selection:website,request_redirect_after_created_on_website:0
 msgid "Redirect to request page"
 msgstr ""
+
+#. module: crnd_wsd
+#: model:request.stage,name:crnd_wsd.request_stage_type_upgrade_rejected
+msgid "Rejected"
+msgstr "Отклонено"
+
+#. module: crnd_wsd
+#: model:request.type,description:crnd_wsd.request_type_bug_report
+msgid "Report a bug"
+msgstr "Сообщить об ошибке"
 
 #. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_request_request
@@ -682,6 +923,11 @@ msgid "Request Limit Max Upload File Size Uom"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_res_company__request_mail_link_access
+msgid "Request Mail Link Access"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:ir.model.fields,field_description:crnd_wsd.field_website__request_redirect_after_created_on_website
 msgid "Request Redirect After Created On Website"
 msgstr ""
@@ -707,18 +953,39 @@ msgid "Request Wsd Public Use Author Phone"
 msgstr ""
 
 #. module: crnd_wsd
+#: model:request.stage,description:crnd_wsd.request_stage_type_bug_report_closed
+#: model:request.stage,description:crnd_wsd.request_stage_type_generic_closed
+#: model:request.stage,description:crnd_wsd.request_stage_type_without_service_closed
+msgid "Request is closed"
+msgstr "Запрос закрыт"
+
+#. module: crnd_wsd
+#: model:request.stage,description:crnd_wsd.request_stage_type_bug_report_draft
+#: model:request.stage,description:crnd_wsd.request_stage_type_generic_draft
+#: model:request.stage,description:crnd_wsd.request_stage_type_without_service_draft
+msgid "Request is in stage Draft"
+msgstr "Запрос на этапе Черновик"
+
+#. module: crnd_wsd
+#: model:request.stage,description:crnd_wsd.request_stage_type_bug_report_sent
+#: model:request.stage,description:crnd_wsd.request_stage_type_generic_sent
+#: model:request.stage,description:crnd_wsd.request_stage_type_without_service_sent
+msgid "Request is in stage Sent"
+msgstr "Запрос на этапе Отправлено"
+
+#. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_request_kind
 msgid "Request kind"
 msgstr "Вид запроса"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:402
+#: code:addons/crnd_wsd/controllers/main.py:585
 #, python-format
 msgid "Request text is empty!"
 msgstr "Текст запроса не заполнен!"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:409
+#: code:addons/crnd_wsd/controllers/main.py:592
 #, python-format
 msgid "Request text is too long!"
 msgstr ""
@@ -730,6 +997,11 @@ msgid "Requests"
 msgstr "Запросы"
 
 #. module: crnd_wsd
+#: selection:res.company,request_mail_link_access:0
+msgid "Require login"
+msgstr ""
+
+#. module: crnd_wsd
 #: selection:res.company,request_wsd_public_use_author_phone:0
 msgid "Required Phone"
 msgstr ""
@@ -738,6 +1010,11 @@ msgstr ""
 #: selection:res.company,request_wsd_public_ui_visibility:0
 msgid "Restricted UI"
 msgstr "Ограниченный интерфейс"
+
+#. module: crnd_wsd
+#: model:request.category,name:crnd_wsd.request_category_demo_website
+msgid "SaAS"
+msgstr ""
 
 #. module: crnd_wsd
 #. openerp-web
@@ -759,14 +1036,67 @@ msgid "Select category"
 msgstr "Выберите категорию"
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_select_service
+msgid "Select service"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_select_type
 msgid "Select type"
 msgstr "Выберите тип"
 
 #. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/main.py:615
+#, python-format
+msgid "Selected request type require service!"
+msgstr ""
+
+#. module: crnd_wsd
+#: code:addons/crnd_wsd/controllers/main.py:610
+#, python-format
+msgid "Selected service and request type are incompatible!"
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:request.type,selection_priority_view:0
+msgid "Selection"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_request_type__selection_priority_view
+msgid "Selection Priority View"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_progress
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_bug_report_draft_to_sent
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_generic_draft_to_sent
+#: model:request.stage.route,name:crnd_wsd.request_stage_route_type_without_service_draft_to_sent
 msgid "Send"
 msgstr "Отправить"
+
+#. module: crnd_wsd
+#: model:request.stage,name:crnd_wsd.request_stage_type_bug_report_sent
+#: model:request.stage,name:crnd_wsd.request_stage_type_generic_sent
+#: model:request.stage,name:crnd_wsd.request_stage_type_without_service_sent
+msgid "Sent"
+msgstr "Отправлен"
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.request_short_info
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_new_selection_box
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_congratulation
+msgid "Service"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_progress
+msgid ""
+"Service\n"
+"                <span/>"
+msgstr ""
 
 #. module: crnd_wsd
 #: model:website.menu,name:crnd_wsd.menu_service_desk
@@ -795,6 +1125,11 @@ msgid ""
 "                            When user tries to enter more symbols than "
 "allowed by this option,\n"
 "                            system will not allow him to do this."
+msgstr ""
+
+#. module: crnd_wsd
+#: selection:res.company,request_mail_link_access:0
+msgid "Shared link"
 msgstr ""
 
 #. module: crnd_wsd
@@ -839,6 +1174,12 @@ msgid ""
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.demo_request_request_upgrade_request_1
+#: model_terms:request.type,help_html:crnd_wsd.request_type_upgrade
+msgid "Specify what you want to upgrade"
+msgstr "Укажите что вы хотите обновить"
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
 msgid "Stage"
 msgstr "Этап"
@@ -847,6 +1188,26 @@ msgstr "Этап"
 #: selection:website,request_create_step_layout:0
 msgid "Standard"
 msgstr ""
+
+#. module: crnd_wsd
+#: selection:request.type,selection_priority_view:0
+msgid "Star bar"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "Step 1"
+msgstr "Шаг 1"
+
+#. module: crnd_wsd
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "Step 2"
+msgstr "Шаг 2"
+
+#. module: crnd_wsd
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "Step N"
+msgstr "Шаг N"
 
 #. module: crnd_wsd
 #. openerp-web
@@ -863,6 +1224,17 @@ msgid "Still loading...<br />Please be patient."
 msgstr "Еще загружаеться...<br />Пожалуйста подождите."
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_body
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_request_table
+msgid "Subrequests"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.category,name:crnd_wsd.request_category_demo_website_support
+msgid "Support"
+msgstr "Поддержка"
+
+#. module: crnd_wsd
 #. openerp-web
 #: code:addons/crnd_wsd/static/src/js/blockui.js:17
 #, python-format
@@ -872,25 +1244,73 @@ msgstr ""
 "загружается..."
 
 #. module: crnd_wsd
+#: model:request.category,name:crnd_wsd.request_category_demo_website_tech
+msgid "Technical"
+msgstr "Технические"
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid ""
 "The list of allowed file types allowed to upload in request.\n"
-"                             This field must contain coma-separated list of"
+"                            This field must contain coma-separated list of"
 msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid ""
 "The type of uploaded file, now also validated on backend side.\n"
-"                                 In order to make file upload restriction "
+"                                In order to make file upload restriction "
 "work properly on backend side,\n"
-"                                 now it is recommended to install"
+"                                now it is recommended to install"
 msgstr ""
 
 #. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests
 msgid "There are currently no requests."
 msgstr "Тут сейчас нет запросов."
+
+#. module: crnd_wsd
+#: model_terms:request.request,note_html:crnd_wsd.demo_request_request_generic_question_1
+#: model_terms:request.type,note_html:crnd_wsd.request_type_generic
+msgid "There you should ask a questions related to our SaaS service."
+msgstr "Здесь вы можете задать вопрос касательно нашего SaaS сервиса."
+
+#. module: crnd_wsd
+#: model_terms:request.request,stage_help_html:crnd_wsd.demo_request_request_printer_1
+msgid ""
+"This is draft request. You can still edit it.\n"
+"             When you think it is finished, send it."
+msgstr ""
+"Это черновик. Вы можете редактировать его.\n"
+"             После окончания редактирования отошлите его."
+
+#. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.demo_request_request_generic_question_1
+#: model_terms:request.type,help_html:crnd_wsd.request_type_generic
+msgid ""
+"This is request type for generic questions related to our SaaS service\n"
+"            Use this request type if you cannot find exact request type for "
+"your question"
+msgstr ""
+"Данный тип запросов предназначен для общих вопросов касательно нашего SaaS "
+"сервиса\n"
+"            используйте этот тип запросов если не можете найти тип, который "
+"соответствует вашему вопросу"
+
+#. module: crnd_wsd
+#: model:request.type,description:crnd_wsd.request_type_without_service
+msgid "This is request type that does not have related service"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.crnd_wsd_subrequest_subrequest
+msgid "This is simple request type with simple routes:"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.demo_request_request_printer_1
+msgid "This request type is used to request access to printer."
+msgstr "Этот тип запроса используется для запроса на доступ к принтеру."
 
 #. module: crnd_wsd
 #: selection:website,request_create_step_layout:0
@@ -937,16 +1357,26 @@ msgstr ""
 "                <span/>"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/main.py:516
+#: code:addons/crnd_wsd/controllers/main.py:727
 #, python-format
 msgid "Unknown server error. See server logs."
 msgstr "Неизвестная ошибка сервера. Смотрите логи сервера."
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:72
+#: code:addons/crnd_wsd/controllers/helpers.py:56
 #, python-format
 msgid "Unsupported file format!"
 msgstr ""
+
+#. module: crnd_wsd
+#: model:request.type,name:crnd_wsd.request_type_upgrade
+msgid "Upgrade request"
+msgstr "Запрос на обновление"
+
+#. module: crnd_wsd
+#: model:request.stage,name:crnd_wsd.request_stage_type_upgrade_upgraded
+msgid "Upgraded"
+msgstr "Обновлено"
 
 #. module: crnd_wsd
 #: model:res.groups,comment:crnd_wsd.group_service_desk_website_user_all_requests
@@ -968,9 +1398,11 @@ msgid "View on Website"
 msgstr "Посмотреть на вебсайте"
 
 #. module: crnd_wsd
+#: model:ir.model.fields,field_description:crnd_wsd.field_generic_service__website_published
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_category__website_published
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_stage_route__website_published
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_type__website_published
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_service_view_search
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_category_search
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_stage_route_search
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.view_request_type_search
@@ -978,7 +1410,13 @@ msgid "Visible in Website"
 msgstr "Видимый на сайте"
 
 #. module: crnd_wsd
+#: model:request.kind,website_filter_name:crnd_wsd.request_kind_demo_wsd
+msgid "WSD"
+msgstr ""
+
+#. module: crnd_wsd
 #: model:ir.model,name:crnd_wsd.model_website
+#: model:ir.model.fields,field_description:crnd_wsd.field_generic_service__website_ids
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_category__website_ids
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_request__website_id
 #: model:ir.model.fields,field_description:crnd_wsd.field_request_type__website_ids
@@ -1040,9 +1478,24 @@ msgstr ""
 "даже если эти типы и категории не опубликованы на вебсайте."
 
 #. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
+msgid "Website settings"
+msgstr ""
+
+#. module: crnd_wsd
+#: model:request.category,description:crnd_wsd.request_category_demo_website_support
+msgid "Website support related requests"
+msgstr "Запросы, связанные с поддержкой вебсайта"
+
+#. module: crnd_wsd
 #: model:res.groups,comment:crnd_wsd.group_service_desk_website_user
 msgid "Website users of service desk"
 msgstr "Пользователи сервис-деска с вебсайта"
+
+#. module: crnd_wsd
+#: model_terms:request.request,instruction_html:crnd_wsd.demo_request_request_printer_1
+msgid "You can use here html, for formatting."
+msgstr "Вы можете использовать здесь html для форматирования."
 
 #. module: crnd_wsd
 #. openerp-web
@@ -1089,6 +1542,16 @@ msgid "audio/*"
 msgstr ""
 
 #. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.crnd_wsd_subrequest_subrequest
+msgid "draft -&gt; sent -&gt; confirmed"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:request.request,help_html:crnd_wsd.crnd_wsd_subrequest_subrequest
+msgid "draft -&gt; sent -&gt; rejected"
+msgstr ""
+
+#. module: crnd_wsd
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data
 msgid "e.g +1 (123)-123-4567"
 msgstr ""
@@ -1124,8 +1587,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid ""
 "of files\n"
-"                             allowed to upload.;\n"
-"                             In order to allow to upload all images, pdf and "
+"                            allowed to upload.;\n"
+"                            In order to allow to upload all images, pdf and "
 "msword documents, you can use following value:"
 msgstr ""
 
@@ -1141,9 +1604,9 @@ msgstr "или"
 msgid ""
 "python package, that is used to detect mimetype of uploaded file on "
 "backend.\n"
-"                                 To make it work properly, it is also "
+"                                To make it work properly, it is also "
 "required to install system dependency libmagic\n"
-"                                 (to do it on Debian/Ubuntu run"
+"                                (to do it on Debian/Ubuntu run"
 msgstr ""
 
 #. module: crnd_wsd
@@ -1172,6 +1635,23 @@ msgstr "чтобы просматривать и создавать запрос
 #: model_terms:ir.ui.view,arch_db:crnd_wsd.generic_request_res_config_settings_view_form
 msgid "video/*"
 msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.wsd_requests_new_request_data_priority
+msgid "{{priority[1]}}"
+msgstr ""
+
+#. module: crnd_wsd
+#: model_terms:ir.ui.view,arch_db:crnd_wsd.priority_bar
+msgid "{{priority_inv[1]}}"
+msgstr ""
+
+#~ msgid ""
+#~ "Image size excessive, uploaded images must be smaller than 42 million "
+#~ "pixel"
+#~ msgstr ""
+#~ "Размер изображения слишком большой, загружуемые изображения должны быть "
+#~ "меньше чем 42 млн. пикселей"
 
 #~ msgid "Button Style"
 #~ msgstr "Стиль кнопки"
@@ -1218,126 +1698,6 @@ msgstr ""
 #~ msgstr ""
 #~ "<span class=\"pull-right label\" id=\"characters_left_label\" data-toggle="
 #~ "\"tooltip\" data-placement=\"bottom\" title=\"Осталось символов.\"/>"
-
-#~ msgid ""
-#~ "\n"
-#~ "            SaAS related requests\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "            Запросы связанные с SaAS\n"
-#~ "        "
-
-#~ msgid ""
-#~ "\n"
-#~ "            Technical requests\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "            Технические запросы\n"
-#~ "        "
-
-#~ msgid "Accepted"
-#~ msgstr "Принят"
-
-#~ msgid "Below is example of list, that describes steps to solve request"
-#~ msgstr ""
-#~ "Ниже представлен пример списка, который описывает шаги для решения запроса"
-
-#~ msgid "Bug Report"
-#~ msgstr "Отчет об ошибках"
-
-#~ msgid "Choose printer You want to get access for"
-#~ msgstr "Выберите принтер, к которому хотите получить доступ"
-
-#~ msgid "Demo WSD"
-#~ msgstr "Демо WSD"
-
-#~ msgid "Demo website service desk requests"
-#~ msgstr "Демо запросы службы поддержки с вебсайта"
-
-#~ msgid "Draft"
-#~ msgstr "Черновик"
-
-#~ msgid "Generic Question"
-#~ msgstr "Общий вопрос"
-
-#~ msgid "Generic questions about anything"
-#~ msgstr "Общие вопросы на любую тему"
-
-#~ msgid "Here is just example of instruction."
-#~ msgstr "Это просто пример инструкции."
-
-#~ msgid "Rejected"
-#~ msgstr "Отклонено"
-
-#~ msgid "Report a bug"
-#~ msgstr "Сообщить об ошибке"
-
-#~ msgid "Request is closed"
-#~ msgstr "Запрос закрыт"
-
-#~ msgid "Request is in stage Draft"
-#~ msgstr "Запрос на этапе Черновик"
-
-#~ msgid "Request is in stage Sent"
-#~ msgstr "Запрос на этапе Отправлено"
-
-#~ msgid "Sent"
-#~ msgstr "Отправлен"
-
-#~ msgid "Specify what you want to upgrade"
-#~ msgstr "Укажите что вы хотите обновить"
-
-#~ msgid "Step 1"
-#~ msgstr "Шаг 1"
-
-#~ msgid "Step 2"
-#~ msgstr "Шаг 2"
-
-#~ msgid "Step N"
-#~ msgstr "Шаг N"
-
-#~ msgid "Support"
-#~ msgstr "Поддержка"
-
-#~ msgid "Technical"
-#~ msgstr "Технические"
-
-#~ msgid "There you should ask a questions related to our SaaS service."
-#~ msgstr "Здесь вы можете задать вопрос касательно нашего SaaS сервиса."
-
-#~ msgid ""
-#~ "This is draft request. You can still edit it.\n"
-#~ "             When you think it is finished, send it."
-#~ msgstr ""
-#~ "Это черновик. Вы можете редактировать его.\n"
-#~ "             После окончания редактирования отошлите его."
-
-#~ msgid ""
-#~ "This is request type for generic questions related to our SaaS service\n"
-#~ "            Use this request type if you cannot find exact request type "
-#~ "for your question"
-#~ msgstr ""
-#~ "Данный тип запросов предназначен для общих вопросов касательно нашего "
-#~ "SaaS сервиса\n"
-#~ "            используйте этот тип запросов если не можете найти тип, "
-#~ "который соответствует вашему вопросу"
-
-#~ msgid "This request type is used to request access to printer."
-#~ msgstr "Этот тип запроса используется для запроса на доступ к принтеру."
-
-#~ msgid "Upgrade request"
-#~ msgstr "Запрос на обновление"
-
-#~ msgid "Upgraded"
-#~ msgstr "Обновлено"
-
-#~ msgid "Website support related requests"
-#~ msgstr "Запросы, связанные с поддержкой вебсайта"
-
-#~ msgid "You can use here html, for formatting."
-#~ msgstr "Вы можете использовать здесь html для форматирования."
 
 #~ msgid "Request have been created!"
 #~ msgstr "Запрос создан!"

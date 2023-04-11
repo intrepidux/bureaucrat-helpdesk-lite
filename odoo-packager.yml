@@ -4,13 +4,20 @@
 
 addons-list:
     - name: bureaucrat_helpdesk_lite
+    - name: bureaucrat_knowledge
+    - name: bureaucrat_knowledge_website
     - name: crnd_service_desk
     - name: crnd_wsd
     - name: generic_request
+    - name: generic_system_event
 
 git-sources:
+    - crnd: crnd/bureaucrat-automation
+      name: bureaucrat_automation_150
     - crnd: crnd/bureaucrat-generics
       name: bureaucrat_generics_98
+    - github: crnd-inc/bureaucrat-knowledge
+      name: crnd_inc_bureaucrat_knowledge_158
 
 
 known-addons:
@@ -22,4 +29,6 @@ known-addons:
     - crnd_web_m2o_info_widget
     - web_widget_colorpicker
     - base_field_m2m_view
+    - generic_m2o
+    - generic_service
     - web_view_searchpanel

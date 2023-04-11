@@ -5,7 +5,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'license': 'LGPL-3',
-    'version': '12.0.1.94.0',
+    'version': '12.0.1.104.0',
 
     'depends': [
         'mail',
@@ -18,6 +18,8 @@
         'templates/templates.xml',
         'templates/templates_request_page.xml',
         'templates/templates_request_new_page.xml',
+        'templates/priority_templates.xml',
+        'views/generic_service.xml',
         'views/request_type_view.xml',
         'views/request_stage_route.xml',
         'views/request_category_view.xml',
@@ -33,8 +35,11 @@
         'demo/request_kind.xml',
         'demo/demo_generic_type.xml',
         'demo/demo_upgrade_type.xml',
+        'demo/generic_service.xml',
         'demo/demo_request_type_seq.xml',
         'demo/demo_bug_report_type.xml',
+        'demo/request_subrequests.xml',
+        'demo/demo_type_no_service.xml',
     ],
     'qweb': [
         'static/src/xml/templates.xml',

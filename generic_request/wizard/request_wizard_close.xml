@@ -19,11 +19,17 @@
                                    attrs="{'required': [('require_response', '=', True)]}"
                                    colspan="4"
                                    placeholder="Response..."/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
                         </page>
                         <page string="Reopen as" name="reopen_as"
                               attrs="{'invisible': [('reopen', '=', False)]}">
                             <field name="reopen" invisible="1"/>
                             <group>
+                                <field name="reopen_as"
+                                       attrs="{'required': [('reopen', '=', True)]}"/>
+                                <field name="new_request_service_id"
+                                       groups="generic_request.group_request_use_services"
+                                       options="{'no_create': true, 'no_quick_create': true}"/>
                                 <field name="new_request_category_id"
                                        options="{'no_create': true, 'no_quick_create': true}"/>
                                 <field name="new_request_type_id"

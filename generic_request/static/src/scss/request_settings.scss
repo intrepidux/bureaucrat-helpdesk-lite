@@ -8,18 +8,42 @@
 .btn-rnd {
     border-radius: 5px;
     padding: 0 4px 0 4px;
+    text-align: center;
 }
 
 .btn-left {
     border-radius: 5px 0 0 5px;
     padding: 0 4px 0 4px;
+    text-align: center;
 }
 
 .btn-right {
     border-radius: 0 5px 5px 0;
     padding: 0 4px 0 4px;
+    text-align: center;
 }
 
 .btn-center {
     padding: 0 4px 0 4px;
+    text-align: center;
+}
+
+.btn-violet {
+    background-color: #5C5B80;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+.btn-violet:hover {
+    background-color: #7e7dad;
+}
+
+.btn-light {
+    background-color: #73d7eb;
+    color: #212529;
+    text-align: center;
+}
+
+.btn-light:hover {
+    background-color: #bcecf5;
 }

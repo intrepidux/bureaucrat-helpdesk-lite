@@ -6,16 +6,19 @@
         }
     }
 
-    .request_title h2 {
-        > * {
-            display: inline;
-        }
+    .request_title {
+        display: inline-block;
+        h2 {
+            > * {
+                display: inline;
+            }
 
-        > div.request-kanban-state {
-            display: inline-flex;
+            > div.request-kanban-state {
+                display: inline-flex;
 
-            > a {
-                display: flex;
+                > a {
+                    display: flex;
+                }
             }
         }
     }
@@ -73,6 +76,13 @@
             width: 100% !important;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
+
+            .m2o_info {
+                display: flex;
+                align-items: center;
+                max-width: 100%;
+            }
 
             a {
                 flex: auto;

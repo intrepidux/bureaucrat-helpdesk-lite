@@ -1,5 +1,31 @@
 # Changelog
 
+## Version 1.102.0
+
+Added response attachments on request form
+
+
+## Version 1.100.0
+
+Remove resolution checking of request upload image
+
+
+## Version 1.98.0
+
+Module `crnd_wsd_subrequest` was merged into the `crnd_wsd`
+
+
+## Version 1.97.0
+
+Module `crnd_wsd_priority` was merged into the `crnd_wsd`
+
+
+## Version 1.96.0
+
+***BUG220963***
+Fix bug when request assigned on inactive channels
+
+
 ## Version 1.94.0
 
 - Added new option that allows to use Shared Link in email.

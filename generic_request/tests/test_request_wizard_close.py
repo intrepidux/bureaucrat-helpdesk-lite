@@ -1,5 +1,5 @@
 from odoo.tests.common import SavepointCase
-from odoo.addons.generic_mixin.tests.common import ReduceLoggingMixin
+from odoo.addons.generic_mixin.tests.common import ReduceLoggingMixin, FindNew
 
 
 class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
@@ -8,12 +8,30 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
     def setUpClass(cls):
         super(TestRequestReopenAs, cls).setUpClass()
 
+        # Requests
+        cls.Request = cls.env['request.request']
         cls.request = cls.env.ref(
             "generic_request.request_request_type_sequence_demo_1")
         cls.request_reopen_1 = cls.env.ref(
             "generic_request.request_request_reopen_main_1")
+        cls.request_resp_attachment = cls.env.ref(
+            'generic_request.request_request_type_simple_demo_1')
+        cls.request = cls.env.ref(
+            "generic_request.request_request_type_sequence_demo_1")
+
+        # Stages
         cls.request.stage_id = cls.env.ref(
             "generic_request.request_stage_type_sequence_sent")
+        cls.request.stage_id = cls.env.ref(
+            "generic_request.request_stage_type_sequence_sent")
+        cls.stage_confirmed = cls.env.ref(
+            'generic_request.request_stage_type_simple_confirmed')
+        cls.stage_draft = cls.env.ref(
+            'generic_request.request_stage_type_simple_draft')
+        cls.stage_sent = cls.env.ref(
+            'generic_request.request_stage_type_simple_sent')
+
+        # Routes
         cls.close_reopen_route = cls.env.ref(
             'generic_request.'
             'request_stage_route_type_sequence_sent_to_grant')
@@ -22,10 +40,16 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         cls.new_reopen_1_route = cls.env.ref(
             'generic_request.'
             'request_stage_route_type_reopen_main_new_to_classified')
+
+        # Categories
         cls.new_request_category = cls.env.ref(
             'generic_request.request_category_demo_technical_configuration')
         cls.new_request_category_gen = cls.env.ref(
             'generic_request.request_category_demo_general')
+        cls.new_request_category = cls.env.ref(
+            'generic_request.request_category_demo_technical_configuration')
+
+        # Types
         cls.new_request_type = cls.env.ref(
             'generic_request.request_type_access')
         cls.new_request_type_reop_no_categ = cls.env.ref(
@@ -34,6 +58,18 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
             'generic_request.request_type_reopen_as_type_categ_1')
         cls.new_request_type_reop_categ_2 = cls.env.ref(
             'generic_request.request_type_reopen_as_type_categ_2')
+        cls.new_request_type = cls.env.ref(
+            'generic_request.request_type_access')
+
+        # Services
+        cls.default_service = cls.env.ref(
+            'generic_service.generic_service_default')
+
+        # Attachments
+        cls.response_attachment1 = cls.env.ref(
+            'generic_request.request_response_attachment_demo1')
+        cls.response_attachment2 = cls.env.ref(
+            'generic_request.request_response_attachment_demo2')
 
     def test_request_wizard_close_onchanges(self):
         self.assertEqual(self.request.stage_id.code, 'sent')
@@ -68,17 +104,33 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         self.assertFalse(request_close.new_request_type_id)
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids', '=', False),
-             ('id', 'in',
-              self.close_reopen_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids', '=', False),
+                ('id', 'in', self.close_reopen_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.close_reopen_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.close_reopen_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(request_close.new_request_text,
                          self.request.request_text)
+
+        # Remove Default Service from category
+        self.assertIn(
+            self.default_service, self.new_request_category.service_ids)
+        self.new_request_category.write({
+            'service_ids': [(5, 0)]
+        })
+        self.assertNotIn(
+            self.default_service, self.new_request_category.service_ids)
 
         # test onchange for new_request_category_id
         request_close.new_request_category_id = self.new_request_category
@@ -95,8 +147,10 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
             [
+                '&', '&',
                 ('category_ids.id', '=', self.new_request_category.id),
                 ('id', 'in', self.close_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False)
             ])
         self.assertEqual(request_close.new_request_text,
                          self.request.request_text)
@@ -107,6 +161,7 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         request_close = self.env['request.wizard.close'].new({
             'request_id': self.request_reopen_1.id,
+            'reopen_as': 'subrequest',
         })
 
         self.assertFalse(request_close.close_route_id)
@@ -114,6 +169,7 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         self.assertFalse(request_close.new_request_category_id)
         self.assertFalse(request_close.new_request_type_id)
         self.assertFalse(request_close.new_request_text)
+        self.assertEqual(request_close.reopen_as, 'subrequest')
 
         # Test onchange request_id, need for add route to wizard
         request_close.onchange_request_id()
@@ -136,21 +192,28 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         self.assertEqual(
             self.new_reopen_1_route.reopen_as_type_ids.ids,
             [
-                self.new_request_type_reop_no_categ.id,
                 self.new_request_type_reop_categ_1.id,
-                self.new_request_type_reop_categ_2.id
+                self.new_request_type_reop_categ_2.id,
+                self.new_request_type_reop_no_categ.id,
             ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids', '=', False),
-             ('id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids', '=', False),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
 
         # test onchange for new_request_type_reop_no_categ
@@ -163,14 +226,31 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids', '=', False),
-             ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids', '=', False),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
+
+        # Remove Default Service from category
+        self.assertIn(
+            self.default_service, self.new_request_category.service_ids)
+        self.new_request_category.write({
+            'service_ids': [(5, 0)]
+        })
+        self.assertNotIn(
+            self.default_service, self.new_request_category.service_ids)
 
         # test onchange for new_request_category
         request_close.new_request_category_id = self.new_request_category
@@ -182,14 +262,22 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids.id', '=', self.new_request_category.id),
-             ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids.id', '=', self.new_request_category.id),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
 
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
 
         # Add new request type new_request_type_reop_categ_2
@@ -204,13 +292,21 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids.id', '=', self.new_request_category.id),
-             ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids.id', '=', self.new_request_category.id),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
 
         # test onchange for new_request_category_gen
@@ -223,13 +319,21 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids.id', '=', self.new_request_category_gen.id),
-             ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids.id', '=', self.new_request_category_gen.id),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
 
         # Add new request type new_request_type_reop_categ_1
@@ -244,13 +348,21 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(
             res.get('domain', {}).get('new_request_type_id', []),
-            [('category_ids.id', '=', self.new_request_category_gen.id),
-             ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&', '&',
+                ('category_ids.id', '=', self.new_request_category_gen.id),
+                ('id', 'in', self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
         self.assertEqual(
             res.get('domain', {}).get('new_request_category_id', []),
-            [('request_type_ids.id', 'in',
-              self.new_reopen_1_route.reopen_as_type_ids.ids)]
+            [
+                '&',
+                ('request_type_ids.id', 'in',
+                    self.new_reopen_1_route.reopen_as_type_ids.ids),
+                ('service_ids', '=', False),
+            ]
         )
 
         request_ids = self.env['request.request'].search([])
@@ -309,6 +421,29 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
         self.assertEqual(subrequest.partner_id, self.request.partner_id)
         self.assertEqual(subrequest.created_by_id, self.env.user)
 
+    def test_request_wizard_close_and_reopen_service(self):
+        # Check stage of the request and service
+        self.assertEqual(self.request.stage_id.code, 'sent')
+        self.assertFalse(self.request.service_id)
+
+        # Create wizard for closing the request.
+        request_close = self.env['request.wizard.close'].create({
+            'request_id': self.request.id,
+            'close_route_id': self.close_reopen_route.id,
+            'new_request_type_id': self.new_request_type.id,
+            'new_request_category_id': self.new_request_category.id,
+            'new_request_service_id': self.default_service.id,
+            'new_request_text': 'test'
+        })
+
+        # Closes the request
+        request_ids = self.Request.search([])
+        request_close.action_close_request()
+        new_request = self.Request.search([('id', 'not in', request_ids.ids)])
+
+        self.assertEqual(self.request.stage_id.code, 'grant')
+        self.assertEqual(new_request.service_id, self.default_service)
+
     def test_request_wizard_close_no_reopen(self):
         # Check stage of the request.
         self.assertEqual(self.request.stage_id.code, 'sent')
@@ -328,3 +463,46 @@ class TestRequestReopenAs(ReduceLoggingMixin, SavepointCase):
 
         self.assertEqual(self.request.stage_id.code, 'closed')
         self.assertFalse(self.request.child_ids)
+
+    def test_wizard_close_attachments(self):
+        # Prepare request for closing
+        self.assertEqual(
+            self.request_resp_attachment.stage_id, self.stage_draft)
+        self.request_resp_attachment.write({'stage_id': self.stage_sent.id})
+        self.assertTrue(self.request_resp_attachment.can_be_closed)
+
+        # Create wizard for closing the request, link attachment to it
+        close_route = self.env['request.stage.route'].sudo().search([
+            ('request_type_id', '=', self.request_resp_attachment.type_id.id),
+            ('stage_from_id', '=', self.request_resp_attachment.stage_id.id),
+            ('stage_to_id', '=', self.stage_confirmed.id),
+        ])
+        wizard_close = self.env['request.wizard.close'].create({
+            'request_id': self.request_resp_attachment.id,
+            'close_route_id': close_route.id,
+            'response_text': 'test-response-attachments',
+            'attachment_ids': [(4, self.response_attachment1.id),
+                               (4, self.response_attachment2.id)],
+        })
+        self.assertEqual(len(wizard_close.attachment_ids), 2)
+        self.assertIn(self.response_attachment1, wizard_close.attachment_ids)
+        self.assertIn(self.response_attachment2, wizard_close.attachment_ids)
+
+        # Close request
+        with FindNew(self.env, 'mail.mail') as nr:
+            wizard_close.action_close_request()
+        self.assertEqual(
+            self.request_resp_attachment.stage_id.code, 'confirmed')
+
+        # Check mail created and has the same attachments as request response
+        # attachments
+        response_mail = nr['mail.mail'].search(
+            [('subject', 'ilike', 'Your request %s has been closed!' %
+              self.request_resp_attachment.name)])
+        mail_attachments = response_mail.attachment_ids
+        self.assertEqual(len(mail_attachments), 2)
+        mail_attachment_datas = sorted(
+            mail_attachments.mapped('datas'))
+        wizard_attachment_datas = sorted(
+            wizard_close.attachment_ids.mapped('datas'))
+        self.assertListEqual(mail_attachment_datas, wizard_attachment_datas)

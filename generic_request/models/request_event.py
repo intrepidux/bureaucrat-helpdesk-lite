@@ -1,6 +1,4 @@
 import logging
-import datetime
-from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 from .request_request import (AVAILABLE_PRIORITIES,
                               AVAILABLE_IMPACTS,
@@ -10,20 +8,17 @@ _logger = logging.getLogger(__name__)
 
 class RequestEvent(models.Model):
     _name = 'request.event'
+    _inherit = [
+        'generic.system.event.data.mixin',
+    ]
     _description = 'Request Event'
-    _order = 'date DESC, id DESC'
+    _order = 'event_date DESC, id DESC'
     _log_access = False
 
-    event_type_id = fields.Many2one(
-        'request.event.type', required=True, readonly=True)
-    event_code = fields.Char(
-        related='event_type_id.code', readonly=True)
+    # Deprecated
     request_id = fields.Many2one(
-        'request.request', index=True, required=True, readonly=True,
+        'request.request', index=True, required=False, readonly=True,
         ondelete='cascade')
-    date = fields.Datetime(
-        default=fields.Datetime.now, required=True, index=True, readonly=True)
-    user_id = fields.Many2one('res.users', required=True, readonly=True)
 
     # Assign related events
     old_user_id = fields.Many2one('res.users', readonly=True)
@@ -104,18 +99,29 @@ class RequestEvent(models.Model):
     parent_old_id = fields.Many2one('request.request', readonly=True)
     parent_new_id = fields.Many2one('request.request', readonly=True)
 
+    old_service_id = fields.Many2one('generic.service', readonly=True)
+    new_service_id = fields.Many2one('generic.service', readonly=True)
+
+    old_service_level_id = fields.Many2one('generic.service.level',
+                                           readonly=True)
+    new_service_level_id = fields.Many2one('generic.service.level',
+                                           readonly=True)
+
     def _get_selection_kanban_state(self):
         return self.env['request.request']._fields['kanban_state'].selection
 
-    def name_get(self):
-        res = []
-        for record in self:
-            res.append((
-                record.id,
-                "%s [%s]" % (
-                    record.request_id.name,
-                    record.event_type_id.display_name)
-            ))
+    @api.model
+    def create(self, vals):
+        event = super().create(vals)
+        event.request_id.invalidate_cache(
+            ['request_event_ids', 'request_event_count'])
+        return event
+
+    def unlink(self):
+        to_invalidate_cache = self.mapped('request_id')
+        res = super().unlink()
+        to_invalidate_cache.invalidate_cache(
+            ['request_event_ids', 'request_event_count'])
         return res
 
     def get_context(self):
@@ -141,34 +147,3 @@ class RequestEvent(models.Model):
             'request_active': self.request_active,
             'request_event': self,
         }
-
-    @api.model
-    def _scheduler_vacuum(self, days=False):
-        """ Run vacuum for events.
-            Delete all events older than <days>
-        """
-        live_time_uom = self.env.user.company_id.request_event_live_time_uom
-        event_auto_remove = self.env.user.company_id.request_event_auto_remove
-
-        if not (live_time_uom and event_auto_remove):
-            return
-
-        if days:
-            _logger.warning(
-                "Passing request event's time to live in scheduler is"
-                " deprecated! Please, update cron job to "
-                "call '_scheduler_vacuum' without arguments")
-
-        if live_time_uom == 'days':
-            delta = relativedelta(
-                days=+self.env.user.company_id.request_event_live_time)
-        elif live_time_uom == 'weeks':
-            delta = relativedelta(
-                days=+self.env.user.company_id.request_event_live_time*7)
-        elif live_time_uom == 'months':
-            delta = relativedelta(
-                months=+self.env.user.company_id.request_event_live_time)
-        vacuum_date = datetime.datetime.now() - delta
-        self.sudo().search(
-            [('date', '<', fields.Datetime.to_string(vacuum_date))],
-        ).unlink()

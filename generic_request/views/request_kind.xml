@@ -2,7 +2,6 @@
 <odoo>
 
     <record model="ir.ui.view" id="view_request_kind_search">
-        <field name="name">view.request.kind.search</field>
         <field name="model">request.kind</field>
         <field name="arch" type="xml">
             <search>

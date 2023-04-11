@@ -70,7 +70,7 @@
             <tbody><tr>
                 <td valign="center">
                     <a target="_blank" t-att-href="object.get_mail_url(pid=partner.id)"
-                       style="padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: none !important; font-weight: 400; background-color: #875A7B; border: 0px solid #875A7B; border-radius:3px">
+                       style="display: table-cell; padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: none !important; font-weight: 400; background-color: #875A7B; border: 0px solid #875A7B; border-radius:3px">
                         View Request</a>
                 </td>
                 <td valign="center" align="right">
@@ -191,5 +191,14 @@
             </t>
             <hr/>
         </div>
+    </template>
+    <template id="message_request_notification__request_info_service"
+        inherit_id="generic_request.message_request_notification__request_info">
+        <xpath expr="//tr[hasclass('request-info-category')]" position="before">
+            <tr t-if="object.sudo().service_id" style="vertical-align: top" class="request-info-service">
+                <th style="border-bottom: 1px solid #ccc; text-align: left;">Service</th>
+                <td style="border-bottom: 1px solid #ccc;"><span t-esc="object.sudo().service_id.display_name"/></td>
+            </tr>
+        </xpath>
     </template>
 </odoo>

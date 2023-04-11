@@ -38,4 +38,13 @@
             </div>
         </field>
     </record>
+    <record model="ir.ui.view" id="res_partner_view_form_inherit_service_agent">
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="generic_service.res_partner_view_form_inherit_service_level"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//notebook//page[@name='service_info']/group[@name='group_service_info']/group[@name='service_info_group_left']" position="inside">
+                <field name="service_agent_id"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
