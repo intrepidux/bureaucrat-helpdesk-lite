@@ -5,6 +5,9 @@ from odoo.addons.generic_mixin.tests.common import (
     ReduceLoggingMixin,
     AccessRulesFixMixinST,
 )
+from odoo.addons.generic_system_event.tests.common import (
+    GenericSystemTestUtils,
+)
 
 
 try:
@@ -30,6 +33,7 @@ def disable_mail_auto_delete(env):
 
 class RequestCase(AccessRulesFixMixinST,
                   ReduceLoggingMixin,
+                  GenericSystemTestUtils,
                   TransactionCase):
     """ BAse tests case for tests related to generic request
     """

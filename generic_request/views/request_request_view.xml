@@ -84,6 +84,23 @@
                     </div>
                     <group name="request_head_info" class="request-head-info">
                         <group name="request_head_info_left" class="request-head-info-left">
+                            <field name="can_change_service" invisible="1"
+                                   groups="generic_request.group_request_use_services"/>
+                            <field name="service_id_domain" invisible="1"
+                                   groups="generic_request.group_request_use_services"/>
+                            <div colspan="2" name="header_service"
+                                 class="request-head-info-item"
+                                 groups="generic_request.group_request_use_services">
+                                <span class="field-with-icon">
+                                    <span title="Service"
+                                          class="field-icon fa fa-square-o oe_inline"/>
+                                    <field name="service_id" placeholder="Service..."
+                                           attrs="{'readonly': [('id', '!=', False), ('can_change_service', '=', False)]}"
+                                           options="{'no_create': true, 'no_quick_create': true}"
+                                           context="{'request_service_id_domain': service_id_domain}"
+                                           class="oe_inline"/>
+                                </span>
+                            </div>
                             <div colspan="2" name="header_category" class="request-head-info-item">
                                 <span class="field-with-icon">
                                     <span class="field-icon fa fa-bars oe_inline"
@@ -253,6 +270,7 @@
                                             </button>
                                         </span>
                                     </div>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                                 </group>
                             </group>
                             <div class="request-separator request-separator-request-text mb8" name="request_text_separator">
@@ -272,8 +290,19 @@
                                    readonly="1"
                                    widget="request_html"
                                    attrs="{'invisible': [('response_text', '=', False)]}"/>
+                            <div class="request-separator request-separator-request-response"
+                                 name="request_response_separator"
+                                 attrs="{'invisible': [('response_attachment_ids', '=', [])]}">
+                                <span class="request-separator-text">Response attachments</span>
+                            </div>
+                            <field name="response_attachment_ids"
+                                   widget="many2many_binary"
+                                   readonly="1"/>
                         </page>
-                        <page string="Time log" attrs="{'invisible': [('use_timesheet', '=', False)]}">
+                        <page name="page_internal_note" string="Internal notes">
+                            <field name="internal_note_text"/>
+                        </page>
+                        <page string="Time log" name ="page_timelog" attrs="{'invisible': [('use_timesheet', '=', False)]}">
                             <field name="timesheet_line_ids">
                                 <tree editable="bottom">
                                     <field name="date_start" invisible="1" readonly="1"/>
@@ -337,6 +366,7 @@
                                     <field name="email_from"/>
                                     <field name="email_cc"/>
                                     <field name="channel_id" widget="many2one"/>
+                                    <field name="service_level_id" groups="generic_service.group_use_service_level"/>
                                 </group>
 
                                 <group name="group_info_right"/>
@@ -347,12 +377,12 @@
                               groups="base.group_no_one">
                             <group>
                                 <group name="group_tech_links" col="1">
-                                    <button name="action_show_request_events"
+                                    <button name="action_show_related_system_events"
                                             type="object"
                                             class="oe_link"
                                             icon="fa-bell"
                                             groups="generic_request.group_request_manager">
-                                        <field name="request_event_count"
+                                        <field name="generic_event_count"
                                             widget="statinfo"
                                             string="Request Events"/>
                                     </button>
@@ -494,11 +524,16 @@
                 <field name="stage_label_color"
                        invisible="1"/>
                 <field name="name" />
+                <field name="service_id"
+                       optional="show"
+                       groups="generic_request.group_request_use_services"/>
                 <field name="type_id"
                        optional="show"/>
                 <field name="category_id"
                        optional="show"/>
                 <field name="parent_id"
+                       optional="show"/>
+                <field name="partner_id"
                        optional="show"/>
                 <field name="author_id"
                        optional="show"/>
@@ -522,6 +557,9 @@
                 <field name="kanban_state"
                        widget="state_selection"
                        optional="show"/>
+                <field name="service_level_id"
+                       optional="show"
+                       groups="generic_service.group_use_service_level"/>
                 <field name="tag_ids"
                        options="{'color_field': 'color'}"
                        widget="many2many_tags"
@@ -559,6 +597,8 @@
                 <field name="name"/>
                 <field name="use_timesheet"/>
                 <field name="timesheet_start_status"/>
+                <field name="service_id"
+                       groups="generic_request.group_request_use_services"/>
                 <field name="type_id"/>
                 <field name="type_color"/>
                 <field name="kind_id"/>
@@ -598,7 +638,8 @@
                                  class="o_request_kanban_header">
                                 <div name="title_box" class="o_header_title_box">
                                     <div t-if="record.parent_id.value"
-                                         class="o_header_box_item">
+                                         class="o_header_box_item"
+                                         name="kanban_action_open_parent">
                                         <a type="object"
                                            name="action_open_parent">
                                             <span><field
@@ -612,7 +653,7 @@
                                     <div name="activities_box" class="o_header_title o_header_box_item">
                                         <span><field name="activity_ids" widget="kanban_activity"/></span>
                                     </div>
-                                    <div class="o_header_box_item">
+                                    <div class="o_header_box_item" name="kanban_action_start_work">
                                         <a name="action_start_work"
                                            type="object"
                                            title="Start"
@@ -634,18 +675,16 @@
                                 </div>
                                 <div name="icons_info" class="o_header_icons_info">
                                     <span t-if="record.message_needaction.raw_value"
-                                          class="icon">
+                                          class="icon"
+                                          name="kanban_messages_icon">
                                         <span title='Messages' class='fa fa-comments mr4'></span>
                                         <span style="font-weight: bold"
                                               title="You have unread messages related to this request.">
                                              <t t-esc="record.message_needaction_counter.raw_value"/>
                                         </span>
                                     </span>
-                                    <span t-if="record.message_follower_ids.raw_value" class="icon">
-                                        <span title='Followers' class='fa fa-users mr4'></span>
-                                        <t t-esc="record.message_follower_ids.raw_value.length"/>
-                                    </span>
                                     <span t-if="record.child_count.raw_value"
+                                          name="kanban_icon_sebrequests"
                                           class="icon">
                                         <span title='Subrequests'
                                               class='fa fa-sitemap mr4'></span>
@@ -666,46 +705,64 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="request_kanban_tags">
-                                <field name="tag_ids"
-                                       widget="many2many_tags"
-                                       options="{'color_field': 'color'}"/>
+                            <div class="request_kanban_tags_and_date" name="kanban_tags">
+                                <div class="request_kanban_tags" title="Tags">
+                                    <field name="tag_ids"
+                                           widget="many2many_tags"
+                                           options="{'color_field': 'color'}"/>
+                                </div>
+                                <div class="request_kanban_date_created">
+                                    <span class="fa fa-calendar" title="Date created">
+                                        <field name="date_created"/>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="o_request_kanban_content">
+                            <div class="o_request_kanban_content" name="kanban_content">
                                 <div class="o_request_kanban_info o_request_kanban_row">
                                     <div name="request_kanban_info_left" class="o_request_kanban_info_left">
+                                        <div groups="generic_request.group_request_use_services">
+                                            <span class="text-muted" title="Service">
+                                                <span class="fa fa-square-o mr4"/>
+                                                <t t-if="record.service_id.raw_value">
+                                                    <field name="service_id"/>
+                                                </t>
+                                                <t t-if="!record.service_id.raw_value">
+                                                    <span>Undefined</span>
+                                                </t>
+                                            </span>
+                                        </div>
                                         <div>
-                                            <span class="text-muted" title="Category">
+                                            <span class="" title="Category" name="kanban_request_category">
                                                 <span class="fa fa-bars mr4"/>
                                                 <t t-if="record.category_id.raw_value">
                                                     <field name="category_id"/>
                                                 </t>
                                                 <t t-if="!record.category_id.raw_value">
-                                                    <span>Undefined</span>
+                                                    <span class="text-muted">Undefined</span>
                                                 </t>
                                             </span>
                                         </div>
                                         <div>
-                                            <span class="text-muted" title="Type">
+                                            <span class="text-muted" title="Type" name="kanban_request_type">
                                                 <span class="fa fa-hashtag mr4"/>
                                                 <field name="type_id"/>
                                             </span>
                                         </div>
                                         <div>
-                                            <span class="text-muted" title="Kind">
+                                            <span class="" title="Kind" name="kanban_request_kind">
                                                 <span class="fa fa-square mr4"/>
                                                 <t t-if="record.kind_id.raw_value">
                                                     <field name="kind_id"/>
                                                 </t>
                                                 <t t-if="!record.kind_id.raw_value">
-                                                    <span>Undefined</span>
+                                                    <span class="text-muted">Undefined</span>
                                                 </t>
                                             </span>
                                         </div>
                                     </div>
                                     <div name="request_kanban_info_right" class="o_request_kanban_info_right">
-                                        <div t-if="record.deadline_date.raw_value">
-                                            <span class="text-muted" title="Deadline">
+                                        <div t-if="record.deadline_date.raw_value" name="kanban_deadline_date">
+                                            <span class="" title="Deadline">
                                                 <span t-if="record.deadline_state.raw_value == 'ok'"
                                                     class="text-success fa fa-clock-o mr4"/>
                                                 <span t-if="record.deadline_state.raw_value == 'today'"
@@ -717,8 +774,39 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div name="request_kanban_info_main"
+                                     class="o_request_kanban_info_main o_request_kanban_row">
+                                    <div name="request_kanban_info_main_left" class="">
+                                        <span>
+                                            <span class="fa fa-vcard-o" title="Author"/>
+                                            <span title="Author">
+                                                <field t-if="record.author_id.raw_value"
+                                                       name="author_id"/>
+                                                <span t-else="" class="text-muted">No author selected</span>
+                                            </span>
+                                        </span>
+                                        <span>
+                                            <span class="fa fa-vcard" title="Partner"/>
+                                            <span title="Partner">
+                                                <field t-if="record.partner_id.raw_value"
+                                                       name="partner_id"/>
+                                                <span t-else="" class="text-muted">No partner selected</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div name="request_kanban_info_main_right" class="">
+                                        <span>
+                                            <span class="fa fa-user" title="Assignee"/>
+                                            <span title="Assignee">
+                                                <field t-if="record.user_id.raw_value"
+                                                       name="user_id"/>
+                                                <span t-else="" class="text-muted">No user assigned</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                              <div class="o_request_kanban_row">
-                              <div class="o_partner_icon mr8">
+                              <div class="o_partner_icon mr8" name="kanban_partner_icon">
                                 <t t-if="record.partner_id.raw_value">
                                     <div>
                                         <a type="open">
@@ -729,65 +817,11 @@
                                         </a>
                                     </div>
                                 </t>
-                             </div>
-                            <div>
-                                <div name="request_text" class="o_request_kanban_text">
-                                    <div>
-                                        <field name="request_text_sample"/>
-                                    </div>
-                                </div>
+                              </div>
+                              <div name="request_text" class="o_request_kanban_text">
+                                  <field name="request_text_sample"/>
+                              </div>
                             </div>
-                            </div>
-                                <div class="o_request_kanban_dates o_request_kanban_row" name="dates">
-                                    <div class="o_date"
-                                         t-att-title="'Created by\n' + record.author_id.value + '\n' + record.date_created.value">
-                                        <t t-if="record.author_id.raw_value">
-                                            <a type="open">
-                                                <img t-att-src="kanban_image('res.partner', 'image_128', record.author_id.raw_value)"
-                                                     t-att-alt="record.author_id.value"
-                                                     class="oe_kanban_image"/>
-                                            </a>
-                                            <strong>
-                                                <field name="author_id"/>
-                                            </strong>
-                                            <div class="oe_kanban_hidden_text">
-                                                 <field name="date_created"/>
-                                            </div>
-                                        </t>
-                                    </div>
-                                    <div class="o_date"
-                                         t-att-title="'Assigned to\n' + record.user_id.value + '\n' + record.date_assigned.value">
-                                        <t t-if="record.user_id.raw_value">
-                                            <a type="open">
-                                                <img t-att-src="kanban_image('res.users', 'image_128', record.user_id.raw_value)"
-                                                     t-att-alt="record.user_id.value"
-                                                     class="oe_kanban_image"/>
-                                            </a>
-                                            <strong>
-                                                <field name="user_id"/>
-                                            </strong>
-                                            <div class="oe_kanban_hidden_text">
-                                                 <field name="date_assigned"/>
-                                            </div>
-                                        </t>
-                                    </div>
-                                    <div class="o_date"
-                                         t-att-title="'Closed by\n' + record.closed_by_id.value + '\n' + record.date_closed.value">
-                                        <t t-if="record.closed_by_id.raw_value">
-                                            <a type="open">
-                                                <img t-att-src="kanban_image('res.users', 'image_128', record.closed_by_id.raw_value)"
-                                                     t-att-alt="record.closed_by_id.value"
-                                                     class="oe_kanban_image"/>
-                                            </a>
-                                            <strong>
-                                                <field name="closed_by_id"/>
-                                            </strong>
-                                            <div class="oe_kanban_hidden_text">
-                                                 <field name="date_closed"/>
-                                            </div>
-                                        </t>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </t>
@@ -801,9 +835,11 @@
         <field name="arch" type="xml">
             <search>
                 <field name="display_name" string=""
-                       filter_domain="['|', '|', '|', '|', '|', '|', '|',
+                       filter_domain="['|', '|', '|', '|', '|', '|', '|', '|', '|',
                        ('name', 'ilike', self),
                        ('request_text', 'ilike', self),
+                       ('response_text', 'ilike', self),
+                       ('internal_note_text', 'ilike', self),
                        ('author_id.phone', 'ilike', self),
                        ('author_id.mobile', 'ilike', self),
                        ('author_id.name', 'ilike', self),
@@ -811,6 +847,9 @@
                        ('partner_id.mobile', 'ilike', self),
                        ('partner_id.name', 'ilike', self)]"/>
                 <field name="name"/>
+                <field name="service_id"
+                       groups="generic_request.group_request_use_services"/>
+                <field name="service_level_id" groups="generic_service.group_use_service_level"/>
                 <field name="type_id"/>
                 <field name="parent_id"/>
                 <field name="kind_id"/>
@@ -838,6 +877,12 @@
                 <filter name="filter_closed"
                         string="Closed"
                         domain="[('closed', '=', True)]"/>
+                <filter name="filter_closed_today"
+                        string="Closed Today"
+                        domain="[
+                            ('date_closed', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                            ('date_closed','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))
+                            ]"/>
 
                 <separator/>
                 <filter name="filter_open"
@@ -857,19 +902,22 @@
                 <separator/>
                 <filter name="filter_today"
                         string="Today"
-                        domain="[('date_created', '&gt;', (context_today() - relativedelta(days=1)).strftime('%%Y-%%m-%%d') )]"/>
+                        domain="[
+                            ('date_created', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                            ('date_created','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))
+                            ]"/>
                 <filter name="filter_24h"
                         string="24 hours"
-                        domain="[('date_created', '&gt;', (datetime.datetime.now() - relativedelta(days=1)).strftime('%%Y-%%m-%%d %H:%M:%S') )]"/>
+                        domain="[('date_created', '&gt;', (datetime.datetime.utcnow() - relativedelta(days=1)).strftime('%%Y-%%m-%%d %H:%M:%S') )]"/>
                 <filter name="filter_week"
                         string="Week"
-                        domain="[('date_created', '&gt;', (context_today() - relativedelta(weeks=1)).strftime('%%Y-%%m-%%d') )]"/>
+                        domain="[('date_created', '&gt;=', (datetime.datetime.combine(context_today() - relativedelta(weeks=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <filter name="filter_month"
                         string="Month"
-                        domain="[('date_created', '&gt;', (context_today() - relativedelta(months=1)).strftime('%%Y-%%m-%%d') )]"/>
+                        domain="[('date_created', '&gt;=', (datetime.datetime.combine(context_today() - relativedelta(months=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <filter name="filter_year"
                         string="Year"
-                        domain="[('date_created', '&gt;', (context_today() - relativedelta(years=1)).strftime('%%Y-%%m-%%d') )]"/>
+                        domain="[('date_created', '&gt;=', (datetime.datetime.combine(context_today() - relativedelta(years=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <separator/>
                 <filter string="Unread Messages"
                         name="message_needaction"
@@ -918,6 +966,18 @@
                     <filter name="filter_group_by_channel"
                             string="Channel"
                             context="{'group_by': 'channel_id'}"/>
+                    <filter name="company"
+                            string="Company"
+                            context="{'group_by':'company_id'}"
+                            groups="base.group_multi_company"/>
+                    <filter name="filter_group_by_service"
+                            string="Service"
+                            context="{'group_by': 'service_id'}"
+                            groups="generic_request.group_request_use_services"/>
+                    <filter name="filter_group_by_service_level"
+                            string="Service Level"
+                            context="{'group_by': 'service_level_id'}"
+                            groups="generic_service.group_use_service_level"/>
                 </group>
             </search>
         </field>
@@ -963,6 +1023,8 @@
         <field name="arch" type="xml">
             <xpath expr="/search/group" position="before">
                 <searchpanel>
+                    <field name="service_id" string="Service"
+                           groups="generic_request.group_request_use_services"/>
                     <field name="category_id" string="Category"/>
                     <field name="type_id" string="Type"/>
                     <field name="stage_type_id" string="Stage Type"/>

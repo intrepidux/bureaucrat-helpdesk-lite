@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <template id="wsd_request_navigation">
         <div class="request_navigation row mt16">
             <div class="oe_structure col-sm-12"/>
@@ -18,7 +17,7 @@
                 </ol>
             </div>
             <div class="request_navigation_right col-12 col-sm 12 col-lg-6">
-                <t t-raw="0"/>
+                <t t-out="0"/>
             </div>
             <div class="oe_structure col-sm-12"/>
         </div>
@@ -33,7 +32,7 @@
                  t-att-data-max_file_size_label_value="request.env.user.company_id._get_request_max_upload_file_size_label()"
                  t-att-data-allowed_file_types="request.env.user.company_id.request_allowed_upload_file_types">
                 <div class="oe_structure"/>
-                <t t-raw="0"/>
+                <t t-out="0"/>
                 <div class="oe_structure"/>
             </div>
         </t>
@@ -47,9 +46,15 @@
                         <td class="wsd_request">
                             <div class="request_top">
                                 <span class="request-title">
+                                    <t t-if="req.parent_id">
+                                        <a t-attf-href="/requests/request/{{ req.parent_id.id }}"
+                                           class="request-parent"
+                                           title="Parent Request"
+                                           t-esc="req.parent_id.name"/> /
+                                    </t>
                                     <a class="request-name"
-                                    t-attf-href="/requests/request/{{req.id}}">
-                                    <t t-esc="req.name"/>
+                                       t-attf-href="/requests/request/{{req.id}}">
+                                        <t t-esc="req.name"/>
                                     </a>
                                 </span>
                                 <span class="request-shortcuts ml8">
@@ -57,6 +62,10 @@
                                        title="Comments"
                                        class="fa fa-comments mr4">
                                     </a>
+                                    <a t-if="req.child_ids"
+                                       t-attf-href="/requests?parent_id={{ req.id }}"
+                                       title="Subrequests"
+                                       class="fa fa-sitemap"/>
                                 </span>
 
                                 <div class="right_info">
@@ -83,7 +92,19 @@
                             <div class="request_content">
                                 <div class="content_info">
                                     <div class="text-muted">
-
+                                        <!-- Show service on requests list -->
+                                        <div t-if="req.service_id" class="content-info-service"
+                                             groups="generic_request.group_request_use_services">
+                                            <span class="fa fa-square-o mr4" title="Service"/>
+                                            <span t-field="req.service_id.display_name" title="Service"/>
+                                            <span t-if="req.service_id.description"
+                                                  role="button" data-toggle="popover"
+                                                  title="Service"
+                                                  data-placement="right"
+                                                  data-trigger="hover"
+                                                  class="fa fa-question text-muted"
+                                                  t-attf-data-content="{{ req.service_id.description }}"/>
+                                        </div>
                                         <div t-if="req.category_id" class="content-info-category">
                                             <span class="fa fa-bars mr4" title="Category"/>
                                             <span t-field="req.category_id.display_name" title="Category"/>
@@ -245,6 +266,11 @@
 
     <template id="request_short_info">
         <div class="text-muted request-short-info">
+            <div t-if="rel_req.service_id" class="content-info-service"
+                 groups="generic_request.group_request_use_services">
+                <span class="fa fa-square-o mr4" title="Service"/>
+                <span t-field="rel_req.service_id.display_name" title="Service"/>
+            </div>
             <div t-if="rel_req.category_id" class="content-info-category">
                 <span class="fa fa-bars mr4" title="Category"/>
                 <span t-field="rel_req.category_id.display_name" title="Category"/>
@@ -342,4 +368,28 @@
             </t>
         </xpath>
     </template>
+
+    <template id="wsd_requests_new_select_service"
+              name="New request (select service)">
+        <t t-call="crnd_wsd.wsd_layout">
+            <div class="container wsd_request_new">
+                <t t-call="crnd_wsd.wsd_request_navigation">
+                    <t t-set="request_name" t-value="'new'"/>
+                    <t t-call="crnd_wsd.wsd_requests_new_progress">
+                        <t t-set="step" t-value="'service'"/>
+                    </t>
+                </t>
+
+                <t t-set="wsd_step_form_id" t-value="'request_service'"/>
+                <t t-set="wsd_step_form_action" t-value="'/requests/new/step/service'"/>
+                <t t-set="wsd_step_form_title">Select service</t>
+                <t t-set="wsd_step_form_items" t-value="req_services"/>
+                <t t-set="wsd_step_form_item_id_prefix" t-value="'service'"/>
+                <t t-set="wsd_step_form_selected_item" t-value="req_service_sel"/>
+                <t t-set="wsd_step_form_sel_field_id" t-value="'service_id'"/>
+                <t t-call="crnd_wsd.wsd_request_new_select_param"/>
+            </div>
+        </t>
+    </template>
+
 </odoo>

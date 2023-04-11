@@ -23,6 +23,10 @@ class RequestType(models.Model):
     website_custom_label_editor = fields.Char()
     website_custom_congratulation_note = fields.Html()
 
+    selection_priority_view = fields.Selection(
+        [('selection', 'Selection'),
+         ('star', 'Star bar')], default='selection', required=True)
+
     def website_publish_button(self):
         for rec in self:
             rec.website_published = not rec.website_published

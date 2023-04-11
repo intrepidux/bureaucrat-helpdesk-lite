@@ -4,7 +4,7 @@
     <t t-name="crnd_wsd.request_text_editor">
         <div id="request-body-text-editor">
             <textarea id="request-body-text-editor-box">
-               <t t-raw="request_text"/>
+               <t t-out="request_text"/>
             </textarea>
             <div class="editor-control">
                 <button class="btn btn-success btn-save">Save</button>

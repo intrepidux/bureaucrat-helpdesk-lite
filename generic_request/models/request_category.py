@@ -105,6 +105,10 @@ class RequestCategory(models.Model):
     sequence = fields.Integer(index=True, default=5)
     color = fields.Integer()  # for many2many_tags widget
 
+    service_ids = fields.Many2many(
+        'generic.service', 'service_category_rel',
+        'category_id', 'service_id', string='Service')
+
     _sql_constraints = [
         ('name_uniq',
          'UNIQUE (parent_id, name)',

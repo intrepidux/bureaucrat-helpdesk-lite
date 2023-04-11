@@ -26,7 +26,6 @@ FEATURE_MODULES = [
     'generic_request_related_requests',
     'generic_request_route_auto',
     'generic_request_sale',
-    'generic_request_service',
     'generic_request_sla',
     'generic_request_sla_log',
     'generic_request_sla_priority',
@@ -66,8 +65,6 @@ class ResConfigSettings(models.TransientModel):
         string="Related Requests")
     module_generic_request_route_auto = fields.Boolean(
         string="Use Automatic Routes")
-    module_generic_request_service = fields.Boolean(
-        string="Use Services")
     module_generic_request_mail = fields.Boolean(
         string="Use Mail Sources")
     module_generic_request_survey = fields.Boolean(
@@ -136,8 +133,6 @@ class ResConfigSettings(models.TransientModel):
         compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_route_auto = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
-    need_install_generic_request_service = fields.Boolean(
-        compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_mail = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
     need_install_generic_request_survey = fields.Boolean(
@@ -181,15 +176,6 @@ class ResConfigSettings(models.TransientModel):
     need_install_generic_request_web_conference = fields.Boolean(
         compute="_compute_generic_request_modules_can_install", readonly=True)
 
-    request_event_live_time = fields.Integer(
-        related='company_id.request_event_live_time', readonly=False)
-    request_event_live_time_uom = fields.Selection(
-        related='company_id.request_event_live_time_uom',
-        readonly=False,
-        help='Units of Measure', ondelete='cascade'
-    )
-    request_event_auto_remove = fields.Boolean(
-        related='company_id.request_event_auto_remove', readonly=False)
     request_mail_suggest_partner = fields.Boolean(
         related='company_id.request_mail_suggest_partner', readonly=False)
     request_mail_suggest_global_cc = fields.Boolean(
@@ -215,6 +201,14 @@ class ResConfigSettings(models.TransientModel):
         group='base.group_user',
         implied_group='generic_request.'
                       'group_request_show_searchpanel_view')
+    group_request_use_services = fields.Boolean(
+        group='base.group_user,base.group_portal,base.group_public',
+        implied_group='generic_request.'
+                      'group_request_use_services')
+    request_autoset_unsubscribe_prev_assignee = fields.Boolean(
+        related='company_id.request_autoset_unsubscribe_prev_assignee',
+        readonly=False
+    )
 
     @api.depends('company_id')
     def _compute_generic_request_modules_can_install(self):

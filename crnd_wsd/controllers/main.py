@@ -14,6 +14,8 @@ from odoo.exceptions import (
 
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo.addons.generic_request.models.request_request import (
+    AVAILABLE_PRIORITIES, AVAILABLE_IMPACTS, AVAILABLE_URGENCIES)
 from .controller_mixin import WSDControllerMixin
 
 _logger = logging.getLogger(__name__)
@@ -103,7 +105,8 @@ def guard_access(func):
 
 
 class WebsiteRequest(WSDControllerMixin, http.Controller):
-    def _requests_get_request_domain_base(self, search, kind_id=None, **post):
+    def _requests_get_request_domain_base(self, search, kind_id=None,
+                                          parent_id=None, **post):
         domain = [
             '|',
             ('website_id', '=', False),
@@ -122,6 +125,11 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                 domain,
                 [('kind_id', '=', kind.id)],
             ])
+
+        parent = self._id_to_record(
+            'request.request', parent_id, no_raise=True)
+        if parent:
+            domain += [('parent_id', '=', parent.id)]
 
         return domain
 
@@ -212,8 +220,13 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'req_status': req_status,
             'req_count': req_count,
             'keep': keep,
-            'get_redirect': get_redirect,
+            'get_redirect': get_redirect
         }
+        if self._is_view_active(
+                'crnd_wsd.wsd_request_table_request_data_priority'):
+            values.update({
+                'request_priority_list': AVAILABLE_PRIORITIES,
+            })
 
         values.update(self._requests_list_get_extra_context(
             req_status=req_status, search=search, **post
@@ -278,8 +291,13 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                 else req.can_change_request_text),
             'disable_composer': disable_new_comments,
             'can_read_request': can_read_request,
-            'show_congrats_msg': kw.get('show_congrats_msg', False),
+            'show_congrats_msg': kw.get('show_congrats_msg', False)
         }
+        if self._is_view_active(
+                'crnd_wsd.wsd_request_page_request_data_priority'):
+            values.update({
+                'request_priority_list': AVAILABLE_PRIORITIES,
+            })
         values.update(self._request_page_get_extra_context(req_id, **kw))
 
         return http.request.render(
@@ -289,78 +307,217 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                 methods=['GET'], website=True)
     @guard_access
     def request_new(self, **kwargs):
-        # May be overridden to change start step
-        return http.request.redirect(QueryURL(
+        # Start request creation process from service
+        if http.request.env.user.has_group(
+                'generic_request.group_request_use_services'):
+            # Redirect to selection of services only when we enable usage
+            # of services in settings
+            return request.redirect(QueryURL(
+                '/requests/new/step/service', [])(**kwargs))
+
+        return request.redirect(QueryURL(
             '/requests/new/step/category', [])(**kwargs))
 
-    def _request_new_get_public_categs_domain(self, category_id=None, **post):
+    def _request_new_get_public_categs_domain(self, category_id=None,
+                                              service_id=None, **post):
         if http.request.env.user.has_group(GROUP_USER_ADVANCED):
-            return []
-        return [
-            '&', ('website_published', '=', True),
-            '|', ('website_ids', '=', False),
-            ('website_ids', 'in', http.request.website.id)]
+            # If user has group Advanced, then, se do not limit categories
+            # by published state
+            domain = []
+        else:
+            # For other users we display only published categories
+            domain = [('website_published', '=', True)]
 
-    def _request_new_get_public_categs(self, category_id=None, **post):
+        # Show only categories related to current website (
+        # or not related to website at all)
+        domain = expression.AND([
+            domain,
+            ['|',
+             ('website_ids', '=', False),
+             ('website_ids', 'in', http.request.website.id)]
+        ])
+
+        # Restrict visible categories by service
+        service = self._id_to_record('generic.service', service_id)
+        if service:
+            domain = expression.AND([
+                domain,
+                [('service_ids.id', '=', service.id)]])
+        else:
+            domain = expression.AND([
+                domain,
+                [('service_ids', '=', False)]])
+
+        return domain
+
+    def _request_new_get_public_categs(self, category_id=None,
+                                       service_id=None, **post):
         domain = self._request_new_get_public_categs_domain(
-            category_id=category_id, **post)
+            category_id=category_id, service_id=service_id, **post)
         categs = http.request.env['request.category'].search(domain)
         result = categs.filtered(
             lambda r: self._request_new_get_public_types(
-                category_id=r.id, **post))
+                category_id=r.id, service_id=service_id, **post))
         return result
+
+    def _request_new_get_public_services_domain(self, **post):
+        if http.request.env.user.has_group(GROUP_USER_ADVANCED):
+            # If user has group Advanced, then, we do not limit services
+            # by published state
+            domain = []
+        else:
+            # For other users we display only published services
+            domain = [('website_published', '=', True)]
+
+        # Show only services related to current website (
+        # or not related to website at all)
+        return expression.AND([
+            domain,
+            ['|',
+             ('website_ids', '=', False),
+             ('website_ids', 'in', http.request.website.id)]
+        ])
+
+    def _request_new_get_public_services(self, **post):
+        if request.env.user.has_group(GROUP_USER_ADVANCED):
+            return request.env['generic.service'].search([])
+        domain = self._request_new_get_public_services_domain(**post)
+
+        result = request.env['generic.service'].search(domain)
+        return result
+
+    @http.route(["/requests/new/step/service"], type='http', auth="public",
+                methods=['GET', 'POST'], website=True)
+    @guard_access
+    def request_new_select_service(self, service_id=None, **kwargs):
+        service = self._id_to_record('generic.service', service_id)
+        keep = QueryURL('', [], service_id=service_id, **kwargs)
+        if request.httprequest.method == 'POST':
+            return request.redirect(keep(
+                '/requests/new/step/category',
+                service_id=service.id, **kwargs))
+
+        public_services = self._request_new_get_public_services(**kwargs)
+        # TODO: May be need refactor this - duplicate use
+        # _request_new_get_public_types where and in the method
+        # _request_new_get_public_categs
+        public_services = public_services.filtered(
+            lambda r: self._request_new_get_public_categs(
+                service_id=r.id, **kwargs
+            ) or self._request_new_get_public_types(
+                service_id=r.id, **kwargs)
+        )
+
+        if len(public_services) <= 1 and not http.request.session.debug:
+            return request.redirect(keep(
+                '/requests/new/step/category',
+                service_id=public_services.id, **kwargs))
+
+        values = {
+            'req_services': public_services,
+            'req_service_sel': service,
+            'keep': keep,
+            'get_redirect': get_redirect,
+        }
+
+        return request.render(
+            "crnd_wsd.wsd_requests_new_select_service",
+            values)
 
     @http.route(["/requests/new/step/category"], type='http', auth="public",
                 methods=['GET', 'POST'], website=True)
     @guard_access
-    def request_new_select_category(self, category_id=None, **kwargs):
-        keep = QueryURL('', [], category_id=category_id, **kwargs)
+    def request_new_select_category(self, category_id=None,
+                                    service_id=None, **kwargs):
+        keep = QueryURL(
+            '', [], category_id=category_id, service_id=service_id, **kwargs)
         req_category = self._id_to_record('request.category', category_id)
+        req_service = self._id_to_record('generic.service', service_id)
         if http.request.httprequest.method == 'POST' and req_category:
             return http.request.redirect(keep(
                 '/requests/new/step/type',
-                category_id=req_category.id, **kwargs))
+                category_id=req_category.id, service_id=service_id, **kwargs))
 
         public_categories = self._request_new_get_public_categs(
-            category_id=category_id, **kwargs).filtered(
+            category_id=category_id, service_id=service_id, **kwargs).filtered(
                 lambda r: self._request_new_get_public_types(
-                    category_id=r.id, **kwargs))
+                    category_id=r.id, service_id=service_id, **kwargs))
 
         if len(public_categories) <= 1 and not http.request.session.debug:
             return http.request.redirect(keep(
                 '/requests/new/step/type',
-                category_id=public_categories.id, **kwargs))
+                category_id=public_categories.id,
+                service_id=service_id, **kwargs))
 
         values = {
             'req_categories': public_categories,
             'req_category_sel': req_category,
             'keep': keep,
             'get_redirect': get_redirect,
+            'service': req_service,
         }
 
         return http.request.render(
             "crnd_wsd.wsd_requests_new_select_category", values)
 
     def _request_new_get_public_types_domain(self, type_id=None,
-                                             category_id=None, **kwargs):
-        domain = []
-        if not http.request.env.user.has_group(GROUP_USER_ADVANCED):
-            domain += [('website_published', '=', True)]
+                                             category_id=None,
+                                             service_id=None, **kwargs):
+        if http.request.env.user.has_group(GROUP_USER_ADVANCED):
+            # If user has group Advanced, then we do not restrict
+            # request types by website published state
+            domain = []
+        else:
+            # For other users, we show only request types published on website
+            domain = [('website_published', '=', True)]
 
         if category_id:
-            domain += [('category_ids.id', '=', category_id)]
+            # If we have pre-selected cateoory, then we have to show only
+            # request types related to this category
+            domain = expression.AND([
+                domain,
+                [('category_ids.id', '=', category_id)],
+            ])
         else:
-            domain += [('category_ids', '=', False)]
+            # Other wise, we show only request types that
+            # are not related to any category
+            domain = expression.AND([
+                domain,
+                [('category_ids', '=', False)],
+            ])
 
-        domain += [
-            '|', ('website_ids', '=', False),
-            ('website_ids', 'in', http.request.website.id)]
+        # Show only request types published on current website,
+        # or request types that are not related to specific websites
+        domain = expression.AND([
+            domain,
+            ['|',
+             ('website_ids', '=', False),
+             ('website_ids', 'in', http.request.website.id)],
+        ])
+
+        service = self._id_to_record('generic.service', service_id)
+        if service:
+            # If we have pre-selected service, then show only request types
+            # related to selected service
+            domain = expression.AND([
+                domain,
+                [('service_ids.id', '=', service.id)],
+            ])
+        else:
+            # Otherwise, we have to show only request types that
+            # do not have related services
+            domain = expression.AND([
+                domain,
+                [('service_ids', '=', False)],
+            ])
         return domain
 
-    def _request_new_get_public_types(self, type_id=None, category_id=None,
-                                      **kwargs):
+    def _request_new_get_public_types(self, type_id=None,
+                                      category_id=None,
+                                      service_id=None, **kwargs):
         domain = self._request_new_get_public_types_domain(
-            type_id=type_id, category_id=category_id, **kwargs)
+            type_id=type_id, category_id=category_id,
+            service_id=service_id, **kwargs)
 
         return http.request.env['request.type'].search(domain)
 
@@ -368,23 +525,26 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                 methods=['GET', 'POST'], website=True)
     @guard_access
     def request_new_select_type(self, type_id=None, category_id=None,
-                                **kwargs):
-        keep = QueryURL('', [], type_id=type_id, category_id=category_id,
-                        **kwargs)
+                                service_id=None, **kwargs):
+        keep = QueryURL(
+            '', [], type_id=type_id, category_id=category_id,
+            service_id=service_id, **kwargs)
         req_type = self._id_to_record('request.type', type_id)
         req_category = self._id_to_record('request.category', category_id)
+        req_service = self._id_to_record('generic.service', service_id)
         if http.request.httprequest.method == 'POST' and req_type:
             return http.request.redirect(keep(
                 '/requests/new/step/data', type_id=req_type.id,
-                category_id=req_category.id, **kwargs))
+                category_id=req_category.id, service_id=service_id, **kwargs))
 
         public_types = self._request_new_get_public_types(
-            type_id=type_id, category_id=req_category.id, **kwargs)
+            type_id=type_id, category_id=req_category.id,
+            service_id=service_id, **kwargs)
 
         if len(public_types) == 1 and not http.request.session.debug:
             return http.request.redirect(keep(
                 '/requests/new/step/data', type_id=public_types.id,
-                category_id=req_category.id, **kwargs))
+                category_id=req_category.id, service_id=service_id, **kwargs))
 
         values = {
             'req_types': public_types,
@@ -392,6 +552,7 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             'req_category': req_category,
             'keep': keep,
             'get_redirect': get_redirect,
+            'service': req_service,
         }
 
         return http.request.render(
@@ -399,11 +560,22 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
 
     def _request_new_process_data(self, req_type, req_category=False,
                                   req_text=None, **post):
-        return {
+        service = self._id_to_record(
+            'generic.service', post.get('service_id'))
+        values = {
             'req_type': req_type,
             'req_category': req_category,
             'req_text': req_text,
+            'service': service,
         }
+        if self._is_view_active(
+                'crnd_wsd.wsd_requests_new_request_data_priority'):
+            values.update({
+                'request_priority_list': AVAILABLE_PRIORITIES,
+                'request_impact_priority_list': AVAILABLE_IMPACTS,
+                'request_urgency_priority_list': AVAILABLE_URGENCIES,
+            })
+        return values
 
     def _request_new_validate_data(self, req_type, req_category,
                                    req_text, data, **post):
@@ -433,19 +605,42 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
                     'request_author_phone': {
                         'error_text': _(
                             "Please, specify your phone number!")}})
+        service_id = data.get('service_id', None)
+        if service_id and service_id not in req_type.service_ids.ids:
+            errors['service_id'] = {
+                'error_text': _(
+                    "Selected service and request type are incompatible!"),
+            }
+        elif not service_id and req_type.service_ids:
+            errors['service_id'] = {
+                'error_text': _(
+                    "Selected request type require service!"),
+            }
         return errors
 
     def _request_new_prepare_data(self, req_type, req_category,
                                   req_text, **post):
-        channel_website = http.request.env.ref(
-            'generic_request.request_channel_website')
         res = {
             'category_id': req_category and req_category.id,
             'type_id': req_type.id,
             'request_text': req_text,
-            'channel_id': channel_website.id,
-            'website_id': http.request.website.id,
+            'website_id': http.request.website.id
         }
+
+        if self._is_view_active(
+                'crnd_wsd.wsd_requests_new_request_data_priority'):
+            res.update({
+                'impact': post.get('request_impact_priority', False),
+                'urgency': post.get('request_urgency_priority', False),
+                'priority': post.get('request_priority', False),
+            })
+
+        channel_website = http.request.env.ref(
+            'generic_request.request_channel_website',
+            raise_if_not_found=False)
+        if channel_website and channel_website.sudo().active:
+            res['channel_id'] = channel_website.id
+
         company = http.request.env.user.company_id
         if http.request.website.is_request_create_public():
             res['created_by_id'] = http.request.env.ref('base.user_root').id
@@ -470,6 +665,11 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
             author_phone = post.get('request_author_phone')
             if author_phone:
                 res['author_phone'] = author_phone
+
+        service = self._id_to_record('generic.service', post.get('service_id'))
+        if service:
+            res['service_id'] = service.id
+
         return res
 
     @http.route(["/requests/new/step/data"],
@@ -551,6 +751,12 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
 
             values['validation_errors'] = validation_errors
             values.update(req_data)
+        if self._is_view_active(
+                'crnd_wsd.wsd_request_table_request_data_priority'):
+            values.update({
+                'request_priority_list': AVAILABLE_PRIORITIES,
+            })
+
         return http.request.render(
             "crnd_wsd.wsd_requests_new_request_data", values)
 
@@ -564,13 +770,17 @@ class WebsiteRequest(WSDControllerMixin, http.Controller):
         if req.website_id and req.website_id != http.request.website:
             raise http.request.not_found()
 
+        values = {
+            'req': req,
+            'keep': keep,
+        }
+        if self._is_view_active(
+                'crnd_wsd.wsd_request_table_request_data_congrat_priority'):
+            values.update({
+                'request_priority_list': AVAILABLE_PRIORITIES,
+            })
         return http.request.render(
-            "crnd_wsd.wsd_requests_new_congratulation",
-            {
-                'req': req,
-                'keep': keep,
-            }
-        )
+            "crnd_wsd.wsd_requests_new_congratulation", values)
 
 
 class RequestCustomerPortal(CustomerPortal):

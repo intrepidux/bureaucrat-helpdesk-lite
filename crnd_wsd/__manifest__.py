@@ -6,7 +6,7 @@
     'author': "Center of Research and Development",
     'website': "https://crnd.pro",
     'license': 'LGPL-3',
-    'version': '15.0.1.94.0',
+    'version': '15.0.1.104.0',
 
     'depends': [
         'mail',
@@ -19,6 +19,8 @@
         'templates/templates.xml',
         'templates/templates_request_page.xml',
         'templates/templates_request_new_page.xml',
+        'templates/priority_templates.xml',
+        'views/generic_service.xml',
         'views/request_type_view.xml',
         'views/request_stage_route.xml',
         'views/request_category_view.xml',
@@ -34,8 +36,11 @@
         'demo/request_kind.xml',
         'demo/demo_generic_type.xml',
         'demo/demo_upgrade_type.xml',
+        'demo/generic_service.xml',
         'demo/demo_request_type_seq.xml',
         'demo/demo_bug_report_type.xml',
+        'demo/request_subrequests.xml',
+        'demo/demo_type_no_service.xml',
     ],
 
     'assets': {
@@ -58,24 +63,12 @@
             'crnd_wsd/static/src/js/request_actions.js',
             'crnd_wsd/static/src/js/enable_popovers.js',
             'crnd_wsd/static/src/js/widgets.js',
-            'crnd_wsd/static/src/scss/request.scss',
-            'crnd_wsd/static/src/scss/blockui_spin.css',
+            'crnd_wsd/static/src/js/priority_selection.js',
+
+            'crnd_wsd/static/src/scss/*',
         ],
         'web.assets_tests': [
-            'crnd_wsd/static/src/js/tours/request_mail_login_portal.js',
-            'crnd_wsd/static/src/js/tours/request_action_no_actions.js',
-            'crnd_wsd/static/src/js/tours/request_action_actions.js',
-            'crnd_wsd/static/src/js/tours/request_action_actions_redirect.js',
-            'crnd_wsd/static/src/js/tours/request_base.js',
-            'crnd_wsd/static/src/js/tours/request_new.js',
-            'crnd_wsd/static/src/js/tours/request_new_default_text.js',
-            'crnd_wsd/static/src/js/tours/request_public_user.js',
-            'crnd_wsd/static/src/js/tours/request_public_user_redirect.js',
-            'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_congrat_page.js',
-            'crnd_wsd/static/src/js/tours/request_public_user_create_req_to_req_page.js',
-            'crnd_wsd/static/src/js/tours/request_filter_kind.js',
-            'crnd_wsd/static/src/js/tours/request_author_no_phone.js',
-            'crnd_wsd/static/src/js/tours/request_author_phone_required.js',
+            'crnd_wsd/static/src/js/tours/*',
         ],
         'web.assets_qweb': [
             'crnd_wsd/static/src/xml/templates.xml',

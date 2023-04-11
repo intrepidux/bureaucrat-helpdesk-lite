@@ -1,13 +1,19 @@
 # pylint:disable=too-many-lines
 import json
 import logging
+
+from operator import itemgetter
+from inspect import getmembers
+
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api, tools, _, http, exceptions, SUPERUSER_ID
 from odoo.addons.generic_mixin import pre_write, post_write, pre_create
 from odoo.osv import expression
 from odoo.exceptions import ValidationError
 from odoo.addons.generic_mixin.tools.x2m_agg_utils import read_counts_for_o2m
 from odoo.addons.generic_mixin.tools.sql import create_sql_view
+from odoo.addons.generic_system_event import on_event
 from ..tools.utils import html2text
 from ..constants import (
     TRACK_FIELD_CHANGES,
@@ -20,20 +26,47 @@ from ..constants import (
     PRIORITY_MAP,
 )
 _logger = logging.getLogger(__name__)
-TRACK_FIELD_CHANGES.update(['parent_id'])
+
+KANBAN_READONLY_FIELDS.update(['service_id', 'service_level_id'])
+TRACK_FIELD_CHANGES.update(['parent_id', 'service_id', 'service_level_id'])
+
+DEFAULT_SERVICE_LEVEL_GUESSER_PRIORITY = 100
+
+
+def service_level_guesser(priority=None):
+    """ Mark method, to be used to guess service level for request
+
+        Note, that this decorator is not propagated, thus, when
+        you need to override the method decorated with this decorator,
+        you have to apply this decorator to redefined method too.
+
+        :param int priority: used to order guesser.
+            Method with lowest priority will be called first.
+    """
+    if priority is not None and not isinstance(priority, int):
+        raise AssertionError("priority must be int")
+
+    def decorator(fn):
+        fn.__service_level_guesser__ = True
+        fn.__service_level_guesser_priority__ = (
+            priority
+            if priority is not None
+            else DEFAULT_SERVICE_LEVEL_GUESSER_PRIORITY)
+        return fn
+    return decorator
 
 
 class RequestRequest(models.Model):
     _name = "request.request"
     _inherit = [
+        'generic.system.event.source.mixin',
         'mail.thread',
         'mail.activity.mixin',
-        'generic.mixin.track.changes',
         'generic.tag.mixin',
         'generic.mixin.get.action',
     ]
     _description = 'Request'
-    _order = 'date_created DESC'
+    _order = 'priority DESC, date_created DESC'
     _needaction = True
     _parent_store = True
     _parent_order = 'name'
@@ -93,8 +126,6 @@ class RequestRequest(models.Model):
         help="Category of request")
     channel_id = fields.Many2one(
         'request.channel', 'Channel', index=True, required=False,
-        default=lambda self: self.env.ref(
-            'generic_request.request_channel_other', raise_if_not_found=False),
         help="Channel of request")
     stage_id = fields.Many2one(
         'request.stage', 'Stage', ondelete='restrict',
@@ -119,7 +150,7 @@ class RequestRequest(models.Model):
             ('normal', 'In Progress'),
             ('blocked', 'Blocked'),
             ('done', 'Ready for next stage')],
-        required='True',
+        required=True,
         default='normal',
         tracking=True,
         help="A requests kanban state indicates special"
@@ -159,16 +190,32 @@ class RequestRequest(models.Model):
 
     # Request data fields
     request_text = fields.Html(required=True)
+    internal_note_text = fields.Html(
+        help="Add here internal notes related to this request. "
+             "This field is not visible on website.")
     response_text = fields.Html(required=False)
+    response_attachment_ids = fields.Many2many(
+        'ir.attachment',
+        'request_response_attachment_rel',
+        'request_id',
+        'response_attachment_id',
+        'Response Attachments')
     request_text_sample = fields.Text(
         compute="_compute_request_text_sample", tracking=True,
         string='Request text')
 
-    deadline_date = fields.Date('Deadline')
+    deadline_date = fields.Date('Deadline', tracking=True)
     deadline_state = fields.Selection(selection=[
         ('ok', 'Ok'),
         ('today', 'Today'),
         ('overdue', 'Overdue')], compute='_compute_deadline_state')
+
+    # Keep info about events related to deadline,
+    # to avoid sending same event multiple times
+    deadline_event_tomorrow_sent = fields.Boolean(readonly=True, default=False)
+    deadline_event_today_sent = fields.Boolean(readonly=True, default=False)
+    deadline_event_overdue_sent = fields.Boolean(readonly=True, default=False)
+
     date_created = fields.Datetime(
         'Created', default=fields.Datetime.now, readonly=True, copy=False)
     date_closed = fields.Datetime('Closed', readonly=True, copy=False)
@@ -197,6 +244,9 @@ class RequestRequest(models.Model):
         'res.users', 'Assigned to',
         ondelete='restrict', tracking=True, index=True,
         help="User responsible for next action on this request.")
+    company_id = fields.Many2one(
+        'res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
 
     # Email support
     email_from = fields.Char(
@@ -234,9 +284,9 @@ class RequestRequest(models.Model):
     # We have to explicitly set compute_sudo to True to avoid access errors
     activity_date_deadline = fields.Date(compute_sudo=True)
 
-    # Events
+    # Events (deprecated, use generic_event_count instead)
     request_event_ids = fields.One2many(
-        'request.event', 'request_id', 'Events', readonly=True)
+        'request.event', 'event_source_record_id', 'Events', readonly=True)
     request_event_count = fields.Integer(
         compute='_compute_request_event_count', readonly=True)
 
@@ -301,31 +351,151 @@ class RequestRequest(models.Model):
              "request. It is used for access-rights checks."
     )
 
+    # Service Fields
+    service_id = fields.Many2one(
+        'generic.service', string='Service', ondelete='restrict',
+        help="Service of request")
+
+    # NOTE: Some notes about service level field
+    #       Here it is readonly and is not computed, but we have to
+    #       emulate behavior of computed-like field because,
+    #       we want to trigger service-level-changed event,
+    #       each time this field is changed in database,
+    #       but in case of computed fields it is difficult to handle when
+    #       the field is changed in database, thus we use in paralled,
+    #       onchange methods to compute it in user interface and
+    #       @post_write handlers to compute it on actual write to database
+    service_level_id = fields.Many2one(
+        'generic.service.level', ondelete='restrict',
+        string='Service Level', readonly=True,
+        help="Service of request. Used to compute SLA for request.")
+    can_change_service = fields.Boolean(
+        compute='_compute_can_change_service', readonly=True, store=False)
+
+    service_id_domain = fields.Text(
+        compute='_compute_service_id_domain', readonly=True, store=False,
+        help='Technical field to provide domain to filter available '
+             'request services in view.')
+
     _sql_constraints = [
         ('name_uniq',
          'UNIQUE (name)',
          'Request name must be unique.'),
     ]
 
+    @property
+    def _request_service_level_guessers(self):
+        cls = type(self)
+
+        def is_guesser(fn):
+            """ Check if fn is function that represents service level guesser.
+            """
+            if not callable(fn):
+                return False
+            if getattr(fn, '__service_level_guesser__', False):
+                return True
+            return False
+
+        guessers = []
+        for method_name, __ in getmembers(cls, is_guesser):
+            method = getattr(cls, method_name)
+            guessers += [
+                (method.__service_level_guesser_priority__, method_name)
+            ]
+        # Sort guessers by priority
+        result = [
+            g[1] for g in sorted(guessers, key=itemgetter(0))]
+
+        # Memoize guessers on class
+        cls._request_service_level_guessers = result
+        return result
+
+    @classmethod
+    def _get_service_level_dependency_fields(cls):
+        """ Return list of fields that have to trigger service level
+            recomputation.
+            Could be extended by other addons
+
+            This list is used to trigger onchange handler that will recompute
+            service level in UI when at least one of mentioned fields changed.
+        """
+        return ['author_id', 'partner_id']
+
+    @classmethod
+    def _init_constraints_onchanges(cls):
+        # Overloading this method to dynamically create onchange handler with
+        # dynamically computed fields. This is required to be able to add
+        # dependency fields in other addons.
+        cls._onchange_update_service_level._onchange = tuple(
+            cls._get_service_level_dependency_fields())
+
+        # Reset momoized list of guessers
+        cls._request_service_level_guessers = (
+            RequestRequest._request_service_level_guessers)
+        return super(RequestRequest, cls)._init_constraints_onchanges()
+
+    def _get_service_level(self):
+        """ Get service level for this request.
+            This is the core method, that will be called from various places
+            to compute service level for request.
+        """
+        self.ensure_one()
+        for guesser in self._request_service_level_guessers:
+            service_level = getattr(self, guesser)()
+            if service_level:
+                return service_level
+        return self.env['generic.service.level'].browse()
+
     @api.model
     def default_get(self, fields_list):
         res = super(RequestRequest, self).default_get(fields_list)
 
-        path = http.request.httprequest.path if http.request else False
-        if path and path.startswith('/web') or path == '/web':
-            res.update({'channel_id': self.env.ref(
-                'generic_request.request_channel_web').id})
-        elif path and path.startswith('/xmlrpc') or path == '/xmlrpc':
-            res.update({'channel_id': self.env.ref(
-                'generic_request.request_channel_api').id})
-        elif path and path.startswith('/jsonrpc') or path == '/jsonrpc':
-            res.update({'channel_id': self.env.ref(
-                'generic_request.request_channel_api').id})
+        channel_id = self._guess_default_channel()
+        if channel_id:
+            res.update({'channel_id': channel_id})
         if 'parent_id' in fields_list:
             parent = self._context.get('generic_request_parent_id')
             res.update({'parent_id': parent})
 
         return res
+
+    def _guess_default_channel(self):
+        path = http.request.httprequest.path if http.request else False
+
+        self_sudo = self.sudo()
+
+        # Define default channel, that will be assigned, when others
+        # are inactive or deleted
+        default = self_sudo.env.ref(
+            'generic_request.request_channel_other', raise_if_not_found=False)
+
+        # Try to define an active specified channel
+        channel = None
+        if path and path.startswith('/web') or path == '/web':
+            channel = self_sudo.env.ref(
+                'generic_request.request_channel_web',
+                raise_if_not_found=False)
+        elif path and path.startswith('/xmlrpc') or path == '/xmlrpc':
+            channel = self_sudo.env.ref(
+                'generic_request.request_channel_api',
+                raise_if_not_found=False)
+        elif path and path.startswith('/jsonrpc') or path == '/jsonrpc':
+            channel = self_sudo.env.ref(
+                'generic_request.request_channel_api',
+                raise_if_not_found=False)
+
+        # If nothing specified active channels found,
+        # try to assign the default one or, at least
+        # (when default also inactive) return False
+        if channel and channel.active:
+            return channel.id
+        return default.id if default and default.active else False
+
+    @service_level_guesser(priority=1000)
+    def _get_service_level__from_parther_author(self):
+        if self.partner_id:
+            return self.partner_id.service_level_id
+        return self.author_id.service_level_id
 
     @api.depends('deadline_date', 'date_closed')
     def _compute_deadline_state(self):
@@ -488,6 +658,9 @@ class RequestRequest(models.Model):
     @api.depends('author_id', 'partner_id')
     def _compute_related_a_p_request_ids(self):
         for record in self:
+            # TODO: Possibly, optimize with SQL, because there are cases
+            #       when there are a lot of requests for single
+            #       partner or author.
             # Usually this will be called on request form view and thus
             # computed only for one record. So, it will lead only to 4
             # search_counts per request to compute stat
@@ -602,6 +775,27 @@ class RequestRequest(models.Model):
         for record in self:
             record.child_count = mapped_data.get(record.id, 0)
 
+    @api.depends('is_new_request', 'type_id', 'category_id')
+    def _compute_service_id_domain(self):
+        """ Compute domain for service_id field in request and encode it as
+            json string.
+
+            Later this domain will be handled in name_search method of
+            Generic Service model.
+        """
+        for record in self:
+            record.service_id_domain = json.dumps(
+                record._get_service_id_domain())
+
+    def _hook_can_change_service(self):
+        self.ensure_one()
+        return self.stage_id == self.type_id.sudo().start_stage_id
+
+    @api.depends('type_id', 'type_id.start_stage_id', 'stage_id')
+    def _compute_can_change_service(self):
+        for record in self:
+            record.can_change_service = record._hook_can_change_service()
+
     @api.model
     def init(self):
         res = super().init()
@@ -708,13 +902,29 @@ class RequestRequest(models.Model):
 
         self_ctx = self.with_context(mail_create_nolog=False)
         request = super(RequestRequest, self_ctx).create(vals)
-        request.trigger_event('created')
-        self_ctx = self.sudo()
-        if self_ctx.env.context.get('generic_request_parent_id'):
-            new_ctx = dict(self_ctx.env.context)
+
+        # This is needed to avoid creation of requests with wrong parent by
+        # accident. For example, in case of following situation:
+        # - We have automated action, that will be triggered when
+        #   request is created. This action have to create another request,
+        #   based on this request (just created).
+        # - If we have in context 'generic_request_parent_id', then this new
+        #   request will be created with same parent.
+        # To avoid this, we have to clean context after request was created.
+        if self.env.context.get('generic_request_parent_id'):
+            new_ctx = dict(self.env.context)
             new_ctx.pop('generic_request_parent_id')
-            return request.with_env(request.env(context=new_ctx))
+            request = request.with_env(request.env(context=new_ctx))
+
+        self.env['res.partner'].invalidate_cache(fnames=['request_ids'])
+        request.service_level_id = request._get_service_level()
         return request
+
+    def unlink(self):
+        res = super().unlink()
+        # Cleanup cache on unlink
+        self.env['res.partner'].invalidate_cache(fnames=['request_ids'])
+        return res
 
     def _get_generic_tracking_fields(self):
         """ Compute list of fields that have to be tracked
@@ -724,6 +934,18 @@ class RequestRequest(models.Model):
         return super(
             RequestRequest, self
         )._get_generic_tracking_fields() | TRACK_FIELD_CHANGES
+
+    def _get_service_id_domain(self):
+        """ This method must return domain for 'service_id' field in request.
+            This method could be overridden in other addons.
+
+            Also, if new dependency added to domain, then such dependency have
+            to be added also to _compute_service_id_domain method.
+        """
+        self.ensure_one()
+        if not self.is_new_request:
+            return [('request_type_ids', '=', self.type_id.id)]
+        return []
 
     @pre_write('active')
     def _before_active_changed(self, changes):
@@ -795,6 +1017,10 @@ class RequestRequest(models.Model):
         elif old_user and not new_user:
             self.trigger_event('unassigned', event_data)
 
+    @post_write('partner_id', 'author_id')
+    def _after_partner_author_changed_invalidate_cache(self, changes):
+        self.env['res.partner'].invalidate_cache(fnames=['request_ids'])
+
     @post_write('request_text')
     def _after_request_text_changed(self, changes):
         self.trigger_event('changed', {
@@ -855,25 +1081,49 @@ class RequestRequest(models.Model):
 
     @post_write('deadline_date')
     def _after_deadline_changed(self, changes):
+        old_date, new_date = changes['deadline_date']
         self.trigger_event('deadline-changed', {
-            'old_deadline': changes['deadline_date'][0],
-            'new_deadline': changes['deadline_date'][1]})
+            'old_deadline': old_date,
+            'new_deadline': new_date,
+        })
+
+        # Update event sent status on request
+        # By default cleanup info about events already triggered.
+        event_status = {
+            'deadline_event_tomorrow_sent': False,
+            'deadline_event_today_sent': False,
+            'deadline_event_overdue_sent': False,
+        }
+        if new_date and not self.closed:
+            # Immediately trigger deadline-related date-based events
+            # if needed. We do not trigger events on already closed request
+            if new_date == fields.Date.today():
+                self.trigger_event('deadline-today')
+                event_status['deadline_event_today_sent'] = True
+            elif new_date < fields.Date.today():
+                self.trigger_event('deadline-overdue')
+                event_status['deadline_event_overdue_sent'] = True
+            elif new_date == fields.Date.today() + relativedelta(days=1):
+                self.trigger_event('deadline-tomorrow')
+                event_status['deadline_event_tomorrow_sent'] = True
+        self.write(event_status)
 
     @post_write('kanban_state')
     def _after_kanban_state_changed(self, changes):
         self.trigger_event('kanban-state-changed', {
-            'old_kanban_state': changes['kanban_state'][0],
-            'new_kanban_state': changes['kanban_state'][1]})
+            'old_kanban_state': changes['kanban_state'].old_val,
+            'new_kanban_state': changes['kanban_state'].new_val})
 
     @post_write('active')
     def _after_active_changed(self, changes):
+        # TODO: Use record archived-unarchived global events,
+        #       or remove this completely and provide migration.
         __, new_active = changes['active']
         if new_active:
             event_code = 'request-unarchived'
         else:
             event_code = 'request-archived'
-        self.trigger_event(event_code, {
-            'request_active': event_code})
+        self.trigger_event(event_code, {'request_active': event_code})
 
     def _creation_subtype(self):
         """ Determine mail subtype for request creation message/notification
@@ -923,6 +1173,26 @@ class RequestRequest(models.Model):
                     self.parent_id.trigger_event(
                         'subrequest-all-subrequests-closed', {})
 
+    @post_write('service_id')
+    def _after_service_changed__trigger_event(self, changes):
+        if 'service_id' in changes:
+            old_service, new_service = changes['service_id']
+            self.trigger_event('service-changed', {
+                'old_service_id': old_service.id,
+                'new_service_id': new_service.id,
+            })
+
+    @post_write('author_id', 'partner_id')
+    def _update_service_level_on_write(self, changes):
+        self.service_level_id = self._get_service_level()
+
+    @post_write('service_level_id')
+    def _after_service_level_id_changed__trigger_event(self, changes):
+        self.trigger_event('service-level-changed', {
+            'old_service_level_id': changes['service_level_id'][0].id,
+            'new_service_level_id': changes['service_level_id'][1].id,
+        })
+
     def _track_subtype(self, init_values):
         """ Give the subtypes triggered by the changes on the record according
         to values that have been updated.
@@ -966,11 +1236,14 @@ class RequestRequest(models.Model):
             # Set default text for request
             if self.env.context.get('default_request_text'):
                 continue
-            if request.type_id and request.type_id.default_request_text:
+            if request.type_id and request.type_id.default_request_text \
+                    not in (False, '<p><br></p>'):
                 request.request_text = request.type_id.default_request_text
 
-    @api.onchange('category_id', 'type_id', 'is_new_request')
+    @api.onchange('category_id', 'type_id', 'service_id', 'is_new_request')
     def _onchange_category_type(self):
+        # TODO: need to optimise this method
+        # pylint: disable=too-many-branches
         if self.type_id and self.category_id and self.is_new_request:
             # Clear type if it does not in allowed type for selected category
             # Or if request category is not selected
@@ -992,6 +1265,35 @@ class RequestRequest(models.Model):
                 ('request_type_ids', '=', self.type_id.id)]
         else:
             domain['category_id'] = []
+
+        if self.category_id and self.service_id:
+            if self.service_id not in self.category_id.service_ids:
+                self.category_id = False
+        elif self.category_id and not self.service_id:
+            if self.category_id.service_ids:
+                self.category_id = False
+
+        if self.service_id and self.is_new_request:
+            if self.type_id not in self.service_id.request_type_ids:
+                # Clean up type only if self is not saved to database
+                self.type_id = None
+
+        if self.service_id:
+            domain['type_id'] = expression.AND([
+                domain['type_id'], [('service_ids', '=', self.service_id.id)],
+            ])
+            domain['category_id'] = expression.AND([
+                domain['category_id'],
+                [('service_ids', '=', self.service_id.id)],
+            ])
+        else:
+            domain['type_id'] = expression.AND([
+                domain['type_id'], [('service_ids', '=', False)],
+            ])
+            domain['category_id'] = expression.AND([
+                domain['category_id'], [('service_ids', '=', False)],
+            ])
+
         return res
 
     @api.onchange('author_id')
@@ -1001,6 +1303,12 @@ class RequestRequest(models.Model):
                 rec.partner_id = self.author_id.parent_id
             else:
                 rec.partner_id = False
+
+    def _onchange_update_service_level(self):
+        """ Onchange method, that will called to automatically compute service
+            level, allowing to change it in future
+        """
+        self.service_level_id = self._get_service_level()
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form',
@@ -1083,6 +1391,7 @@ class RequestRequest(models.Model):
         # string.
         lazy_subject = message_data_g.pop('lazy_subject', None)
 
+        self_sudo = self.sudo()
         for partner in partners.sudo():
             # Skip partners without emails to avoid errors
             if not partner.email:
@@ -1091,7 +1400,9 @@ class RequestRequest(models.Model):
                 values_g,
                 partner=partner,
             )
-            self_ctx = self.sudo()
+
+            # Prepare base context for this notification
+            self_ctx = self_sudo
 
             # remove default author from context
             # This is required to fix bug in generic_request_crm:
@@ -1106,7 +1417,7 @@ class RequestRequest(models.Model):
                 self_ctx = self_ctx.with_env(self_ctx.env(context=new_ctx))
 
             if partner.lang:
-                self_ctx = self_ctx.with_context(lang=partner.sudo().lang)
+                self_ctx = self_ctx.with_context(lang=partner.lang)
             message_data = dict(
                 message_data_g,
                 partner_ids=[(4, partner.id)],
@@ -1117,6 +1428,7 @@ class RequestRequest(models.Model):
                 template,
                 **message_data)
 
+    @on_event('record-created')
     def _send_default_notification_created(self, event):
         # if created request has parent,
         # send the event message to parent in any case
@@ -1139,6 +1451,7 @@ class RequestRequest(models.Model):
             ) % {'request': self.name},
         )
 
+    @on_event('assigned', 'reassigned')
     def _send_default_notification_assigned(self, event):
         # if assigned request has parent,
         # send the event message to parent in any case
@@ -1160,6 +1473,7 @@ class RequestRequest(models.Model):
             ) % {'request': self.name},
         )
 
+    @on_event('closed')
     def _send_default_notification_closed(self, event):
         # if closed request has parent,
         # send the event message to parent in any case
@@ -1181,8 +1495,10 @@ class RequestRequest(models.Model):
             lazy_subject=lambda self: _(
                 "Your request %(request)s has been closed!"
             ) % {'request': self.name},
+            attachment_ids=self.response_attachment_ids,
         )
 
+    @on_event('reopened')
     def _send_default_notification_reopened(self, event):
         # if reopened request has parent,
         # send the event message to parent in any case
@@ -1204,35 +1520,15 @@ class RequestRequest(models.Model):
             ) % {'request': self.name},
         )
 
-    def handle_request_event(self, event):
-        """ Place to handle request events
-        """
-        if event.event_type_id.code in ('assigned', 'reassigned'):
-            self._send_default_notification_assigned(event)
-        elif event.event_type_id.code == 'created':
-            self._send_default_notification_created(event)
-        elif event.event_type_id.code == 'closed':
-            self._send_default_notification_closed(event)
-        elif event.event_type_id.code == 'reopened':
-            self._send_default_notification_reopened(event)
-
-    def trigger_event(self, event_type, event_data=None):
-        """ Trigger an event.
-
-            :param str event_type: code of event type
-            :param dict event_data: dictionary with data to be written to event
-        """
-        event_type_id = self.env['request.event.type'].get_event_type_id(
-            event_type)
-        event_data = event_data if event_data is not None else {}
-        event_data.update({
-            'event_type_id': event_type_id,
-            'request_id': self.id,
-            'user_id': self.env.user.id,
-            'date': fields.Datetime.now(),
-        })
-        event = self.env['request.event'].sudo().create(event_data)
-        self.handle_request_event(event)
+    def trigger_event(self, event_type_code, event_data_vals=None):
+        # Set `request_id` for all events.
+        # This is needed for backward compatibility,
+        # but may be removed in future
+        if event_data_vals is None:
+            vals = {'request_id': self.id}
+        else:
+            vals = dict(event_data_vals, request_id=self.id)
+        return super().trigger_event(event_type_code, event_data_vals=vals)
 
     def get_mail_url(self, pid=None):
         """ Get request URL to be used in mails
@@ -1414,9 +1710,11 @@ class RequestRequest(models.Model):
             defaults['author_id'] = False
             defaults['partner_id'] = False
             defaults['author_name'] = author_name
-
-        defaults.update({'channel_id': self.env.ref(
-            'generic_request.request_channel_email').id})
+        channel_mail = self.env.ref(
+            'generic_request.request_channel_email',
+            raise_if_not_found=False)
+        if channel_mail and channel_mail.sudo().active:
+            defaults['channel_id'] = channel_mail.id
 
         request = super(RequestRequest, self).message_new(
             msg_dict, custom_values=defaults)
@@ -1507,6 +1805,17 @@ class RequestRequest(models.Model):
             message, msg_vals, *args, **kwargs
         )
 
+    def _close_mail_activities_for_user(self, user):
+        self.ensure_one()
+        user_activities = self.env['mail.activity'].search([
+            ('res_id', '=', self.id),
+            ('res_model', '=', self._name),
+            ('user_id', '=', user.id)
+        ])
+        for activity in user_activities:
+            activity.action_feedback(
+                _('Closing this activity because assignee was unsubscribed!'))
+
     def api_move_request(self, route_id):
         """ This method could be used to move request via specified route.
             In case of specified route is closing route, then it will return
@@ -1537,14 +1846,40 @@ class RequestRequest(models.Model):
             'route': route.display_name,
         })
 
-    def action_show_request_events(self):
-        self.ensure_one()
-        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
-            'generic_request.action_request_event_view',
-            domain=[('request_id', '=', self.id)])
+    @api.model
+    def _scheduler_check_deadlines(self):
+        """ Check deadline dates and trigger events:
+            - Deadline Tomorrow
+            - Deadline Today
+            - Deadline Overdue
+            if needed
+        """
+        today = fields.Date.today()
+        tomorrow = today + relativedelta(days=1)
+        requests_deadline_tomorrow = self.sudo().search([
+            ('closed', '=', False),
+            ('deadline_date', '=', tomorrow),
+            ('deadline_event_tomorrow_sent', '=', False)])
+        requests_deadline_today = self.sudo().search([
+            ('closed', '=', False),
+            ('deadline_date', '=', today),
+            ('deadline_event_today_sent', '=', False)])
+        requests_deadline_yesterday = self.sudo().search([
+            ('closed', '=', False),
+            ('deadline_date', '<', today),
+            ('deadline_event_overdue_sent', '=', False)])
+        for request in requests_deadline_tomorrow:
+            request.trigger_event('deadline-tomorrow')
+            request.deadline_event_tomorrow_sent = True
+        for request in requests_deadline_today:
+            request.trigger_event('deadline-today')
+            request.deadline_event_today_sent = True
+        for request in requests_deadline_yesterday:
+            request.trigger_event('deadline-overdue')
+            request.deadline_event_overdue_sent = True
 
     def _request_timesheet_get_defaults(self):
-        """ This method suppoesed to be overridden in other modules,
+        """ This method supposed to be overridden in other modules,
             to provide some additional default values for timesheet lines.
         """
         return {

@@ -54,6 +54,12 @@ class RequestStage(models.Model):
     route_out_count = fields.Integer(
         'Routes Out', compute='_compute_routes_out_count', readonly=True)
 
+    # Requests relations
+    request_ids = fields.One2many(
+        'request.request', 'stage_id', 'Requests', readonly=True, copy=False)
+    request_count = fields.Integer(
+        'All Requests', compute='_compute_request_count', readonly=True)
+
     previous_stage_ids = fields.Many2many(
         'request.stage', 'request_stage_prev_stage_ids_rel',
         'stage_id', 'prev_stage_id',
@@ -61,6 +67,8 @@ class RequestStage(models.Model):
         store=True)
     closed = fields.Boolean(
         index=True, help="Is request on this stage closed?")
+
+    diagram_position = fields.Char(readonly=True)
 
     _sql_constraints = [
         ('stage_name_uniq',
@@ -112,6 +120,14 @@ class RequestStage(models.Model):
                 rec.res_bg_color = DEFAULT_BG_COLOR
                 rec.res_label_color = DEFAULT_LABEL_COLOR
 
+    @api.depends('request_ids')
+    def _compute_request_count(self):
+        mapped_data = read_counts_for_o2m(
+            records=self,
+            field_name='request_ids')
+        for record in self:
+            record.request_count = mapped_data.get(record.id, 0)
+
     @api.model
     def _add_missing_default_values(self, values):
         res = super(RequestStage, self)._add_missing_default_values(values)
@@ -139,6 +155,13 @@ class RequestStage(models.Model):
                 'default_stage_from_id': self.id,
                 'default_request_type_id': self.request_type_id.id,
             })
+
+    def action_show_current_requests(self):
+        self.ensure_one()
+        return self.env['generic.mixin.get.action'].get_action_by_xmlid(
+            'generic_request.action_stat_request_count',
+            domain=[
+                ('stage_id', '=', self.id)])
 
     def unlink(self):
         messages = []
