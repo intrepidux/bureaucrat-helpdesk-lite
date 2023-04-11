@@ -25,6 +25,15 @@ class RequestTimesheetReport(models.Model):
         'res.partner', readonly=True)
     request_partner_id = fields.Many2one(
         'res.partner', readonly=True)
+    request_stage_type_id = fields.Many2one(
+        'request.stage.type', readonly=True)
+    request_stage_id = fields.Many2one(
+        'request.stage', readonly=True)
+    request_channel_id = fields.Many2one(
+        'request.channel', readonly=True)
+    request_closed = fields.Boolean(readonly=True)
+    request_service_id = fields.Many2one(
+        'generic.service', readonly=True)
 
     def _get_request_fields(self):
         """ Get list of fields to read from request.
@@ -37,14 +46,18 @@ class RequestTimesheetReport(models.Model):
             ('kind_id', 'request_kind_id'),
             ('author_id', 'request_author_id'),
             ('partner_id', 'request_partner_id'),
+            ('stage_type_id', 'request_stage_type_id'),
+            ('stage_id', 'request_stage_id'),
+            ('closed', 'request_closed'),
+            ('channel_id', 'request_channel_id'),
+            ('service_id', 'request_service_id'),
         ]
 
     @api.model_cr
     def init(self):
         # pylint: disable=sql-injection
         tools.drop_view_if_exists(self.env.cr, self._table)
-        # nosec
-        self.env.cr.execute(  # nosec
+        self.env.cr.execute(
             """
                 CREATE or REPLACE VIEW %(view_name)s as (
                 SELECT
@@ -63,4 +76,4 @@ class RequestTimesheetReport(models.Model):
                 'request_fields': ", ".join((
                     "rr.%s AS %s" % r for r in self._get_request_fields()
                 )),
-            })
+            })  # nosec

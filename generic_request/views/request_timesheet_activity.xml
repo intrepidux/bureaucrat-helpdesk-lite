@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record model="ir.ui.view" id="view_request_timesheet_activity_form">
-        <field name="name">view.request.timesheet.activity.form</field>
         <field name="model">request.timesheet.activity</field>
         <field name="arch" type="xml">
             <form string="Request Timesheet Activity">
@@ -27,7 +26,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_timesheet_activity_tree">
-        <field name="name">view.request.timesheet.activity.tree</field>
         <field name="model">request.timesheet.activity</field>
         <field name="arch" type="xml">
             <tree>
@@ -40,7 +38,6 @@
     </record>
 
     <record model="ir.ui.view" id="view_request_timesheet_activity_search">
-        <field name="name">view.request.timesheet.activity.search</field>
         <field name="model">request.timesheet.activity</field>
         <field name="arch" type="xml">
             <search>

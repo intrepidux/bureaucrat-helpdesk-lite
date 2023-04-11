@@ -1,12 +1,10 @@
-import io
 import os
 import json
 import base64
 import logging
-from PIL import Image
 from werkzeug.urls import url_quote
 
-from odoo import http, tools, _
+from odoo import http, _
 from odoo.tools import ustr
 from odoo.tools.mimetypes import guess_mimetype
 from odoo.http import request
@@ -17,20 +15,6 @@ _logger = logging.getLogger(__name__)
 
 
 class WSDHelpers(WSDControllerMixin, http.Controller):
-
-    def _optimize_image(self, image_data, disable_optimization=False):
-        try:
-            image = Image.open(io.BytesIO(image_data))
-            w, h = image.size
-            if w * h >= 42e6:  # Nokia Lumia 1020 photo resolution
-                raise ValueError(_(
-                    u"Image size excessive, uploaded images "
-                    u"must be smaller than 42 million pixel"))
-            if not disable_optimization and image.format in ('PNG', 'JPEG'):
-                image_data = tools.image_save_for_web(image)
-        except IOError:  # pylint: disable=except-pass
-            pass
-        return image_data
 
     def _get_max_upload_size(self):
         """ Get configuration for max upload size
@@ -112,9 +96,6 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
         try:
             data = upload.read()
             self._check_file_has_allowed_type(data)
-
-            if is_image:
-                data = self._optimize_image(data, disable_optimization=False)
 
             attachment = Attachments.create(dict(
                 attachment_data,

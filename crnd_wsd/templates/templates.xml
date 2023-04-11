@@ -24,8 +24,11 @@
             <script type="text/javascript" src="/crnd_wsd/static/src/js/request_actions.js"/>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/enable_popovers.js"/>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/widgets.js"/>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/priority_selection.js"/>
+            <link rel="stylesheet" type="text/scss" href="/crnd_wsd/static/src/scss/star_select.scss"/>
             <link rel='stylesheet' type="text/scss" href='/crnd_wsd/static/src/scss/request.scss'/>
             <link rel='stylesheet' type="text/css" href="/crnd_wsd/static/src/scss/blockui_spin.css"/>
+            <link rel='stylesheet' type="text/scss" href='/crnd_wsd/static/src/scss/wsd_subrequest.scss'/>
         </xpath>
     </template>
 
@@ -47,6 +50,13 @@
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_filter_kind.js"></script>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_author_no_phone.js"></script>
             <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_author_phone_required.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_priority_star.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_priority_complex_star.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_priority_selection.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_priority_complex_selection.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/crnd_wsd_subrequest_additional.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/crnd_wsd_subrequest.js"></script>
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/crnd_wsd_response_attachments.js"></script>
 
         </xpath>
     </template>
@@ -97,9 +107,15 @@
                         <td class="wsd_request">
                             <div class="request_top">
                                 <span class="request-title">
+                                    <t t-if="req.parent_id">
+                                        <a t-attf-href="/requests/request/{{ req.parent_id.id }}"
+                                           class="request-parent"
+                                           title="Parent Request"
+                                           t-esc="req.parent_id.name"/> /
+                                    </t>
                                     <a class="request-name"
-                                    t-attf-href="/requests/request/{{req.id}}">
-                                    <t t-esc="req.name"/>
+                                       t-attf-href="/requests/request/{{req.id}}">
+                                        <t t-esc="req.name"/>
                                     </a>
                                 </span>
                                 <span class="request-shortcuts ml8">
@@ -107,6 +123,10 @@
                                        title="Comments"
                                        class="fa fa-comments mr4">
                                     </a>
+                                    <a t-if="req.child_ids"
+                                       t-attf-href="/requests?parent_id={{ req.id }}"
+                                       title="Subrequests"
+                                       class="fa fa-sitemap"/>
                                 </span>
 
                                 <div class="right_info">
@@ -133,7 +153,19 @@
                             <div class="request_content">
                                 <div class="content_info">
                                     <div class="text-muted">
-
+                                        <!-- Show service on requests list -->
+                                        <div t-if="req.service_id" class="content-info-service"
+                                             groups="generic_request.group_request_use_services">
+                                            <span class="fa fa-square-o mr4" title="Service"/>
+                                            <span t-field="req.service_id.display_name" title="Service"/>
+                                            <span t-if="req.service_id.description"
+                                                  role="button" data-toggle="popover"
+                                                  title="Service"
+                                                  data-placement="right"
+                                                  data-trigger="hover"
+                                                  class="fa fa-question text-muted"
+                                                  t-attf-data-content="{{ req.service_id.description }}"/>
+                                        </div>
                                         <div t-if="req.category_id" class="content-info-category">
                                             <span class="fa fa-bars mr4" title="Category"/>
                                             <span t-field="req.category_id.display_name" title="Category"/>
@@ -295,6 +327,11 @@
 
     <template id="request_short_info">
         <div class="text-muted request-short-info">
+            <div t-if="rel_req.service_id" class="content-info-service"
+                 groups="generic_request.group_request_use_services">
+                <span class="fa fa-square-o mr4" title="Service"/>
+                <span t-field="rel_req.service_id.display_name" title="Service"/>
+            </div>
             <div t-if="rel_req.category_id" class="content-info-category">
                 <span class="fa fa-bars mr4" title="Category"/>
                 <span t-field="rel_req.category_id.display_name" title="Category"/>
@@ -392,4 +429,35 @@
             </t>
         </xpath>
     </template>
+    <template id="wsd_service_tests"
+              name="Website Service Desk Tests (Service)"
+              inherit_id="web.assets_common">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/crnd_wsd/static/src/js/tours/request_new_with_service.js"></script>
+        </xpath>
+    </template>
+
+    <template id="wsd_requests_new_select_service"
+              name="New request (select service)">
+        <t t-call="crnd_wsd.wsd_layout">
+            <div class="container wsd_request_new">
+                <t t-call="crnd_wsd.wsd_request_navigation">
+                    <t t-set="request_name" t-value="'new'"/>
+                    <t t-call="crnd_wsd.wsd_requests_new_progress">
+                        <t t-set="step" t-value="'service'"/>
+                    </t>
+                </t>
+
+                <t t-set="wsd_step_form_id" t-value="'request_service'"/>
+                <t t-set="wsd_step_form_action" t-value="'/requests/new/step/service'"/>
+                <t t-set="wsd_step_form_title">Select service</t>
+                <t t-set="wsd_step_form_items" t-value="req_services"/>
+                <t t-set="wsd_step_form_item_id_prefix" t-value="'service'"/>
+                <t t-set="wsd_step_form_selected_item" t-value="req_service_sel"/>
+                <t t-set="wsd_step_form_sel_field_id" t-value="'service_id'"/>
+                <t t-call="crnd_wsd.wsd_request_new_select_param"/>
+            </div>
+        </t>
+    </template>
+
 </odoo>

@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import logging
 from psycopg2 import IntegrityError
 
@@ -153,6 +154,8 @@ class TestRequestBase(RequestCase):
             'generic_request.request_category_demo_technical_configuration')
         category_resource = self.env.ref(
             'generic_request.request_category_demo_resource')
+        default_service = self.env.ref(
+            'generic_service.generic_service_default')
 
         # Create new (empty) request
         request = Request.new({})
@@ -166,14 +169,25 @@ class TestRequestBase(RequestCase):
         self.assertFalse(request.type_id)
         self.assertFalse(request.category_id)
 
+        # Remove Default Service from category
+        self.assertIn(default_service, category_tech.service_ids)
+        category_tech.write({
+            'service_ids': [(5, 0)]
+        })
+        self.assertNotIn(default_service, category_tech.service_ids)
+
         # Choose category Demo / Technical / Configuration
         request.category_id = category_tech
         res = request._onchange_category_type()
         self.assertTrue(request.category_id)
         self.assertEqual(
             res['domain']['type_id'],
-            [('category_ids', '=', category_tech.id),
-             ('start_stage_id', '!=', False)])
+            [
+                '&', '&',
+                ('category_ids', '=', category_tech.id),
+                ('start_stage_id', '!=', False),
+                ('service_ids', '=', False)
+            ])
         self.assertIn(self.access_type, category_tech.request_type_ids)
         self.assertEqual(request.category_id, category_tech)
 
@@ -187,6 +201,13 @@ class TestRequestBase(RequestCase):
         res = request._onchange_category_type()
         self.assertEqual(request.type_id, self.access_type)
 
+        # Remove Default Service from category
+        self.assertIn(default_service, category_resource.service_ids)
+        category_resource.write({
+            'service_ids': [(3, default_service.id)]
+        })
+        self.assertNotIn(default_service, category_resource.service_ids)
+
         # Choose category Demo / Resource
         request.category_id = category_resource
         self.assertNotIn(self.access_type, category_resource.request_type_ids)
@@ -196,11 +217,16 @@ class TestRequestBase(RequestCase):
         request.onchange_type_id()
         self.assertFalse(request.type_id)
         self.assertFalse(request.stage_id)
+
         self.assertEqual(request.category_id, category_resource)
         self.assertEqual(
             res['domain']['type_id'],
-            [('category_ids', '=', category_resource.id),
-             ('start_stage_id', '!=', False)])
+            [
+                '&', '&',
+                ('category_ids', '=', category_resource.id),
+                ('start_stage_id', '!=', False),
+                ('service_ids', '=', False)
+            ])
 
         # Choose type 'Printer Request'
         request.type_id = self.sequence_type
@@ -325,7 +351,7 @@ class TestRequestBase(RequestCase):
             })
             self.assertEqual(request.request_event_count, 1)
             self.assertEqual(
-                request.request_event_ids.event_type_id.code, 'created')
+                request.request_event_ids.event_type_id.code, 'record-created')
 
         with freeze_time('2018-07-25'):
             # Change request text
@@ -343,7 +369,7 @@ class TestRequestBase(RequestCase):
             # Test autovacuum of events (by default 90 days old)
             # No events removed, date not changed
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 2)
 
@@ -351,7 +377,7 @@ class TestRequestBase(RequestCase):
             # Test autovacuum of events (by default 90 days old)
             # No events removed, events not older that 90 days
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 2)
 
@@ -359,7 +385,7 @@ class TestRequestBase(RequestCase):
             # Test autovacuum of events (by default 90 days old)
             # One events removed, created event is older that 90 days
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 1)
             self.assertEqual(
@@ -369,13 +395,15 @@ class TestRequestBase(RequestCase):
             self.assertEqual(
                 request.request_event_ids.new_text, '<p>Test 42</p>')
 
-        request.created_by_id.company_id.request_event_auto_remove = False
+        self.env.ref(
+            'generic_request.system_event_source__request_request'
+        ).vacuum_enable = False
 
         with freeze_time('2018-10-27'):
             # Test autovacuum of events (by default 90 days old)
             # All events removed, all events older that 90 days
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 1)
 
@@ -383,17 +411,19 @@ class TestRequestBase(RequestCase):
             # Test autovacuum of events (by default 90 days old)
             # All events removed, all events older that 90 days
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 1)
 
-        request.created_by_id.company_id.request_event_auto_remove = True
+        self.env.ref(
+            'generic_request.system_event_source__request_request'
+        ).vacuum_enable = True
 
         with freeze_time('2018-12-27'):
             # Test autovacuum of events (by default 90 days old)
             # All events removed, all events older that 90 days
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
+                'generic_system_event.ir_cron_vacuum_events')
             cron_job.method_direct_trigger()
             self.assertEqual(request.request_event_count, 0)
 
@@ -408,6 +438,38 @@ class TestRequestBase(RequestCase):
         })
 
         self.assertEqual(request.channel_id, channel_other)
+
+    def test_251_request_channel_other_archived(self):
+        Request = self.env['request.request']
+        channel_other = self.env.ref('generic_request.request_channel_other')
+
+        # Archive channel 'Other'
+        channel_other.sudo().active = False
+        channel_other.invalidate_cache()
+
+        # Check that archived channel is not assigned to the request
+        request = Request.create({
+            'type_id': self.simple_type.id,
+            'category_id': self.general_category.id,
+            'request_text': 'Request Text',
+        })
+
+        self.assertFalse(request.channel_id)
+
+    def test_252_request_channel_other_deleted(self):
+        Request = self.env['request.request']
+
+        # Delete channel 'Other'
+        self.env.ref('generic_request.request_channel_other').sudo().unlink()
+
+        # Check that deleted channel is not assigned to the request
+        request = Request.create({
+            'type_id': self.simple_type.id,
+            'category_id': self.general_category.id,
+            'request_text': 'Request Text',
+        })
+
+        self.assertFalse(request.channel_id)
 
     def test_260_request_create_simple_with_channel_call(self):
         Request = self.env['request.request']
@@ -429,7 +491,7 @@ class TestRequestBase(RequestCase):
         })
         self.assertEqual(request.request_event_count, 1)
         self.assertEqual(
-            request.request_event_ids.event_type_id.code, 'created')
+            request.request_event_ids.event_type_id.code, 'record-created')
 
         # change priority
         request.priority = '4'
@@ -438,7 +500,7 @@ class TestRequestBase(RequestCase):
         self.assertEqual(request.request_event_count, 2)
         self.assertSetEqual(
             set(request.request_event_ids.mapped('event_type_id.code')),
-            {'created', 'priority-changed'})
+            {'record-created', 'priority-changed'})
 
     def test_unlink_just_created(self):
         request = self.env['request.request'].sudo(
@@ -784,33 +846,39 @@ class TestRequestBase(RequestCase):
         request = self.env.ref(
             'generic_request.request_request_type_simple_demo_1'
         )
-        self.assertEqual(request.request_event_count, 1)
-        self.assertEqual(request.request_event_ids.event_type_id.code,
-                         'created')
+        self.assertNotIn(
+            'author-changed',
+            self._get_events(request).mapped('event_code'))
+
+        # Try to change the author of request
         current_author_id = request.author_id.ids[0]
         author_ids = list(filter(lambda x: x != current_author_id, (
             self.env['res.partner'].search([('is_company', '=', False)])).ids))
         request.author_id = author_ids[0]
-        self.assertSetEqual(
-            set(request.request_event_ids.mapped('event_type_id.code')),
-            {'created', 'author-changed'})
-        self.assertEqual(request.request_event_count, 2)
+
+        # Ensure that 'author-changed' event was generated
+        self.assertIn(
+            'author-changed',
+            self._get_events(request).mapped('event_code'))
 
     def test_request_partner_changed_event_created(self):
         request = self.env.ref(
             'generic_request.request_request_type_simple_demo_1'
         )
-        self.assertEqual(request.request_event_count, 1)
-        self.assertEqual(request.request_event_ids.event_type_id.code,
-                         'created')
+        self.assertNotIn(
+            'partner-changed',
+            self._get_events(request).mapped('event_code'))
+
+        # Try to change the author of request
         current_partner_id = request.partner_id.ids[0]
         partner_ids = list(filter(lambda x: x != current_partner_id, (
             self.env['res.partner'].search([])).ids))
         request.partner_id = partner_ids[0]
-        self.assertSetEqual(
-            set(request.request_event_ids.mapped('event_type_id.code')),
-            {'created', 'partner-changed'})
-        self.assertEqual(request.request_event_count, 2)
+
+        # Ensure that 'author-changed' event was generated
+        self.assertIn(
+            'partner-changed',
+            self._get_events(request).mapped('event_code'))
 
     def test_access_request_to_change_active(self):
         request = self.env['request.request'].sudo(
@@ -892,18 +960,22 @@ class TestRequestBase(RequestCase):
                 'type_id': self.simple_type.id,
                 'request_text': 'Test autovacuum',
             })
-            company = request.created_by_id.company_id
-            company.request_event_auto_remove = True
-            company.request_event_live_time = 2
-            company.request_event_live_time_uom = False
+            event_source = self.env.ref(
+                'generic_request.system_event_source__request_request')
+            event_source.vacuum_enable = True
+            event_source.vacuum_time = 2
+            event_source.vacuum_time_uom = False
             self.assertEqual(request.request_event_count, 1)
 
         with freeze_time('2018-07-12'):
             # Test autovacuum of events (set 2 day)
             # No events was removed, autovacuum skipped (uom = False)
             cron_job = self.env.ref(
-                'generic_request.ir_cron_request_vacuum_events')
-            cron_job.method_direct_trigger()
+                'generic_system_event.ir_cron_vacuum_events')
+
+            with self.assertRaises(exceptions.UserError):
+                cron_job.method_direct_trigger()
+
             self.assertEqual(request.request_event_count, 1)
 
     def test_wizard_base_partner_merge(self):
@@ -930,3 +1002,139 @@ class TestRequestBase(RequestCase):
                          demo_user_request_count + request_user_request_count)
         self.assertEqual(self.demo_user.request_count,
                          len(self.demo_user.request_ids))
+
+    def test_request_deadline_events(self):
+        # pylint: disable=too-many-statements
+        with freeze_time('2020-03-07'):
+            self.request_1.deadline_date = '2020-03-10'
+            cron_job = self.env.ref(
+                'generic_request.ir_cron_request_check_deadlines')
+            # TODO: During the migration, there will be a quantity error,
+            # because the service-related event ('service-level-changed')
+            # will be missing on the previously created requests.
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 2)
+
+        # Check no deadline events created over 2 day to deadline
+        with freeze_time('2020-03-08'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 2)
+
+        # Check that event 'deadline-tomorrow' created 1 day before deadline
+        with freeze_time('2020-03-09'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 3)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertIn('deadline-tomorrow', events)
+
+        # Check that event 'deadline-today' created in deadline date
+        with freeze_time('2020-03-10'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 4)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertIn('deadline-today', events)
+
+        # Check that event 'deadline-overdue' created 1 day after deadline
+        with freeze_time('2020-03-11'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 5)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertIn('deadline-overdue', events)
+
+        # Check that repeated cron action wouldn't generate same events
+            cron_job.method_direct_trigger()
+            events = self.request_1.request_event_ids.mapped('event_code')
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 5)
+            self.assertEqual(events.count('deadline-overdue'), 1)
+
+        # Check no more deadline events created 2 days after deadline
+        with freeze_time('2020-03-12'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 5)
+
+        # Check that event generated when deadline changed on future date
+        # immediately
+        with freeze_time('2020-03-13'):
+            self.request_1.deadline_date = '2020-03-14'
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 7)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertEqual(events.count('deadline-overdue'), 1)
+            self.assertEqual(events.count('deadline-today'), 1)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 2)
+
+        # Check that event is generated by cron when new deadline reached
+        with freeze_time('2020-03-14'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 8)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertEqual(events.count('deadline-overdue'), 1)
+            self.assertEqual(events.count('deadline-today'), 2)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 2)
+
+        # Check that overdue event generated when changing deadline
+        # to past date
+        with freeze_time('2020-03-14'):
+            self.request_1.deadline_date = '2020-03-11'
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 10)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertEqual(events.count('deadline-overdue'), 2)
+            self.assertEqual(events.count('deadline-today'), 2)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 3)
+
+        # Check that no new event generated by cron
+        with freeze_time('2020-03-14'):
+            cron_job.method_direct_trigger()
+            events = self.request_1.request_event_ids.mapped('event_code')
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 10)
+            self.assertEqual(events.count('deadline-overdue'), 2)
+            self.assertEqual(events.count('deadline-today'), 2)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 3)
+
+        # Test that 'deadline-today' event will be triggered immediately
+        with freeze_time('2020-03-14'):
+            self.request_1.deadline_date = '2020-03-14'
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 12)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertEqual(events.count('deadline-overdue'), 2)
+            self.assertEqual(events.count('deadline-today'), 3)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 4)
+
+        # Check that no new event generated by cron
+        with freeze_time('2020-03-14'):
+            cron_job.method_direct_trigger()
+            event_count = self._get_event_count(
+                self.request_1, exclude_codes=['service-level-changed'])
+            self.assertEqual(event_count, 12)
+            events = self.request_1.request_event_ids.mapped('event_code')
+            self.assertEqual(events.count('deadline-overdue'), 2)
+            self.assertEqual(events.count('deadline-today'), 3)
+            self.assertEqual(events.count('deadline-tomorrow'), 2)
+            self.assertEqual(events.count('deadline-changed'), 4)

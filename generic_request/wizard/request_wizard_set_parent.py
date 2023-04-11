@@ -7,7 +7,7 @@ class RequestWizardSetParent(models.TransientModel):
 
     request_ids = fields.Many2many('request.request', required=True)
     parent_id = fields.Many2one(
-        'request.request', 'Parent Request')
+        'request.request', 'Parent Request', ondelete='cascade')
     request_text_sample = fields.Text(
         'Parent request text', related='parent_id.request_text_sample')
     author_id = fields.Many2one(

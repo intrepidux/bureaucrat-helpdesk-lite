@@ -17,12 +17,15 @@ class RequestCreationTemplate(models.Model):
         domain=[('model_id.model', '=', 'request.request')],
         help="Assign tags to requests created from this mail source")
 
+    request_service_id = fields.Many2one('generic.service')
+
     def _prepare_request_data(self):
         """
         :return: dictionary with default request values
         from creation template
         """
         return {
+            'service_id': self.request_service_id.id,
             'category_id': self.request_category_id.id,
             'type_id': self.request_type_id.id,
             'request_text': self.request_text,

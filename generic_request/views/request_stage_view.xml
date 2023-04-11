@@ -54,6 +54,7 @@
                 <field name="res_bg_color" widget="colorpicker"/>
                 <field name="res_label_color" widget="colorpicker"/>
                 <field name="closed"/>
+                <field name="request_count"/>
                 <field name="route_in_count"/>
                 <field name="route_out_count"/>
                 <field name="active"/>
@@ -68,15 +69,21 @@
             <form>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_show_incoming_routes"
+                        <button name="action_show_current_requests"
                                 type="object"
                                 class="oe_stat_button" icon="fa-comments-o">
+                            <field string="Requests" name="request_count"
+                                   widget="statinfo"/>
+                        </button>
+                        <button name="action_show_incoming_routes"
+                                type="object"
+                                class="oe_stat_button" icon="fa-random">
                             <field string="Routes In" name="route_in_count"
                                    widget="statinfo"/>
                         </button>
                         <button name="action_show_outgoing_routes"
                                 type="object"
-                                class="oe_stat_button" icon="fa-comments-o">
+                                class="oe_stat_button" icon="fa-random">
                             <field string="Routes Out" name="route_out_count"
                                    widget="statinfo"/>
                         </button>
