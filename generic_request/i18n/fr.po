@@ -1673,11 +1673,6 @@ msgid "Email address of the contact"
 msgstr "Adresse courriel du contact"
 
 #. module: generic_request
-#: model:ir.model,name:generic_request.model_mail_compose_message
-msgid "Email composition wizard"
-msgstr ""
-
-#. module: generic_request
 #: model_terms:ir.ui.view,arch_db:generic_request.generic_request_res_config_settings_view_form
 msgid "Email settings"
 msgstr ""

@@ -188,7 +188,7 @@ class RequestRequest(models.Model):
         'request_response_attachment_rel',
         'request_id',
         'response_attachment_id',
-        'Response Attachments')
+        'Response Attachments', copy=False)
     request_text_sample = fields.Text(
         compute="_compute_request_text_sample", track_visibility="always",
         string='Request text')
@@ -1480,7 +1480,7 @@ class RequestRequest(models.Model):
             lazy_subject=lambda self: _(
                 "Your request %(request)s has been closed!"
             ) % {'request': self.name},
-            attachment_ids=self.response_attachment_ids,
+            attachment_ids=[(6, 0, self.response_attachment_ids.ids)],
         )
 
     @on_event('reopened')

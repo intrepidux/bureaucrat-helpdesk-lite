@@ -18,5 +18,4 @@ from . import (
     request_timesheet_line,
     request_channel,
     ir_actions,
-    mail_compose_message,
 )
