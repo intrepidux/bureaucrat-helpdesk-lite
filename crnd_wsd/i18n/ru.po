@@ -275,11 +275,11 @@ msgid "Accepted"
 msgstr "Принят"
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:143
-#: code:addons/crnd_wsd/controllers/helpers.py:149
-#: code:addons/crnd_wsd/controllers/helpers.py:156
-#: code:addons/crnd_wsd/controllers/helpers.py:182
-#: code:addons/crnd_wsd/controllers/helpers.py:193
+#: code:addons/crnd_wsd/controllers/helpers.py:174
+#: code:addons/crnd_wsd/controllers/helpers.py:180
+#: code:addons/crnd_wsd/controllers/helpers.py:187
+#: code:addons/crnd_wsd/controllers/helpers.py:213
+#: code:addons/crnd_wsd/controllers/helpers.py:224
 #, python-format
 msgid "Access denied"
 msgstr "Доступ запрещен"
@@ -587,7 +587,7 @@ msgid "File Types Allowed to Upload"
 msgstr ""
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:91
+#: code:addons/crnd_wsd/controllers/helpers.py:122
 #, python-format
 msgid "File size is too big!"
 msgstr ""
@@ -1363,7 +1363,7 @@ msgid "Unknown server error. See server logs."
 msgstr "Неизвестная ошибка сервера. Смотрите логи сервера."
 
 #. module: crnd_wsd
-#: code:addons/crnd_wsd/controllers/helpers.py:56
+#: code:addons/crnd_wsd/controllers/helpers.py:88
 #, python-format
 msgid "Unsupported file format!"
 msgstr ""

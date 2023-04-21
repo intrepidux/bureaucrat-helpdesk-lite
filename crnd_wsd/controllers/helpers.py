@@ -26,15 +26,25 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
         """
         return request.env.user.company_id._get_allowed_upload_file_types()
 
-    def _check_file_has_allowed_type(self, data):
-        allowed_upload_file_types = self._get_allowed_upload_file_types()
+    def _is_mimetype_match(self, mimetype, allowed_mimetypes):
+        '''
+        Check if a given mimetype matches any of the allowed mimetypes.
 
-        if not allowed_upload_file_types:
-            return True
-        mimetype = guess_mimetype(data or b'')
+        Args:
+            mimetype: The mimetype to check, in the form "type/subtype".
+            allowed_mimetypes: A list of allowed mimetypes,
+                               each in the form "type/subtype".
+                               The subtype may be the wildcard character "*",
+                               indicating that any subtype is allowed for
+                               that type.
+
+        Returns:
+            `True` if the given mimetype matches any of the allowed mimetypes,
+            and `False` otherwise.
+        '''
         match = False
         f_type, f_subtype = mimetype.split('/')
-        for allowed_type in allowed_upload_file_types:
+        for allowed_type in allowed_mimetypes:
             _type, subtype = allowed_type.split('/')
             if subtype == '*':
                 if _type == f_type:
@@ -44,9 +54,31 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
                 if _type == f_type and subtype == f_subtype:
                     match = True
                     break
-        if match:
+        return match
+
+    def _check_file_has_allowed_type(self, data):
+        """ Check if uploaded file has allowed mimetype.
+            This check if is needed to protect against uploading
+            malicious files by end users.
+
+            :param data: represents werkzeug's uploaded file wrapper
+        """
+        allowed_upload_file_types = self._get_allowed_upload_file_types()
+        if not allowed_upload_file_types:
             return True
 
+        # If werkzeug pass mime-type, check is it allowed to upload
+        mimetype = data.mimetype
+        if mimetype and self._is_mimetype_match(mimetype,
+                                                allowed_upload_file_types):
+            return True
+
+        # if werkzeug doesn't allow mime-type or mime-type absent, try check
+        # first 1024 bytes of file content using python-magic
+        mimetype = guess_mimetype(data.read(1024) or b'')
+        data.seek(0, os.SEEK_SET)  # Rewind file to beginning
+        if self._is_mimetype_match(mimetype, allowed_upload_file_types):
+            return True
         _logger.warning(
             'Unsupported file format %s,'
             ' attachment only supports %s',
@@ -59,7 +91,6 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
                 auth='user', methods=['POST'], website=True)
     def wsd_upload_file(self, upload, alt='File', filename=None,
                         is_image=False, **post_data):
-        Attachments = request.env['ir.attachment'].sudo()
         attachment_data = {
             'name': alt,
             # TODO: How to use file type checking for case 'upload'?
@@ -94,10 +125,10 @@ class WSDHelpers(WSDControllerMixin, http.Controller):
         upload.seek(0, os.SEEK_SET)
 
         try:
-            data = upload.read()
-            self._check_file_has_allowed_type(data)
+            self._check_file_has_allowed_type(data=upload)
 
-            attachment = Attachments.create(dict(
+            data = upload.read()
+            attachment = request.env['ir.attachment'].sudo().create(dict(
                 attachment_data,
                 datas=base64.b64encode(data),
             ))
